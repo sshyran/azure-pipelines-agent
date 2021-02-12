@@ -178,7 +178,7 @@ jobs:
           flavor: ${{ parameters.arch }}
 
     # Create agent package zip
-    - script: "${{ variables.devCommand }} package Release"
+    - script: "${{ variables.devCommand }} package Release ${{ parameters.os }}-${{ parameters.arch }}"
       workingDirectory: src
       displayName: Package Release
 
