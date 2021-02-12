@@ -102,7 +102,7 @@ jobs:
         branch: ${{ parameters.branch }}
 
   # Build agent layout
-  - script: ${{ variables.devCommand }} layout Release
+  - script: ${{ variables.devCommand }} layout Release ${{ parameters.os }}-${{ parameters.arch }}
     workingDirectory: src
     displayName: Build & Layout Release
     ${{ if parameters.enableADOLogIssue }}:
