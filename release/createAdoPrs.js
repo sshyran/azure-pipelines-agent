@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const tl = require('azure-pipelines-task-lib/task');
 const util = require('./util');
-const fetch = require('node-fetch');
+const got = require('got');
 
 const INTEGRATION_DIR = path.join(__dirname, '..', '_layout', 'integrations');
 const GIT = 'git';
@@ -152,9 +152,8 @@ async function createConfigChangePR(repoPath, agentVersion) {
  * @returns current sprint version
  */
 async function getCurrentSprint() {
-    const response = await fetch('https://whatsprintis.it/?json');
-    const responseJson = await response.json();
-    return responseJson.sprint;
+    const response = await got.get('https://whatsprintis.it/?json', { responseType: 'json' });
+    return response.body.sprint;
 }
 
 async function main()
