@@ -84,22 +84,22 @@ extends:
           - task: DownloadBuildArtifacts@0
             displayName: Download Agent Packages
             inputs:
-              buildType: 'specific'
-              project: 'b924d696-3eae-4116-8443-9a18392d8544'
-              pipeline: '5845'
-              buildVersionToDownload: 'specific'
-              buildId: '15944470'
+              # buildType: 'specific'
+              # project: 'b924d696-3eae-4116-8443-9a18392d8544'
+              # pipeline: '5845'
+              # buildVersionToDownload: 'specific'
+              # buildId: '15944470'
               artifactName: agent
 
           # Download all agent hashes created in previous phases
           - task: DownloadBuildArtifacts@0
             displayName: Download Agent Hashes
             inputs:
-              buildType: 'specific'
-              project: 'b924d696-3eae-4116-8443-9a18392d8544'
-              pipeline: '5845'
-              buildVersionToDownload: 'specific'
-              buildId: '15944470'
+              # buildType: 'specific'
+              # project: 'b924d696-3eae-4116-8443-9a18392d8544'
+              # pipeline: '5845'
+              # buildVersionToDownload: 'specific'
+              # buildId: '15944470'
               artifactName: hash
               downloadPath: $(Build.SourcesDirectory)/_hashes
 
@@ -129,11 +129,11 @@ extends:
           - task: DownloadBuildArtifacts@0
             displayName: Download Agent Hashes
             inputs:
-              buildType: 'specific'
-              project: 'b924d696-3eae-4116-8443-9a18392d8544'
-              pipeline: '5845'
-              buildVersionToDownload: 'specific'
-              buildId: '15944470'
+              # buildType: 'specific'
+              # project: 'b924d696-3eae-4116-8443-9a18392d8544'
+              # pipeline: '5845'
+              # buildVersionToDownload: 'specific'
+              # buildId: '15944470'
               artifactName: hash
               downloadPath: $(Build.SourcesDirectory)/_hashes
 
