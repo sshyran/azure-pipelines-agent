@@ -208,7 +208,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
             try
             {
                 // Download the agent, using multiple attempts in order to be resilient against any networking/CDN issues
-                for (int attempt = 1; attempt <= Constants.AgentDownloadRetryMaxAttempts; attempt++)
+                for (int attempt = 1; attempt <= Constants.AgentDownloadRetryMaxAttempts && !downloadSucceeded; attempt++)
                 {
                     // Generate an available package name, and do our best effort to clean up stale local zip files
                     while (true)
