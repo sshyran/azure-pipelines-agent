@@ -4,7 +4,10 @@
 using Agent.Sdk;
 using Agent.Sdk.Knob;
 using Microsoft.TeamFoundation.DistributedTask.WebApi;
+using Microsoft.VisualStudio.Services.Agent.Listener.Configuration;
 using Microsoft.VisualStudio.Services.Agent.Util;
+using Microsoft.VisualStudio.Services.Common;
+using Microsoft.VisualStudio.Services.WebApi;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -13,7 +16,6 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.Services.WebApi;
 
 namespace Microsoft.VisualStudio.Services.Agent.Listener
 {
@@ -34,6 +36,8 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
         private IAgentServer _agentServer;
         private int _poolId;
         private int _agentId;
+        private string _serverUrl;
+        private VssCredentials _creds;
 
         public override void Initialize(IHostContext hostContext)
         {
@@ -46,6 +50,31 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
             var settings = configStore.GetSettings();
             _poolId = settings.PoolId;
             _agentId = settings.AgentId;
+            _serverUrl = settings.ServerUrl;
+            var credManager = HostContext.GetService<ICredentialManager>();
+            _creds = credManager.LoadCredentials();
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA2000:Dispose objects before losing scope", MessageId = "locationServer")]
+        private async Task<bool> IsHostedServer(string serverUrl, VssCredentials credentials)
+        {
+            // Determine the service deployment type based on connection data. (Hosted/OnPremises)
+            var locationServer = HostContext.GetService<ILocationServer>();
+            VssConnection connection = VssUtil.CreateConnection(new Uri(serverUrl), credentials);
+            await locationServer.ConnectAsync(connection);
+            try
+            {
+                var connectionData = await locationServer.GetConnectionDataAsync();
+                Trace.Info($"Server deployment type: {connectionData.DeploymentType}");
+                return connectionData.DeploymentType.HasFlag(DeploymentFlags.Hosted);
+            }
+            catch (Exception ex)
+            {
+                // Since the DeploymentType is Enum, deserialization exception means there is a new Enum member been added.
+                // It's more likely to be Hosted since OnPremises is always behind and customer can update their agent if are on-prem
+                Trace.Error(ex);
+                return true;
+            }
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA2000:Dispose objects before losing scope", MessageId = "invokeScript")]
@@ -237,19 +266,34 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
 
                             Trace.Info($"Download agent: finished download");
 
-                            string archiveHash = IOUtil.GetFileHash(archiveFile);
-                            bool hashesMatch = StringUtil.HashesMatch(archiveHash, _targetPackage.HashValue);
+                            // System.Diagnostics.Debugger.Launch(); // SHOULD BE DELETED IN PROD ! ! !
 
-                            if (hashesMatch)
+                            // Determine the service deployment type based on connection data. (Hosted/OnPremises)
+                            bool isHostedServer = await IsHostedServer(_serverUrl, _creds);
+
+                            if (!isHostedServer)
                             {
-                                Trace.Info($"Checksum validation secceeded");
+                                Trace.Info($"Skipping checksum validation for On-Premises solution");
                                 downloadSucceeded = true;
-                                break;
+                            }
+                            else if (string.IsNullOrEmpty(_targetPackage.HashValue))
+                            {
+                                Trace.Warning($"Unable to perform the necessary checksum validation since the target package hash is missed");
                             }
                             else
                             {
-                                Trace.Warning($"Checksum validation failed");
-                                continue;
+                                string archiveHash = IOUtil.GetFileHash(archiveFile);
+                                bool hashesMatch = StringUtil.HashesMatch(archiveHash, _targetPackage.HashValue);
+
+                                if (hashesMatch)
+                                {
+                                    Trace.Info($"Checksum validation secceeded");
+                                    downloadSucceeded = true;
+                                }
+                                else
+                                {
+                                    Trace.Warning($"Checksum validation failed");
+                                }
                             }
                         }
                         catch (OperationCanceledException) when (token.IsCancellationRequested)
