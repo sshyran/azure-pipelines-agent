@@ -38,6 +38,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
         private int _agentId;
         private string _serverUrl;
         private VssCredentials _creds;
+        private ILocationServer _locationServer;
 
         public override void Initialize(IHostContext hostContext)
         {
@@ -53,28 +54,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
             _serverUrl = settings.ServerUrl;
             var credManager = HostContext.GetService<ICredentialManager>();
             _creds = credManager.LoadCredentials();
-        }
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA2000:Dispose objects before losing scope", MessageId = "locationServer")]
-        private async Task<bool> IsHostedServer(string serverUrl, VssCredentials credentials)
-        {
-            // Determine the service deployment type based on connection data. (Hosted/OnPremises)
-            var locationServer = HostContext.GetService<ILocationServer>();
-            VssConnection connection = VssUtil.CreateConnection(new Uri(serverUrl), credentials);
-            await locationServer.ConnectAsync(connection);
-            try
-            {
-                var connectionData = await locationServer.GetConnectionDataAsync();
-                Trace.Info($"Server deployment type: {connectionData.DeploymentType}");
-                return connectionData.DeploymentType.HasFlag(DeploymentFlags.Hosted);
-            }
-            catch (Exception ex)
-            {
-                // Since the DeploymentType is Enum, deserialization exception means there is a new Enum member been added.
-                // It's more likely to be Hosted since OnPremises is always behind and customer can update their agent if are on-prem
-                Trace.Error(ex);
-                return true;
-            }
+            _locationServer = HostContext.GetService<ILocationServer>();
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA2000:Dispose objects before losing scope", MessageId = "invokeScript")]
@@ -269,7 +249,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
                             // System.Diagnostics.Debugger.Launch(); // SHOULD BE DELETED IN PROD ! ! !
 
                             // Determine the service deployment type based on connection data. (Hosted/OnPremises)
-                            bool isHostedServer = await IsHostedServer(_serverUrl, _creds);
+                            bool isHostedServer = await Validators.IsHostedServer(_serverUrl, _creds, _locationServer);
 
                             if (!isHostedServer)
                             {

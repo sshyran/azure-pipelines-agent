@@ -7,7 +7,6 @@ using Microsoft.VisualStudio.Services.Agent.Capabilities;
 using Microsoft.VisualStudio.Services.Agent.Util;
 using Microsoft.VisualStudio.Services.Common;
 using Microsoft.VisualStudio.Services.OAuth;
-using Microsoft.VisualStudio.Services.WebApi;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -35,6 +34,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener.Configuration
         private IConfigurationStore _store;
         private IAgentServer _agentServer;
         private ITerminal _term;
+        private ILocationServer _locationServer;
 
         public override void Initialize(IHostContext hostContext)
         {
@@ -44,6 +44,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener.Configuration
             _store = hostContext.GetService<IConfigurationStore>();
             Trace.Verbose("store created");
             _term = hostContext.GetService<ITerminal>();
+            _locationServer = hostContext.GetService<ILocationServer>();
         }
 
         public bool IsConfigured()
@@ -224,7 +225,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener.Configuration
                 try
                 {
                     // Determine the service deployment type based on connection data. (Hosted/OnPremises)
-                    isHostedServer = await IsHostedServer(agentSettings.ServerUrl, creds);
+                    isHostedServer = await Validators.IsHostedServer(agentSettings.ServerUrl, creds, _locationServer);
 
                     // Get the collection name for deployment group
                     agentProvider.GetCollectionName(agentSettings, command, isHostedServer);
@@ -579,7 +580,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener.Configuration
                     ArgUtil.NotNull(agentProvider, agentType);
 
                     // Determine the service deployment type based on connection data. (Hosted/OnPremises)
-                    bool isHostedServer = await IsHostedServer(settings.ServerUrl, creds);
+                    bool isHostedServer = await Validators.IsHostedServer(settings.ServerUrl, creds, _locationServer);
                     await agentProvider.TestConnectionAsync(settings, creds, isHostedServer);
 
                     TaskAgent agent = await agentProvider.GetAgentAsync(settings);
@@ -769,28 +770,6 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener.Configuration
                 Trace.Warning("Can't check permissions for agent root folder:");
                 Trace.Warning(ex.Message);
                 _term.Write(StringUtil.Loc("agentRootFolderCheckError"));
-            }
-        }
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA2000:Dispose objects before losing scope", MessageId = "locationServer")]
-        private async Task<bool> IsHostedServer(string serverUrl, VssCredentials credentials)
-        {
-            // Determine the service deployment type based on connection data. (Hosted/OnPremises)
-            var locationServer = HostContext.GetService<ILocationServer>();
-            VssConnection connection = VssUtil.CreateConnection(new Uri(serverUrl), credentials);
-            await locationServer.ConnectAsync(connection);
-            try
-            {
-                var connectionData = await locationServer.GetConnectionDataAsync();
-                Trace.Info($"Server deployment type: {connectionData.DeploymentType}");
-                return connectionData.DeploymentType.HasFlag(DeploymentFlags.Hosted);
-            }
-            catch (Exception ex)
-            {
-                // Since the DeploymentType is Enum, deserialization exception means there is a new Enum member been added.
-                // It's more likely to be Hosted since OnPremises is always behind and customer can update their agent if are on-prem
-                Trace.Error(ex);
-                return true;
             }
         }
     }

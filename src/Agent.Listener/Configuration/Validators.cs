@@ -2,9 +2,12 @@
 // Licensed under the MIT License.
 
 using Microsoft.VisualStudio.Services.Agent.Util;
+using Microsoft.VisualStudio.Services.Common;
+using Microsoft.VisualStudio.Services.WebApi;
 using System;
 using System.IO;
 using System.Security.Principal;
+using System.Threading.Tasks;
 
 namespace Microsoft.VisualStudio.Services.Agent.Listener.Configuration
 {
@@ -91,6 +94,25 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener.Configuration
             }
 
             return true;
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA2000:Dispose objects before losing scope", MessageId = "locationServer")]
+        public static async Task<bool> IsHostedServer(string serverUrl, VssCredentials credentials, ILocationServer locationServer)
+        {
+            // Determine the service deployment type based on connection data. (Hosted/OnPremises)
+            VssConnection connection = VssUtil.CreateConnection(new Uri(serverUrl), credentials);
+            await locationServer.ConnectAsync(connection);
+            try
+            {
+                var connectionData = await locationServer.GetConnectionDataAsync();
+                return connectionData.DeploymentType.HasFlag(DeploymentFlags.Hosted);
+            }
+            catch (Exception)
+            {
+                // Since the DeploymentType is Enum, deserialization exception means there is a new Enum member been added.
+                // It's more likely to be Hosted since OnPremises is always behind and customer can update their agent if are on-prem
+                return true;
+            }
         }
     }
 }
