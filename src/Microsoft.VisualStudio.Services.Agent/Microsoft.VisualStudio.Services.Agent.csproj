@@ -8,6 +8,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Agent.Sdk\Agent.Sdk.csproj" />
+    <PackageReference Include="Microsoft.NETCore.App.Runtime.win-x64" Version="6.0.0-preview.7.21377.19" />
+    <PackageReference Include="Microsoft.WindowsDesktop.App.Runtime.win-x64" Version="6.0.0-preview.7.21378.9" />
+    <PackageReference Include="Microsoft.AspNetCore.App.Runtime.win-x64" Version="6.0.0-preview.7.21378.6" />
   </ItemGroup>
 
   <ItemGroup>
