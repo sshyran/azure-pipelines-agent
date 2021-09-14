@@ -270,6 +270,10 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
                                 }
                                 else
                                 {
+                                    // A hash mismatch can occur in two cases:
+                                    // 1) The archive is compromised
+                                    // 2) The archive was not fully downloaded or was damaged during downloading
+                                    // Since there is no way to determine the case, we go to the next iteration in both cases
                                     Trace.Warning($"Checksum validation failed");
                                 }
                             }
