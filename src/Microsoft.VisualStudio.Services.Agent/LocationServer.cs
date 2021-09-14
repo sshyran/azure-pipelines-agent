@@ -31,7 +31,8 @@ namespace Microsoft.VisualStudio.Services.Agent
 
             try
             {
-                await _connection.ConnectAsync();
+                System.Diagnostics.Debugger.Launch();
+                await _connection.ConnectAsync(); // <<<
             }
             catch (Exception ex)
             {
