@@ -246,8 +246,6 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
 
                             Trace.Info($"Download agent: finished download");
 
-                            // System.Diagnostics.Debugger.Launch(); // SHOULD BE DELETED IN PROD ! ! !
-
                             // Determine the service deployment type based on connection data. (Hosted/OnPremises)
                             bool isHostedServer = await Validators.IsHostedServer(_serverUrl, _creds, _locationServer);
 
