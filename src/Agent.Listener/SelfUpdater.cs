@@ -164,8 +164,16 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
             return false;
         }
 
-        private async Task<bool> hashValidationSucceeded(string archiveFile)
+        private async Task<bool> hashValidation(string archiveFile)
         {
+            var hashValidationDisabled = AgentKnobs.HashValidationDisabled.GetValue(_knobContext).AsBoolean();
+
+            if (hashValidationDisabled)
+            {
+                Trace.Info($"Agent package hash validation disabled, so skipping it");
+                return true;
+            }
+
             // Determine the service deployment type based on connection data. (Hosted/OnPremises)
             bool isHostedServer = await Validators.IsHostedServer(_serverUrl, _creds, _locationServer);
 
@@ -174,31 +182,28 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
                 Trace.Info($"Skipping checksum validation for On-Premises solution");
                 return true;
             }
-            else if (string.IsNullOrEmpty(_targetPackage.HashValue))
+
+            if (string.IsNullOrEmpty(_targetPackage.HashValue))
             {
                 Trace.Warning($"Unable to perform the necessary checksum validation since the target package hash is missed");
                 return false;
             }
-            else
-            {
-                string archiveHash = IOUtil.GetFileHash(archiveFile);
-                bool hashesMatch = StringUtil.HashesMatch(archiveHash, _targetPackage.HashValue);
 
-                if (hashesMatch)
-                {
-                    Trace.Info($"Checksum validation secceeded");
-                    return true;
-                }
-                else
-                {
-                    // A hash mismatch can occur in two cases:
-                    // 1) The archive is compromised
-                    // 2) The archive was not fully downloaded or was damaged during downloading
-                    // Since there is no way to determine the case, we go to the next iteration in both cases
-                    Trace.Warning($"Checksum validation failed");
-                    return false;
-                }
+            string archiveHash = IOUtil.GetFileHash(archiveFile);
+            bool hashesMatch = StringUtil.HashesMatch(archiveHash, _targetPackage.HashValue);
+
+            if (hashesMatch)
+            {
+                Trace.Info($"Checksum validation secceeded");
+                return true;
             }
+
+            // A hash mismatch can occur in two cases:
+            // 1) The archive is compromised
+            // 2) The archive was not fully downloaded or was damaged during downloading
+            // Since there is no way to determine the case, we go to the next iteration in both cases
+            Trace.Warning($"Checksum validation failed");
+            return false;
         }
 
         /// <summary>
@@ -283,17 +288,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
 
                             Trace.Info($"Download agent: finished download");
 
-                            var hashValidationDisabled = AgentKnobs.HashValidationDisabled.GetValue(_knobContext).AsBoolean();
-
-                            if (hashValidationDisabled)
-                            {
-                                Trace.Info($"Agent package hash validation disabled, so skipping it.");
-                                downloadSucceeded = true;
-                            }
-                            else
-                            {
-                                downloadSucceeded = await hashValidationSucceeded(archiveFile);
-                            }
+                            downloadSucceeded = await hashValidation(archiveFile);
                         }
                         catch (OperationCanceledException) when (token.IsCancellationRequested)
                         {
