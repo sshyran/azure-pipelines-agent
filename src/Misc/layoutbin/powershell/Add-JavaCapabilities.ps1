@@ -28,7 +28,7 @@ $jdk9AndGreaterNameAdoptOpenJREEclipse = "Software\Eclipse Foundation\JRE"
 $jdk9AndGreaterNameAdoptOpenJDKSemeru = "Software\Semeru\JDK"
 $jdk9AndGreaterNameAdoptOpenJRESemeru = "Software\Semeru\JRE"
 
-# JVM subdirectory AdoptOpenJDK is ditributed with two different JVM versions, which are located in different subdirectories inside version directory
+# JVM subdirectories for AdoptOpenJDK, since it could be ditributed with two different JVM versions, which are located in different subdirectories inside version directory
 $jvmHotSpot = "hotspot\MSI"
 $jvmOpenj9 = "openj9\MSI"
 
