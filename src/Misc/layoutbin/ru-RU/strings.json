@@ -538,6 +538,7 @@
     "ServiceInstalled":  "Служба \"{0}\" успешно установлена",
     "ServiceRecoveryOptionSet":  "Для службы \"{0}\" успешно задан вариант восстановления",
     "ServiceStartedSuccessfully":  "Служба \"{0}\" успешно запущена",
+    "StartServiceDescription": "запустить службу после окончания конфигурации? ([Д]а/[Н]ет)",
     "SessionCreateFailed":  "Не удалось создать сеанс. {0}",
     "SessionExist":  "Сеанс для этого агента уже существует.",
     "SessionExistStopRetry":  "Остановить выполнение повторных попыток при SessionConflictException после очередной повторной попытки на {0} с.",

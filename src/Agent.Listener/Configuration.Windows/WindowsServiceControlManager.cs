@@ -13,7 +13,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener.Configuration
     [ServiceLocator(Default = typeof(WindowsServiceControlManager))]
     public interface IWindowsServiceControlManager : IAgentService
     {
-        void ConfigureService(AgentSettings settings, CommandSettings command);
+        void ConfigureService(AgentSettings settings, CommandSettings command, bool startService);
 
         void UnconfigureService();
     }
@@ -35,7 +35,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener.Configuration
             _term = HostContext.GetService<ITerminal>();
         }
 
-        public void ConfigureService(AgentSettings settings, CommandSettings command)
+        public void ConfigureService(AgentSettings settings, CommandSettings command, bool startService)
         {
             ArgUtil.NotNull(command, nameof(command));
             Trace.Entering();
@@ -132,7 +132,10 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener.Configuration
             _windowsServiceHelper.CreateVstsAgentRegistryKey();
 
             Trace.Info("Configuration was successful, trying to start the service");
-            _windowsServiceHelper.StartService(serviceName);
+            if(startService){
+                _windowsServiceHelper.StartService(serviceName);
+            }
+            
         }
 
         public void UnconfigureService()

@@ -566,6 +566,7 @@
   "ServiceInstalled": "Service {0} successfully installed",
   "ServiceRecoveryOptionSet": "Service {0} successfully set recovery option",
   "ServiceStartedSuccessfully": "Service {0} started successfully",
+  "StartServiceDescription": "whether to start service immediately after configuration is finished? (Y/N)" ,
   "SessionCreateFailed": "Failed to create session. {0}",
   "SessionExist": "A session for this agent already exists.",
   "SessionExistStopRetry": "Stop retry on SessionConflictException after retried for {0} seconds.",
