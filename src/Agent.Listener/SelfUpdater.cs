@@ -164,7 +164,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
             return false;
         }
 
-        private async Task<bool> hashValidation(string archiveFile)
+        private async Task<bool> HashValidation(string archiveFile)
         {
             var hashValidationDisabled = AgentKnobs.HashValidationDisabled.GetValue(_knobContext).AsBoolean();
 
@@ -201,7 +201,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
             // A hash mismatch can occur in two cases:
             // 1) The archive is compromised
             // 2) The archive was not fully downloaded or was damaged during downloading
-            // Since there is no way to determine the case, we go to the next iteration in both cases
+            // There is no way to determine the case so we just return false in both cases (without throwing an exception)
             Trace.Warning($"Checksum validation failed");
             return false;
         }
@@ -288,7 +288,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
 
                             Trace.Info($"Download agent: finished download");
 
-                            downloadSucceeded = await hashValidation(archiveFile);
+                            downloadSucceeded = await HashValidation(archiveFile);
                         }
                         catch (OperationCanceledException) when (token.IsCancellationRequested)
                         {
