@@ -364,18 +364,17 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
                     taskDirectory: definition.Directory);
 
                 // Run the task.
-
                 int retryCount = this.Task.RetryCountOnTaskFailure;
-                if (retryCount > RetryCountOnTaskFailureLimit) 
-                {
-                    ExecutionContext.Warning(StringUtil.Loc("RetryCountLimitExceeded", RetryCountOnTaskFailureLimit, retryCount));
-                    retryCount = RetryCountOnTaskFailureLimit;
-                }
 
                 if (retryCount > 0)
                 {
-                    RetryHelper rh = new RetryHelper(ExecutionContext, retryCount);
+                    if (retryCount > RetryCountOnTaskFailureLimit)
+                    {
+                        ExecutionContext.Warning(StringUtil.Loc("RetryCountLimitExceeded", RetryCountOnTaskFailureLimit, retryCount));
+                        retryCount = RetryCountOnTaskFailureLimit;
+                    }
 
+                    RetryHelper rh = new RetryHelper(ExecutionContext, retryCount);
                     await rh.RetryStep(async () => await handler.RunAsync(), RetryHelper.ExponentialDelay);
                 }
                 else

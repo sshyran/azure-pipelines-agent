@@ -103,7 +103,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
                         {
                             throw;
                         }
-                        Warning($"RetryHelper encountered exception, will retry (attempt #: {retryCounter} {ex.Message}) afer ${delayInterval} ms");
+                        Warning($"RetryHelper encountered exception, will retry (attempt #: {retryCounter + 1} {ex.Message}) afer ${delayInterval} ms");
                     }
                     await Task.Delay(timeDelayInterval(retryCounter), ExecutionContext.CancellationToken);
                     retryCounter++;
