@@ -326,10 +326,19 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
                 }
             }
 
+            if (!String.IsNullOrEmpty(AgentKnobs.DisableAuthenticodeValidation.GetValue(HostContext).AsString()))
+            {
+                Trace.Warning("Authenticode validation skipped for downloaded agent package since it is disabled currently by agent settings.");
+            }
+
             var isValid = this.VerifyAgentAuthenticode(latestAgentDirectory);
             if (!isValid)
             {
                 throw new Exception("Authenticode validation of agent assemblies failed.");
+            }
+            else
+            {
+                Trace.Info("Authenticode validation of agent assemblies passed successfully.");
             }
 
             // copy latest agent into agent root folder
@@ -529,7 +538,12 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
                 return false;
             }
 
-            var agentAssemblies = Directory.GetFiles(agentFolderPath, "*.dll|*.exe", SearchOption.AllDirectories);
+            var agentDllFiles = Directory.GetFiles(agentFolderPath, "*.dll", SearchOption.AllDirectories);
+            var agentExeFiles = Directory.GetFiles(agentFolderPath, "*.exe", SearchOption.AllDirectories);
+
+            var agentAssemblies = agentDllFiles.Concat(agentExeFiles);
+            Trace.Verbose(String.Format("Found {0} agent assemblies. Performing authenticode validation...", agentAssemblies.Count()));
+
             foreach (var assemblyFile in agentAssemblies)
             {
                 FileInfo info = new FileInfo(assemblyFile);
