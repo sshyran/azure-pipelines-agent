@@ -19,6 +19,7 @@ $minimumMajorVersion9 = 9
 # JRE/JDK keys for AdoptOpenJDK
 $jdk9AndGreaterNameAdoptOpenJDK = "Software\AdoptOpenJDK\JDK"
 $jdk9AndGreaterNameAdoptOpenJRE = "Software\AdoptOpenJDK\JRE"
+
 # These keys required for latest versions of AdoptOpenJDK since they started to publish under Eclipse Foundation name from 24th July 2021 https://blog.adoptopenjdk.net/2021/03/transition-to-eclipse-an-update/ 
 $jdk9AndGreaterNameAdoptOpenJDKEclipse = "Software\Eclipse Foundation\JDK"
 $jdk9AndGreaterNameAdoptOpenJREEclipse = "Software\Eclipse Foundation\JRE"
@@ -27,7 +28,7 @@ $jdk9AndGreaterNameAdoptOpenJREEclipse = "Software\Eclipse Foundation\JRE"
 $jdk9AndGreaterNameAdoptOpenJDKSemeru = "Software\Semeru\JDK"
 $jdk9AndGreaterNameAdoptOpenJRESemeru = "Software\Semeru\JRE"
 
-# jvm subdirectory AdoptOpenJDK is ditributed with two different JVM versions
+# JVM subdirectory AdoptOpenJDK is ditributed with two different JVM versions, which are located in different subdirectories inside version directory
 $jvmHotSpot = "hotspot\MSI"
 $jvmOpenj9 = "openj9\MSI"
 

@@ -138,12 +138,12 @@ function Add-CapabilityFromRegistryWithLastVersionAvailableForSubkey {
 
         $wholeKey = ""
         if ( -not [string]::IsNullOrEmpty($VersionSubdirectory)) {
-            $wholeKey = Join-Path -Path $KeyName -ChildPath $Subkey
-            $wholeKey = Join-Path -Path $wholeKey -ChildPath $VersionSubdirectory
+            $versionDir = Join-Path -Path $KeyName -ChildPath $Subkey
+            $wholeKey = Join-Path -Path $versionDir -ChildPath $VersionSubdirectory
         } else {
             $wholeKey = Join-Path -Path $KeyName -ChildPath $Subkey
         }
-
+ 
         $capabilityValue = Get-RegistryValue -Hive $Hive -View $View -KeyName $wholeKey -ValueName $ValueName
 
         if ([string]::IsNullOrEmpty($capabilityValue)) {
