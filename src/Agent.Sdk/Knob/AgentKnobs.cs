@@ -94,6 +94,12 @@ namespace Agent.Sdk.Knob
             new EnvironmentKnobSource("AGENT_USE_NODE10"),
             new BuiltInDefaultKnobSource("false"));
 
+        public static readonly Knob HashValidationDisabled = new Knob(
+            nameof(HashValidationDisabled),
+            "If true, agent package hash validation during self-updating will be disabled.",
+            new EnvironmentKnobSource("AZP_AGENT_HASH_VALIDATION_DISABLED"),
+            new BuiltInDefaultKnobSource("false"));
+
         // Agent logging
         public static readonly Knob AgentPerflog = new Knob(
             nameof(AgentPerflog),
