@@ -16,6 +16,13 @@ $jre9AndGreaterName = "Software\JavaSoft\Java Runtime Environment"
 $jdk9AndGreaterName = "Software\JavaSoft\Java Development Kit"
 $minimumMajorVersion9 = 9
 
+# JRE/JDK keys for AdoptOpenJDK
+$jdk9AndGreaterNameAdoptOpenJDK = "Software\AdoptOpenJDK\JDK"
+$jdk9AndGreaterNameAdoptOpenJRE = "Software\AdoptOpenJDK\JRE"
+# These keys required for latest versions of AdoptOpenJDK since they started to publish under Eclipse Foundation name from 24th July 2021 https://blog.adoptopenjdk.net/2021/03/transition-to-eclipse-an-update/ 
+$jdk9AndGreaterNameAdoptOpenJDKEclipse = "Software\Eclipse Foundation\JDK"
+$jdk9AndGreaterNameAdoptOpenJREEclipse = "Software\Eclipse Foundation\JRE"
+
 # Check for JRE.
 $latestJre = $null
 $null = Add-CapabilityFromRegistry -Name 'java_6' -Hive 'LocalMachine' -View 'Registry32' -KeyName $jre6KeyName -ValueName 'JavaHome' -Value ([ref]$latestJre)
@@ -36,6 +43,11 @@ if  (-not (Test-Path env:DISABLE_JAVA_CAPABILITY_HIGHER_THAN_9)) {
         Write-Host $_
     }
 }
+
+# AdoptOpenJDK section
+$null = Add-CapabilityFromRegistryWithLastVersionAvailable -PrefixName 'java_' -PostfixName '_x64' -Hive 'LocalMachine' -View 'Registry64' -KeyName $jdk9AndGreaterNameAdoptOpenJRE -ValueName 'Path' -Value ([ref]$latestJre) -VersionSubdirectory 'hotspot\MSI' -MinimumMajorVersion $minimumMajorVersion9
+$null = Add-CapabilityFromRegistryWithLastVersionAvailable -PrefixName 'java_' -PostfixName '_x64' -Hive 'LocalMachine' -View 'Registry64' -KeyName $jdk9AndGreaterNameAdoptOpenJREEclipse -ValueName 'Path' -Value ([ref]$latestJre) -VersionSubdirectory 'hotspot\MSI' -MinimumMajorVersion $minimumMajorVersion9
+
 
 if ($latestJre) {
     # Favor x64.
@@ -62,6 +74,11 @@ if  (-not (Test-Path env:DISABLE_JAVA_CAPABILITY_HIGHER_THAN_9)) {
         Write-Host $_
     }
 }
+
+# AdoptOpenJDK section
+$null = Add-CapabilityFromRegistryWithLastVersionAvailable -PrefixName 'jdk_' -PostfixName '_x64' -Hive 'LocalMachine' -View 'Registry64' -KeyName $jdk9AndGreaterNameAdoptOpenJDK -ValueName 'Path' -Value ([ref]$latestJre) -VersionSubdirectory 'hotspot\MSI' -MinimumMajorVersion $minimumMajorVersion9
+$null = Add-CapabilityFromRegistryWithLastVersionAvailable -PrefixName 'jdk_' -PostfixName '_x64' -Hive 'LocalMachine' -View 'Registry64' -KeyName $jdk9AndGreaterNameAdoptOpenJDKEclipse -ValueName 'Path' -Value ([ref]$latestJre) -VersionSubdirectory 'hotspot\MSI' -MinimumMajorVersion $minimumMajorVersion9
+
 
 if ($latestJdk) {
     # Favor x64.
