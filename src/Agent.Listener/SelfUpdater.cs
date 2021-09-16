@@ -244,22 +244,29 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
                             archiveFile = Path.Combine(latestAgentDirectory, $"agent{agentSuffix}.tar.gz");
                         }
 
-                        try
+                        // The package name is generated, check if there is already a file with the same name and path
+                        if (!string.IsNullOrEmpty(archiveFile) && File.Exists(archiveFile))
                         {
-                            // delete .zip file
-                            if (!string.IsNullOrEmpty(archiveFile) && File.Exists(archiveFile))
+                            Trace.Verbose("Deleting latest agent package zip '{0}'", archiveFile);
+                            try
                             {
-                                Trace.Verbose("Deleting latest agent package zip '{0}'", archiveFile);
+                                // Such a file already exists, so try deleting it
                                 IOUtil.DeleteFile(archiveFile);
-                            }
 
-                            break;
+                                // The file was successfully deleted, so we can use the generated package name
+                                break;
+                            }
+                            catch (Exception ex)
+                            {
+                                // Couldn't delete the file for whatever reason, so generate another package name
+                                Trace.Warning("Failed to delete agent package zip '{0}'. Exception: {1}", archiveFile, ex);
+                                agentSuffix++;
+                            }
                         }
-                        catch (Exception ex)
+                        else
                         {
-                            // couldn't delete the file for whatever reason, so generate another name
-                            Trace.Warning("Failed to delete agent package zip '{0}'. Exception: {1}", archiveFile, ex);
-                            agentSuffix++;
+                            // There is no a file with the same name and path, so we can use the generated package name
+                            break;
                         }
                     }
 
