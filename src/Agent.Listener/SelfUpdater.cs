@@ -39,6 +39,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
         private string _serverUrl;
         private VssCredentials _creds;
         private ILocationServer _locationServer;
+        private bool _hashValidationDisabled;
 
         public override void Initialize(IHostContext hostContext)
         {
@@ -55,6 +56,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
             var credManager = HostContext.GetService<ICredentialManager>();
             _creds = credManager.LoadCredentials();
             _locationServer = HostContext.GetService<ILocationServer>();
+            _hashValidationDisabled = AgentKnobs.DisableHashValidation.GetValue(_knobContext).AsBoolean();
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA2000:Dispose objects before losing scope", MessageId = "invokeScript")]
@@ -166,9 +168,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
 
         private async Task<bool> HashValidation(string archiveFile)
         {
-            var hashValidationDisabled = AgentKnobs.HashValidationDisabled.GetValue(_knobContext).AsBoolean();
-
-            if (hashValidationDisabled)
+            if (_hashValidationDisabled)
             {
                 Trace.Info($"Agent package hash validation disabled, so skipping it");
                 return true;
@@ -309,7 +309,12 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
 
                 if (!downloadSucceeded)
                 {
-                    throw new TaskCanceledException($"Agent package '{archiveFile}' failed after {Constants.AgentDownloadRetryMaxAttempts} download attempts");
+                    string exceptionMessage = $"Agent package '{archiveFile}' failed after {Constants.AgentDownloadRetryMaxAttempts} download attempts.";
+                    if (!_hashValidationDisabled)
+                    {
+                        exceptionMessage += $" You can try to set the environment variable DISABLE_HASH_VALIDATION=true to avoid this error, but this is not secure.";
+                    }
+                    throw new TaskCanceledException(exceptionMessage);
                 }
 
                 // If we got this far, we know that we've successfully downloadeded the agent package

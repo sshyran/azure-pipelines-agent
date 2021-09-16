@@ -94,12 +94,6 @@ namespace Agent.Sdk.Knob
             new EnvironmentKnobSource("AGENT_USE_NODE10"),
             new BuiltInDefaultKnobSource("false"));
 
-        public static readonly Knob HashValidationDisabled = new Knob(
-            nameof(HashValidationDisabled),
-            "If true, agent package hash validation during self-updating will be disabled.",
-            new EnvironmentKnobSource("AZP_AGENT_HASH_VALIDATION_DISABLED"),
-            new BuiltInDefaultKnobSource("false"));
-
         // Agent logging
         public static readonly Knob AgentPerflog = new Knob(
             nameof(AgentPerflog),
@@ -251,6 +245,11 @@ namespace Agent.Sdk.Knob
             "Return DownloadBuildArtifactsV1 target path resolution behavior back to how it was originally implemented. This breaks back compatibility with DownloadBuildArtifactsV0.",
             new RuntimeKnobSource("EnableIncompatibleBuildArtifactsPathResolution"),
             new EnvironmentKnobSource("EnableIncompatibleBuildArtifactsPathResolution"),
+            new BuiltInDefaultKnobSource("false"));
+        public static readonly Knob DisableHashValidation = new Knob(
+            nameof(DisableHashValidation),
+            "If true, agent package hash validation during self-updating will be disabled.",
+            new EnvironmentKnobSource("DISABLE_HASH_VALIDATION"),
             new BuiltInDefaultKnobSource("false"));
     }
 }
