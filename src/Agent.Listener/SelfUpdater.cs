@@ -175,7 +175,8 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
             }
 
             // Determine the service deployment type based on connection data. (Hosted/OnPremises)
-            bool isHostedServer = await Validators.IsHostedServer(_serverUrl, _creds, _locationServer);
+            var connectionData = await ConfigurationManager.GetConnectionData(_serverUrl, _creds, _locationServer);
+            bool isHostedServer = ConfigurationManager.IsHostedServer(connectionData);
 
             if (!isHostedServer)
             {

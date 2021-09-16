@@ -6,6 +6,7 @@ using Microsoft.TeamFoundation.DistributedTask.WebApi;
 using Microsoft.VisualStudio.Services.Agent.Capabilities;
 using Microsoft.VisualStudio.Services.Agent.Util;
 using Microsoft.VisualStudio.Services.Common;
+using Microsoft.VisualStudio.Services.WebApi;
 using Microsoft.VisualStudio.Services.OAuth;
 using System;
 using System.Collections.Generic;
@@ -225,7 +226,8 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener.Configuration
                 try
                 {
                     // Determine the service deployment type based on connection data. (Hosted/OnPremises)
-                    isHostedServer = await Validators.IsHostedServer(agentSettings.ServerUrl, creds, _locationServer);
+                    var connectionData = await GetConnectionData(agentSettings.ServerUrl, creds, _locationServer);
+                    isHostedServer = IsHostedServer(connectionData);
 
                     // Get the collection name for deployment group
                     agentProvider.GetCollectionName(agentSettings, command, isHostedServer);
@@ -580,7 +582,9 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener.Configuration
                     ArgUtil.NotNull(agentProvider, agentType);
 
                     // Determine the service deployment type based on connection data. (Hosted/OnPremises)
-                    bool isHostedServer = await Validators.IsHostedServer(settings.ServerUrl, creds, _locationServer);
+                    var connectionData = await GetConnectionData(settings.ServerUrl, creds, _locationServer);
+                    bool isHostedServer = IsHostedServer(connectionData);
+
                     await agentProvider.TestConnectionAsync(settings, creds, isHostedServer);
 
                     TaskAgent agent = await agentProvider.GetAgentAsync(settings);
@@ -770,6 +774,29 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener.Configuration
                 Trace.Warning("Can't check permissions for agent root folder:");
                 Trace.Warning(ex.Message);
                 _term.Write(StringUtil.Loc("agentRootFolderCheckError"));
+            }
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA2000:Dispose objects before losing scope", MessageId = "locationServer")]
+        public static async Task<Location.ConnectionData> GetConnectionData(string serverUrl, VssCredentials credentials, ILocationServer locationServer)
+        {
+            VssConnection connection = VssUtil.CreateConnection(new Uri(serverUrl), credentials);
+            await locationServer.ConnectAsync(connection);
+            return await locationServer.GetConnectionDataAsync();
+        }
+
+        public static bool IsHostedServer(Location.ConnectionData connectionData)
+        {
+            // Determine the service deployment type based on connection data. (Hosted/OnPremises)
+            try
+            {
+                return connectionData.DeploymentType.HasFlag(DeploymentFlags.Hosted);
+            }
+            catch (Exception)
+            {
+                // Since the DeploymentType is Enum, deserialization exception means there is a new Enum member been added.
+                // It's more likely to be Hosted since OnPremises is always behind and customer can update their agent if are on-prem
+                return true;
             }
         }
     }
