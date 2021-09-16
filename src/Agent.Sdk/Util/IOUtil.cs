@@ -69,9 +69,15 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
             using (SHA256 sha256hash = SHA256.Create())
             {
                 FileInfo info = new FileInfo(path);
+                // Open the file.
                 FileStream stream = info.Open(FileMode.Open);
+                // Be sure the stream is positioned to the beginning of the file.
                 stream.Position = 0;
+                // Compute the hash of the file stream.
                 byte[] hashAsBytes = sha256hash.ComputeHash(stream);
+                // Close the file.
+                stream.Close();
+                // Convert the computed file hash from the byte array to a string.
                 string hash = BitConverter.ToString(hashAsBytes);
                 return hash;
             }
