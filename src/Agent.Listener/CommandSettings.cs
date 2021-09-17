@@ -149,7 +149,8 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
                 defaultValue: false);
         }
 
-        public bool GetStartService(){
+        public bool GetStartService()
+        {
             return TestFlagOrPrompt(
                 value: Configure?.StartService,
                 name: Constants.Agent.CommandLine.Flags.StartService,
