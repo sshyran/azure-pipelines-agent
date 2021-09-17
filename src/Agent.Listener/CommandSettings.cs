@@ -149,13 +149,13 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
                 defaultValue: false);
         }
 
-        public bool GetStartService()
+        public bool GetPreventServiceStart()
         {
             return TestFlagOrPrompt(
-                value: Configure?.StartService,
-                name: Constants.Agent.CommandLine.Flags.StartService,
-                description: StringUtil.Loc("StartServiceDescription"),
-                defaultValue: true
+                value: Configure?.PreventServiceStart,
+                name: Constants.Agent.CommandLine.Flags.PreventServiceStart,
+                description: StringUtil.Loc("PreventServiceStartDescription"),
+                defaultValue: false
             );
         }
 
