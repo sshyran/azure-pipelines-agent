@@ -468,10 +468,9 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener.Configuration
                 bool runAsService = command.GetRunAsService();
                 if (runAsService)
                 {
-                    bool preventServiceStart = command.GetPreventServiceStart();
                     Trace.Info("Configuring to run the agent as service");
                     var serviceControlManager = HostContext.GetService<IWindowsServiceControlManager>();
-                    serviceControlManager.ConfigureService(agentSettings, command, preventServiceStart);
+                    serviceControlManager.ConfigureService(agentSettings, command);
                 }
                 // config auto logon
                 else if (command.GetRunAsAutoLogon())
