@@ -490,6 +490,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
                 !String.IsNullOrEmpty(doneText) &&
                 StringUtil.ConvertToBoolean(doneText))
             {
+                context.Warning("Task was done. Run ForceTaskComplete");
                 context.ForceTaskComplete();
             }
         }

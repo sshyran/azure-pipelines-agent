@@ -79,6 +79,11 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
         /// </summary>
         /// <returns></returns>
         void ReInitializeForceCompleted();
+        /// <summary>
+        /// Cancel force task completion between retry attempts
+        /// </summary>
+        /// <returns></returns>
+        void CancelForceTaskCompletion();
     }
 
     public sealed class ExecutionContext : AgentService, IExecutionContext, IDisposable
@@ -101,6 +106,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
         private Guid _detailTimelineId;
         private int _childTimelineRecordOrder = 0;
         private CancellationTokenSource _cancellationTokenSource;
+        private CancellationTokenSource _forceCompleteCancellationTokenSource = new CancellationTokenSource();
         private TaskCompletionSource<int> _forceCompleted = new TaskCompletionSource<int>();
         private bool _throttlingReported = false;
         private ExecutionTargetInfo _defaultStepTarget;
@@ -117,6 +123,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
         public Guid Id => _record.Id;
         public Task ForceCompleted => _forceCompleted.Task;
         public CancellationToken CancellationToken => _cancellationTokenSource.Token;
+        public CancellationToken ForceCompleteCancellationToken => _forceCompleteCancellationTokenSource.Token;
         public List<ServiceEndpoint> Endpoints { get; private set; }
         public List<SecureFile> SecureFiles { get; private set; }
         public List<Pipelines.RepositoryResource> Repositories { get; private set; }
@@ -184,11 +191,36 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
         public void ForceTaskComplete()
         {
             Trace.Info("Force finish current task in 5 sec.");
+            this.Warning($"Force finish current task in 5 sec.");
+            this.Warning($"IsCancellationRequested: {ForceCompleteCancellationToken.IsCancellationRequested} and IsCompleted ?: { _forceCompleted.Task.IsCompleted} Id: {_forceCompleted.GetHashCode()}");
+            Task.Run(async () =>
+            {
+                await Task.Delay(TimeSpan.FromSeconds(5), ForceCompleteCancellationToken);
+                if (!ForceCompleteCancellationToken.IsCancellationRequested)
+                {
+                    this.Warning($"_forceCompleted TrySetResult 1.");
+                    _forceCompleted?.TrySetResult(1);
+                }
+            });
+        }
+        /// <summary>
+        /// Default ForceTaskComplete:
+        /// </summary>
+        public void ForceTaskComplete2()
+        {
+            Trace.Info("Force finish current task in 5 sec.");
             Task.Run(async () =>
             {
                 await Task.Delay(TimeSpan.FromSeconds(5));
+                this.Warning($"_forceCompleted TrySetResult 1.");
                 _forceCompleted?.TrySetResult(1);
             });
+        }
+
+        public void CancelForceTaskCompletion()
+        {
+            this.Warning($"Force Completion Canceled.");
+            this._forceCompleteCancellationTokenSource.Cancel();
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1721: Property names should not match get methods")]
@@ -841,12 +873,15 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
 
         public void ReInitializeForceCompleted()
         {
+            this.Warning("Run ReInitializeForceCompleted");
             this._forceCompleted = new TaskCompletionSource<int>();
+            this._forceCompleteCancellationTokenSource = new CancellationTokenSource();
         }
 
         public void Dispose()
         {
             _cancellationTokenSource?.Dispose();
+            _forceCompleteCancellationTokenSource?.Dispose();
 
             _buildLogsWriter?.Dispose();
             _buildLogsWriter = null;
