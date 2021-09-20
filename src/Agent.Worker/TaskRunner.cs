@@ -365,7 +365,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
 
                 // Run the task.
                 int retryCount = this.Task.RetryCountOnTaskFailure;
-                System.Diagnostics.Debugger.Launch();
+
                 if (retryCount > 0)
                 {
                     if (retryCount > RetryCountOnTaskFailureLimit)

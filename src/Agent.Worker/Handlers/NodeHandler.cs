@@ -154,12 +154,10 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Handlers
 
                 if (ExecutionContext.ForceCompleted.IsCompleted)
                 {
-                    ExecutionContext.Warning($"IsCompleted");
                     ExecutionContext.Debug("The task was marked as \"done\", but the process has not closed after 5 seconds. Treating the task as complete.");
                 }
                 else
                 {
-                    ExecutionContext.Warning($"await step");
                     await step;
                 }
             }

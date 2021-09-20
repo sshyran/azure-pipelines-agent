@@ -188,32 +188,16 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             _cancellationTokenSource.Cancel();
         }
 
-        public void ForceTaskComplete()
+        public void ForceTaskComplete1()
         {
             Trace.Info("Force finish current task in 5 sec.");
-            this.Warning($"Force finish current task in 5 sec.");
-            this.Warning($"IsCancellationRequested: {ForceCompleteCancellationToken.IsCancellationRequested} and IsCompleted ?: { _forceCompleted.Task.IsCompleted} Id: {_forceCompleted.GetHashCode()}");
             Task.Run(async () =>
             {
                 await Task.Delay(TimeSpan.FromSeconds(5), ForceCompleteCancellationToken);
                 if (!ForceCompleteCancellationToken.IsCancellationRequested)
                 {
-                    this.Warning($"_forceCompleted TrySetResult 1.");
                     _forceCompleted?.TrySetResult(1);
                 }
-            });
-        }
-        /// <summary>
-        /// Default ForceTaskComplete:
-        /// </summary>
-        public void ForceTaskComplete2()
-        {
-            Trace.Info("Force finish current task in 5 sec.");
-            Task.Run(async () =>
-            {
-                await Task.Delay(TimeSpan.FromSeconds(5));
-                this.Warning($"_forceCompleted TrySetResult 1.");
-                _forceCompleted?.TrySetResult(1);
             });
         }
 

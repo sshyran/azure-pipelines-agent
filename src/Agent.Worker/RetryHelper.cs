@@ -15,7 +15,6 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
         public static int ExponentialDelay(int retryNumber)
         {
             return (int)(Math.Pow(retryNumber + 1, 2) * 1000);
-            //return retryNumber + 1000;
         }
 
 
@@ -82,7 +81,6 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
                         if (retryCounter > 0)
                         {
                             Warning($"Run CancelForceTaskCompletion");
-
                             //ReInitialize _forceCompleted and _forceCompleteCancellationTokenSource
                             ExecutionContext.ReInitializeForceCompleted();
                         }
@@ -91,7 +89,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
                         Debug($"Invoking Method: {action.Method}. Attempt count: {retryCounter}");
                         await action();
 
-                        if (ExecutionContext.Result != TaskResult.Failed || ExhaustedRetryCount(retryCounter) )
+                        if (ExecutionContext.Result != TaskResult.Failed || ExhaustedRetryCount(retryCounter))
                         {
                             return;
                         }
