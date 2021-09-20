@@ -80,7 +80,6 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
                     {
                         if (retryCounter > 0)
                         {
-                            Warning($"Run CancelForceTaskCompletion");
                             //ReInitialize _forceCompleted and _forceCompleteCancellationTokenSource
                             ExecutionContext.ReInitializeForceCompleted();
                         }

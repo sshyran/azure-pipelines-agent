@@ -188,7 +188,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             _cancellationTokenSource.Cancel();
         }
 
-        public void ForceTaskComplete1()
+        public void ForceTaskComplete()
         {
             Trace.Info("Force finish current task in 5 sec.");
             Task.Run(async () =>
@@ -203,7 +203,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
 
         public void CancelForceTaskCompletion()
         {
-            this.Warning($"Force Completion Canceled.");
+            Trace.Info($"Forced completion canceled");
             this._forceCompleteCancellationTokenSource.Cancel();
         }
 
@@ -857,7 +857,6 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
 
         public void ReInitializeForceCompleted()
         {
-            this.Warning("Run ReInitializeForceCompleted");
             this._forceCompleted = new TaskCompletionSource<int>();
             this._forceCompleteCancellationTokenSource = new CancellationTokenSource();
         }
