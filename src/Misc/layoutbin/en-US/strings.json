@@ -184,7 +184,7 @@
     ".\\config.cmd --unattended --url https://myaccount.visualstudio.com --auth pat --token myToken --pool default --agent myAgent --runAsService --windowsLogonAccount myDomain\\myUserName --windowsLogonPassword myPassword",
     "",
     "Run as a Windows service that logs on as a domain account (Windows only) and doesn't start service immediately",
-    ".\\config.cmd --unattended --url https://myaccount.visualstudio.com --auth pat --token myToken --pool default --agent myAgent --runAsService --windowsLogonAccount myDomain\\myUserName --windowsLogonPassword myPassword",
+    ".\\config.cmd --unattended --url https://myaccount.visualstudio.com --auth pat --token myToken --pool default --agent myAgent --runAsService --preventServiceStart --windowsLogonAccount myDomain\\myUserName --windowsLogonPassword myPassword ",
     "",
     "Run as an auto logon agent (Windows only)",
     ".\\config.cmd --unattended --url https://myaccount.visualstudio.com --auth pat --token myToken --pool default --agent myAgent --runAsAutoLogon --windowsLogonAccount myDomain\\myUserName --windowsLogonPassword myPassword",
