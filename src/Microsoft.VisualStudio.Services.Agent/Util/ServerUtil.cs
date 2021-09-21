@@ -20,6 +20,22 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
             return await locationServer.GetConnectionDataAsync();
         }
 
+        public static bool IsHosted()
+        {
+            // If deployment type was not determined before, an exception will be thrown
+            switch (_deploymentType)
+            {
+                case DeploymentFlags.Hosted:
+                    return true;
+                case DeploymentFlags.OnPremises:
+                    return false;
+                case DeploymentFlags.None:
+                    throw new Exception($"Deployment type has not been determined");
+                default:
+                    throw new Exception($"Unable to recognize deployment type: '{_deploymentType}'");
+            }
+        }
+
         public static async Task<bool> IsHosted(string serverUrl, VssCredentials credentials, ILocationServer locationServer)
         {
             // Check if deployment type has not been determined yet
@@ -30,17 +46,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
                 _deploymentType = connectionData.DeploymentType;
             }
 
-            switch (_deploymentType)
-            {
-                case DeploymentFlags.Hosted:
-                    return true;
-                case DeploymentFlags.OnPremises:
-                    return false;
-                case DeploymentFlags.None:
-                    throw new Exception($"Deployment type not found");
-                default:
-                    throw new Exception($"Unable to recognize deployment type: '{_deploymentType}'");
-            }
+            return IsHosted();
         }
     }
 }
