@@ -224,7 +224,6 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener.Configuration
                 Trace.Info("cred retrieved");
                 try
                 {
-                    System.Diagnostics.Debugger.Launch();
                     isHostedServer = await ServerUtil.IsHosted(agentSettings.ServerUrl, creds, _locationServer);
 
                     // Get the collection name for deployment group
@@ -578,7 +577,6 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener.Configuration
                     IConfigurationProvider agentProvider = (extensionManager.GetExtensions<IConfigurationProvider>()).FirstOrDefault(x => x.ConfigurationProviderType == agentType);
                     ArgUtil.NotNull(agentProvider, agentType);
 
-                    System.Diagnostics.Debugger.Launch();
                     bool isHostedServer = await ServerUtil.IsHosted(settings.ServerUrl, creds, _locationServer);
 
                     await agentProvider.TestConnectionAsync(settings, creds, isHostedServer);

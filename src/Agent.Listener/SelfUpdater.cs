@@ -174,7 +174,6 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
                 return true;
             }
 
-            System.Diagnostics.Debugger.Launch();
             bool isHostedServer = await ServerUtil.IsHosted(_serverUrl, _creds, _locationServer);
 
             if (!isHostedServer)
