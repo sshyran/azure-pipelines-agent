@@ -22,8 +22,10 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
 
         public static async Task<bool> IsHosted(string serverUrl, VssCredentials credentials, ILocationServer locationServer)
         {
+            // Check if deployment type has not been determined yet
             if (_deploymentType == DeploymentFlags.None)
             {
+                // Determine the service deployment type based on connection data. (Hosted/OnPremises)
                 var connectionData = await GetConnectionData(serverUrl, credentials, locationServer);
                 _deploymentType = connectionData.DeploymentType;
             }
