@@ -174,9 +174,8 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
                 return true;
             }
 
-            // Determine the service deployment type based on connection data. (Hosted/OnPremises)
-            var connectionData = await ConfigurationManager.GetConnectionData(_serverUrl, _creds, _locationServer);
-            bool isHostedServer = ConfigurationManager.IsHostedServer(connectionData);
+            System.Diagnostics.Debugger.Launch();
+            bool isHostedServer = await ServerUtil.IsHosted(_serverUrl, _creds, _locationServer);
 
             if (!isHostedServer)
             {
@@ -320,7 +319,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
                     string exceptionMessage = $"Agent package '{archiveFile}' failed after {Constants.AgentDownloadRetryMaxAttempts} download attempts.";
                     if (!_hashValidationDisabled)
                     {
-                        exceptionMessage += $" You can try to set the environment variable DISABLE_HASH_VALIDATION=true to avoid this error, but this is not secure.";
+                        exceptionMessage += $"\nYou can try to set the environment variable DISABLE_HASH_VALIDATION=true to avoid this error, but this is not secure.";
                     }
                     throw new TaskCanceledException(exceptionMessage);
                 }
