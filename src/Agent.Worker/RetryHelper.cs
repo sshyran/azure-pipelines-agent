@@ -83,7 +83,6 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
                             //ReInitialize _forceCompleted and _forceCompleteCancellationTokenSource
                             ExecutionContext.ReInitializeForceCompleted();
                         }
-                        ExecutionContext.SetVariable(Constants.Variables.Agent.RetryAttempt, retryCounter.ToString());
 
                         Debug($"Invoking Method: {action.Method}. Attempt count: {retryCounter}");
                         await action();
