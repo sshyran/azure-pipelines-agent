@@ -21,7 +21,6 @@ namespace Microsoft.VisualStudio.Services.Agent
     public sealed class LocationServer : AgentService, ILocationServer
     {
         private bool _hasConnection;
-        private VssConnection _connection;
         private LocationHttpClient _locationClient;
 
         public async Task ConnectAsync(VssConnection jobConnection)
