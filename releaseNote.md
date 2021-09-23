@@ -1,3 +1,16 @@
+## Features
+ - Add prompt for autostarting service on Windows (#3534)
+
+## Bugs
+ - Fixed error on finalize job (Could not load file or assembly 'Microsoft.VisualStudio.Services.Agent'...) (#3526)
+ - Installing dependencies for SUSE systems - fixed issue with incorrect ID parameter picking up (#3528)
+ - Add support of the default AdoptOpenJDK registry keys to capabilities scanner (#3533)
+ - Add retries to client create and GetPipelineCacheArtifactAsync (#3539)
+
+## Misc
+ - Add documentation for setting custom MTU parameter (#3527)
+ - dotnet-install.sh updating (#3536)
+
 
 ## Agent Downloads
 
