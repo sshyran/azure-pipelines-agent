@@ -31,7 +31,24 @@ namespace Microsoft.VisualStudio.Services.Agent
 
             try
             {
-                await _connection.ConnectAsync();
+                int attemptsNumber = 100;
+                while (true)
+                {
+                    try
+                    {
+                        await _connection.ConnectAsync();
+                        break;
+                    }
+                    catch (Exception)
+                    {
+                        attemptsNumber--;
+                        Trace.Info($"Unable to connect to {_connection.Uri}, attempts left: {attemptsNumber}");
+                        if (attemptsNumber == 0)
+                        {
+                            throw;
+                        }
+                    }
+                }
             }
             catch (Exception ex)
             {
