@@ -36,7 +36,7 @@ namespace Microsoft.VisualStudio.Services.Agent
                     try
                     {
                         await jobConnection.ConnectAsync();
-                        break;
+                        throw new Exception("Successfully connected!");
                     }
                     catch (Exception)
                     {
@@ -56,9 +56,9 @@ namespace Microsoft.VisualStudio.Services.Agent
                 throw;
             }
 
-            _locationClient = jobConnection.GetClient<LocationHttpClient>();
-            _connection = jobConnection;
-            _hasConnection = true;
+            // _locationClient = jobConnection.GetClient<LocationHttpClient>();
+            // _connection = jobConnection;
+            // _hasConnection = true;
         }
 
         private void CheckConnection()
