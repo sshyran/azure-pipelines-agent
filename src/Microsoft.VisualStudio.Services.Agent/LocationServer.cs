@@ -27,7 +27,6 @@ namespace Microsoft.VisualStudio.Services.Agent
         public async Task ConnectAsync(VssConnection jobConnection)
         {
             ArgUtil.NotNull(jobConnection, nameof(jobConnection));
-            _connection = jobConnection;
 
             try
             {
@@ -36,13 +35,13 @@ namespace Microsoft.VisualStudio.Services.Agent
                 {
                     try
                     {
-                        await _connection.ConnectAsync();
+                        await jobConnection.ConnectAsync();
                         break;
                     }
                     catch (Exception)
                     {
                         attemptsNumber--;
-                        Trace.Info($"Unable to connect to {_connection.Uri}, attempts left: {attemptsNumber}");
+                        Trace.Info($"Unable to connect to {jobConnection.Uri}, attempts left: {attemptsNumber}");
                         if (attemptsNumber == 0)
                         {
                             throw;
@@ -52,12 +51,13 @@ namespace Microsoft.VisualStudio.Services.Agent
             }
             catch (Exception ex)
             {
-                Trace.Info($"Unable to connect to {_connection.Uri}.");
+                Trace.Info($"Unable to connect to {jobConnection.Uri}.");
                 Trace.Error(ex);
                 throw;
             }
 
-            _locationClient = _connection.GetClient<LocationHttpClient>();
+            _locationClient = jobConnection.GetClient<LocationHttpClient>();
+            _connection = jobConnection;
             _hasConnection = true;
         }
 
