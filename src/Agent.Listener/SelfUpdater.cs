@@ -225,11 +225,12 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
             int agentSuffix = 1;
             string archiveFile = null;
             bool downloadSucceeded = false;
+            bool validationSucceeded = false;
 
             try
             {
                 // Download the agent, using multiple attempts in order to be resilient against any networking/CDN issues
-                for (int attempt = 1; attempt <= Constants.AgentDownloadRetryMaxAttempts && !downloadSucceeded; attempt++)
+                for (int attempt = 1; attempt <= Constants.AgentDownloadRetryMaxAttempts && !validationSucceeded; attempt++)
                 {
                     // Generate an available package name, and do our best effort to clean up stale local zip files
                     while (true)
@@ -294,7 +295,8 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
 
                             Trace.Info($"Download agent: finished download");
 
-                            downloadSucceeded = await HashValidation(archiveFile);
+                            downloadSucceeded = true;
+                            validationSucceeded = await HashValidation(archiveFile);
                         }
                         catch (OperationCanceledException) when (token.IsCancellationRequested)
                         {
@@ -315,12 +317,16 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
 
                 if (!downloadSucceeded)
                 {
-                    string exceptionMessage = $"Agent package '{archiveFile}' failed after {Constants.AgentDownloadRetryMaxAttempts} download attempts.";
-                    if (!_hashValidationDisabled)
-                    {
-                        exceptionMessage += $"\nYou can try to set the environment variable DISABLE_HASH_VALIDATION=true to avoid this error, but this is not secure.";
-                    }
-                    throw new TaskCanceledException(exceptionMessage);
+                    throw new TaskCanceledException($"Agent package '{archiveFile}' failed after {Constants.AgentDownloadRetryMaxAttempts} download attempts.");
+                }
+
+                if (!validationSucceeded)
+                {
+                    throw new TaskCanceledException(@"Agent package checksum validation failed.
+There are possible reasons why this happened:
+  1) The agent package was compromised.
+  2) The agent package was not fully downloaded or was corrupted during the download process.
+You can skip checksum validation for the agent package by setting the environment variable DISABLE_HASH_VALIDATION=true");
                 }
 
                 // If we got this far, we know that we've successfully downloadeded the agent package
