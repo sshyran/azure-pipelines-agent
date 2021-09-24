@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using Agent.Sdk;
+using Agent.Sdk.Knob;
 using Microsoft.VisualStudio.Services.Agent.Util;
 using System;
 using System.Collections.Generic;
@@ -230,24 +231,35 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
             {
                 refSpec = refSpec.Where(r => !string.IsNullOrEmpty(r)).ToList();
             }
-
             // default options for git fetch.
-            string options = StringUtil.Format($"--tags --prune --progress --no-recurse-submodules {remoteName} {string.Join(" ", refSpec)}");
+            string fetchString = $"--tags --prune --progress --no-recurse-submodules {remoteName} {string.Join(" ", refSpec)}";
 
+            // insert prune-tags if knob is false to sync tags with the remote
+            if(!AgentKnobs.DisableFetchPruneTags.GetValue(context).AsBoolean()){
+                string modifiedFetchString = fetchString.Insert(fetchString.IndexOf("--progress"),"--prune-tags ");
+                fetchString = modifiedFetchString;
+            }
+            
             // If shallow fetch add --depth arg
             // If the local repository is shallowed but there is no fetch depth provide for this build,
             // add --unshallow to convert the shallow repository to a complete repository
             if (fetchDepth > 0)
-            {
-                options = StringUtil.Format($"--tags --prune --progress --no-recurse-submodules --depth={fetchDepth} {remoteName} {string.Join(" ", refSpec)}");
+            {   
+                string modifiedFetchString = fetchString.Insert(fetchString.IndexOf($"{remoteName}"), $"--depth={fetchDepth} ");
+                fetchString = modifiedFetchString; 
             }
             else
             {
                 if (File.Exists(Path.Combine(repositoryPath, ".git", "shallow")))
                 {
-                    options = StringUtil.Format($"--tags --prune --progress --no-recurse-submodules --unshallow {remoteName} {string.Join(" ", refSpec)}");
+                    
+                string modifiedFetchString = fetchString.Insert(fetchString.IndexOf($"{remoteName}"), "--unshallow ");
+                fetchString = modifiedFetchString;
                 }
             }
+
+            //define options for fetch
+            string options = StringUtil.Format(fetchString);
 
             return await ExecuteGitCommandAsync(context, repositoryPath, "fetch", options, additionalCommandLine, cancellationToken);
         }
