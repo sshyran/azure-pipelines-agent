@@ -225,7 +225,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener.Configuration
                 try
                 {
                     // Determine the service deployment type based on connection data. (Hosted/OnPremises)
-                    isHostedServer = await ServerUtil.IsHosted(agentSettings.ServerUrl, creds, _locationServer);
+                    isHostedServer = await ServerUtil.IsDeploymentTypeHosted(agentSettings.ServerUrl, creds, _locationServer);
 
                     // Get the collection name for deployment group
                     agentProvider.GetCollectionName(agentSettings, command, isHostedServer);
@@ -579,7 +579,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener.Configuration
                     ArgUtil.NotNull(agentProvider, agentType);
 
                     // Determine the service deployment type based on connection data. (Hosted/OnPremises)
-                    bool isHostedServer = await ServerUtil.IsHosted(settings.ServerUrl, creds, _locationServer);
+                    bool isHostedServer = await ServerUtil.IsDeploymentTypeHosted(settings.ServerUrl, creds, _locationServer);
 
                     await agentProvider.TestConnectionAsync(settings, creds, isHostedServer);
 

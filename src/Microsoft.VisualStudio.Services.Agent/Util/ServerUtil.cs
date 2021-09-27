@@ -20,9 +20,12 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
             return await locationServer.GetConnectionDataAsync();
         }
 
-        public static bool IsHosted()
+        /// <summary>
+        /// Returns true if server deployment type is Hosted.
+        /// An exception will be thrown if the type was not determined before.
+        /// </summary>
+        public static bool IsDeploymentTypeHostedIfDetermined()
         {
-            // If deployment type was not determined before, an exception will be thrown
             switch (_deploymentType)
             {
                 case DeploymentFlags.Hosted:
@@ -36,7 +39,11 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
             }
         }
 
-        public static async Task<bool> IsHosted(string serverUrl, VssCredentials credentials, ILocationServer locationServer)
+        /// <summary>
+        /// Returns true if server deployment type is Hosted.
+        /// Determines the type if it has not been determined yet.
+        /// </summary>
+        public static async Task<bool> IsDeploymentTypeHosted(string serverUrl, VssCredentials credentials, ILocationServer locationServer)
         {
             // Check if deployment type has not been determined yet
             if (_deploymentType == DeploymentFlags.None)
@@ -46,7 +53,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
                 _deploymentType = connectionData.DeploymentType;
             }
 
-            return IsHosted();
+            return IsDeploymentTypeHostedIfDetermined();
         }
     }
 }

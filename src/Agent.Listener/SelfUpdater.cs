@@ -174,7 +174,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
                 return true;
             }
 
-            bool isHostedServer = await ServerUtil.IsHosted(_serverUrl, _creds, _locationServer);
+            bool isHostedServer = await ServerUtil.IsDeploymentTypeHosted(_serverUrl, _creds, _locationServer);
 
             if (!isHostedServer)
             {
