@@ -65,7 +65,7 @@ namespace Agent.Sdk.Knob
 
         public static readonly Knob DisableFetchPruneTags = new Knob(
             nameof(DisableFetchPruneTags),
-            "If true, disable --prune-tags in the initial fetch.",
+            "If true, disable --prune-tags in the fetches.",
             new RuntimeKnobSource("VSTS.DisableFetchPruneTags"),
             new EnvironmentKnobSource("VSTS_DISABLEFETCHPRUNETAGS"),
             new BuiltInDefaultKnobSource("false")); 
