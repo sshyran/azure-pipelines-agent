@@ -40,6 +40,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
         private VssCredentials _creds;
         private ILocationServer _locationServer;
         private bool _hashValidationDisabled;
+        private ServerUtil _serverUtil;
 
         public override void Initialize(IHostContext hostContext)
         {
@@ -57,6 +58,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
             _creds = credManager.LoadCredentials();
             _locationServer = HostContext.GetService<ILocationServer>();
             _hashValidationDisabled = AgentKnobs.DisableHashValidation.GetValue(_knobContext).AsBoolean();
+            _serverUtil = new ServerUtil();
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA2000:Dispose objects before losing scope", MessageId = "invokeScript")]
@@ -174,7 +176,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
                 return true;
             }
 
-            bool isHostedServer = await ServerUtil.IsDeploymentTypeHosted(_serverUrl, _creds, _locationServer);
+            bool isHostedServer = await _serverUtil.IsDeploymentTypeHosted(_serverUrl, _creds, _locationServer);
 
             if (!isHostedServer)
             {

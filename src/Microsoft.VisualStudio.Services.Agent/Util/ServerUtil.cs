@@ -8,12 +8,12 @@ using Microsoft.VisualStudio.Services.WebApi;
 
 namespace Microsoft.VisualStudio.Services.Agent.Util
 {
-    public static class ServerUtil
+    public class ServerUtil
     {
-        private static DeploymentFlags _deploymentType;
+        private DeploymentFlags _deploymentType;
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA2000:Dispose objects before losing scope", MessageId = "locationServer")]
-        private static async Task<Location.ConnectionData> GetConnectionData(string serverUrl, VssCredentials credentials, ILocationServer locationServer)
+        private async Task<Location.ConnectionData> GetConnectionData(string serverUrl, VssCredentials credentials, ILocationServer locationServer)
         {
             VssConnection connection = VssUtil.CreateConnection(new Uri(serverUrl), credentials);
             await locationServer.ConnectAsync(connection);
@@ -24,7 +24,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
         /// Returns true if server deployment type is Hosted.
         /// An exception will be thrown if the type was not determined before.
         /// </summary>
-        public static bool IsDeploymentTypeHostedIfDetermined()
+        public bool IsDeploymentTypeHostedIfDetermined()
         {
             switch (_deploymentType)
             {
@@ -43,7 +43,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
         /// Returns true if server deployment type is Hosted.
         /// Determines the type if it has not been determined yet.
         /// </summary>
-        public static async Task<bool> IsDeploymentTypeHosted(string serverUrl, VssCredentials credentials, ILocationServer locationServer)
+        public async Task<bool> IsDeploymentTypeHosted(string serverUrl, VssCredentials credentials, ILocationServer locationServer)
         {
             // Check if deployment type has not been determined yet
             if (_deploymentType == DeploymentFlags.None)

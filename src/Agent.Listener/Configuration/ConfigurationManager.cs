@@ -35,6 +35,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener.Configuration
         private IConfigurationStore _store;
         private ITerminal _term;
         private ILocationServer _locationServer;
+        private ServerUtil _serverUtil;
 
         public override void Initialize(IHostContext hostContext)
         {
@@ -45,6 +46,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener.Configuration
             Trace.Verbose("store created");
             _term = hostContext.GetService<ITerminal>();
             _locationServer = hostContext.GetService<ILocationServer>();
+            _serverUtil = new ServerUtil();
         }
 
         public bool IsConfigured()
@@ -225,7 +227,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener.Configuration
                 try
                 {
                     // Determine the service deployment type based on connection data. (Hosted/OnPremises)
-                    isHostedServer = await ServerUtil.IsDeploymentTypeHosted(agentSettings.ServerUrl, creds, _locationServer);
+                    isHostedServer = await _serverUtil.IsDeploymentTypeHosted(agentSettings.ServerUrl, creds, _locationServer);
 
                     // Get the collection name for deployment group
                     agentProvider.GetCollectionName(agentSettings, command, isHostedServer);
@@ -579,7 +581,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener.Configuration
                     ArgUtil.NotNull(agentProvider, agentType);
 
                     // Determine the service deployment type based on connection data. (Hosted/OnPremises)
-                    bool isHostedServer = await ServerUtil.IsDeploymentTypeHosted(settings.ServerUrl, creds, _locationServer);
+                    bool isHostedServer = await _serverUtil.IsDeploymentTypeHosted(settings.ServerUrl, creds, _locationServer);
 
                     await agentProvider.TestConnectionAsync(settings, creds, isHostedServer);
 
