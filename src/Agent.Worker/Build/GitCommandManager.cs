@@ -231,35 +231,17 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
             {
                 refSpec = refSpec.Where(r => !string.IsNullOrEmpty(r)).ToList();
             }
-            // default options for git fetch.
-            string fetchString = $"{forceTag} --tags --prune {progress} --no-recurse-submodules {remoteName} {string.Join(" ", refSpec)}";
 
             // insert prune-tags if knob is false to sync tags with the remote
-            if(!AgentKnobs.DisableFetchPruneTags.GetValue(context).AsBoolean()){
-                string modifiedFetchString = fetchString.Insert(fetchString.IndexOf("--progress"),"--prune-tags ");
-                fetchString = modifiedFetchString;
-            }
-            
+            string pruneTags = AgentKnobs.DisableFetchPruneTags.GetValue(context).AsBoolean() ? string.Empty : "--prune-tags";
+
             // If shallow fetch add --depth arg
             // If the local repository is shallowed but there is no fetch depth provide for this build,
             // add --unshallow to convert the shallow repository to a complete repository
-            if (fetchDepth > 0)
-            {   
-                string modifiedFetchString = fetchString.Insert(fetchString.IndexOf($"{remoteName}"), $"--depth={fetchDepth} ");
-                fetchString = modifiedFetchString; 
-            }
-            else
-            {
-                if (File.Exists(Path.Combine(repositoryPath, ".git", "shallow")))
-                {
-                    
-                string modifiedFetchString = fetchString.Insert(fetchString.IndexOf($"{remoteName}"), "--unshallow ");
-                fetchString = modifiedFetchString;
-                }
-            }
+            string depth = fetchDepth > 0 ? $"--depth={fetchDepth}" : (File.Exists(Path.Combine(repositoryPath, ".git", "shallow")) ? "--unshallow" : string.Empty );
 
             //define options for fetch
-            string options = fetchString;
+            string options = $"--tags --prune {pruneTags} --progress --no-recurse-submodules {remoteName} {depth} {string.Join(" ", refSpec)}";
 
 
             return await ExecuteGitCommandAsync(context, repositoryPath, "fetch", options, additionalCommandLine, cancellationToken);
