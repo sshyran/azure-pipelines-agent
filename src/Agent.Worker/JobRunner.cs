@@ -72,7 +72,9 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             Trace.Info($"Creating job server with URL: {jobServerUrl}");
             // jobServerQueue is the throttling reporter.
             _jobServerQueue = HostContext.GetService<IJobServerQueue>();
+#pragma warning disable CA2000
             VssConnection jobConnection = VssUtil.CreateConnection(jobServerUrl, jobServerCredential, new DelegatingHandler[] { new ThrottlingReportHandler(_jobServerQueue) });
+#pragma warning restore CA2000
             await jobServer.ConnectAsync(jobConnection);
 
             _jobServerQueue.Start(message);
@@ -174,6 +176,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
                 if (taskServerUri != null)
                 {
                     Trace.Info($"Creating task server with {taskServerUri}");
+#pragma warning disable CA2000
                     await taskServer.ConnectAsync(VssUtil.CreateConnection(taskServerUri, taskServerCredential));
                 }
 
@@ -189,6 +192,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
                         await taskServer.ConnectAsync(VssUtil.CreateConnection(taskServerUri, taskServerCredential));
                     }
                 }
+#pragma warning restore CA2000
 
                 // Expand the endpoint data values.
                 foreach (ServiceEndpoint endpoint in jobContext.Endpoints)

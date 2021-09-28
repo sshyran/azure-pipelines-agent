@@ -323,6 +323,7 @@ namespace Agent.Plugins.Repository
             return string.Join(" ", formattedArgs);
         }
 
+#pragma warning disable CA1711
         [Flags]
         protected enum FormatFlags
         {
@@ -333,6 +334,7 @@ namespace Agent.Plugins.Repository
             All = OmitCollectionUrl | OmitLogin | OmitNoPrompt,
         }
     }
+#pragma warning restore CA1711
 
     [Flags]
     public enum TfsVCFeatures

@@ -206,7 +206,9 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Handlers
                     outputEncoding = Encoding.UTF8;
                 }
 
+#pragma warning disable CA2000
                 var redirectStandardIn = new InputQueue<string>();
+#pragma warning restore CA2000
                 var payloadJson = JsonUtility.ToString(payload);
                 redirectStandardIn.Enqueue(payloadJson);
                 HostContext.GetTrace(nameof(ContainerStepHost)).Info($"Payload: {payloadJson}");

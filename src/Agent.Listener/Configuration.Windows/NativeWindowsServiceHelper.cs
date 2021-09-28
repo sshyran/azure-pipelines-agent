@@ -1237,7 +1237,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener.Configuration
             Severe = 0x00000002,
             Critical = 0x00000003
         }
-
+#pragma warning disable CA1711
         public enum ServiceBootFlag
         {
             Start = 0x00000000,
@@ -1246,6 +1246,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener.Configuration
             DemandStart = 0x00000003,
             Disabled = 0x00000004
         }
+#pragma warning restore CA1711
 
         // Enum for recovery actions (correspond to the Win32 equivalents )
         private enum RecoverAction

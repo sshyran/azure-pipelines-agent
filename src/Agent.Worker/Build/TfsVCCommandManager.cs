@@ -319,6 +319,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
             return null;
         }
 
+#pragma warning disable CA1711
         [Flags]
         protected enum FormatFlags
         {
@@ -328,6 +329,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
             OmitNoPrompt = 4,
             All = OmitCollectionUrl | OmitLogin | OmitNoPrompt,
         }
+#pragma warning restore CA1711
     }
 
     [Flags]
