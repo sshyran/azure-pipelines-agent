@@ -1,7 +1,6 @@
 <Project>
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
-    <RuntimeFrameworkVersion>5.0.10</RuntimeFrameworkVersion>
+    <TargetFramework>net6.0</TargetFramework>
     <RuntimeIdentifier>$(PackageRuntime)</RuntimeIdentifier>
     <TargetLatestRuntimePatch>true</TargetLatestRuntimePatch>
     <AssetTargetFallback>portable-net45+win8</AssetTargetFallback>
