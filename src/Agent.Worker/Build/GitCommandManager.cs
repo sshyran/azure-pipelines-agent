@@ -259,7 +259,8 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
             }
 
             //define options for fetch
-            string options = StringUtil.Format(fetchString);
+            string options = fetchString;
+
 
             return await ExecuteGitCommandAsync(context, repositoryPath, "fetch", options, additionalCommandLine, cancellationToken);
         }
