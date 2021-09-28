@@ -232,7 +232,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
                 refSpec = refSpec.Where(r => !string.IsNullOrEmpty(r)).ToList();
             }
             // default options for git fetch.
-            string fetchString = $"--tags --prune --progress --no-recurse-submodules {remoteName} {string.Join(" ", refSpec)}";
+            string fetchString = $"{forceTag} --tags --prune {progress} --no-recurse-submodules {remoteName} {string.Join(" ", refSpec)}";
 
             // insert prune-tags if knob is false to sync tags with the remote
             if(!AgentKnobs.DisableFetchPruneTags.GetValue(context).AsBoolean()){

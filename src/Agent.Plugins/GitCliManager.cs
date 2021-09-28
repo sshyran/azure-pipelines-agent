@@ -174,8 +174,8 @@ namespace Agent.Plugins.Repository
             bool reducedOutput = AgentKnobs.QuietCheckout.GetValue(context).AsBoolean();
             string progress = reducedOutput ? string.Empty : "--progress";
 
- // default options for git fetch.
-            string fetchString = $"--tags --prune --progress --no-recurse-submodules {remoteName} {string.Join(" ", refSpec)}";
+            // default options for git fetch.
+            string fetchString = $"{forceTag} --tags --prune {progress} --no-recurse-submodules {remoteName} {string.Join(" ", refSpec)}";
 
             // insert prune-tags if knob is false to sync tags with the remote
             if(!AgentKnobs.DisableFetchPruneTags.GetValue(context).AsBoolean()){
