@@ -195,7 +195,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
 
             if (hashesMatch)
             {
-                Trace.Info($"Checksum validation secceeded");
+                Trace.Info($"Checksum validation succeeded");
                 return true;
             }
 
