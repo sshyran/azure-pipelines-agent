@@ -241,11 +241,11 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
             return String.Join("", hash.Split("-")).ToLower();
         }
 
-        public static bool HashesMatch(string hash1, string hash2)
+        public static bool AreHashesEqual(string leftValue, string rightValue)
         {
             // Compare hashes.
             // For example: "A1-B2-C3-D4-E5-F6" and "a1b2c3d5f6" are the same hash.
-            return HashNormalizer(hash1) == HashNormalizer(hash2);
+            return HashNormalizer(leftValue) == HashNormalizer(rightValue);
         }
     }
 }

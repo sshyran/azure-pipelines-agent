@@ -190,9 +190,9 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
                 return false;
             }
 
-            string expectedHash =  _targetPackage.HashValue;
+            string expectedHash = _targetPackage.HashValue;
             string actualHash = IOUtil.GetFileHash(archiveFile);
-            bool hashesMatch = StringUtil.HashesMatch(actualHash, expectedHash);
+            bool hashesMatch = StringUtil.AreHashesEqual(actualHash, expectedHash);
 
             if (hashesMatch)
             {
