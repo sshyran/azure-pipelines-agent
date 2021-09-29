@@ -249,7 +249,7 @@ namespace Agent.Sdk.Knob
 
         public static readonly Knob DisableHashValidation = new Knob(
             nameof(DisableHashValidation),
-            "If true, agent package hash validation during self-updating will be disabled.",
+            "If true, the agent will skip package hash validation during self-updating.",
             new EnvironmentKnobSource("DISABLE_HASH_VALIDATION"),
             new BuiltInDefaultKnobSource("false"));
     }
