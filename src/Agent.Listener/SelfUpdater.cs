@@ -204,7 +204,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
             // 1) The archive is compromised
             // 2) The archive was not fully downloaded or was damaged during downloading
             // There is no way to determine the case so we just return false in both cases (without throwing an exception)
-            Trace.Warning($"Checksum validation failed");
+            Trace.Warning($"Checksum validation failed\n  Expected hash: '{expectedHash}'\n  Actual hash: '{actualHash}'");
             return false;
         }
 
