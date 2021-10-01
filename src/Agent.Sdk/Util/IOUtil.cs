@@ -453,12 +453,32 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
             }
         }
 
+        private static void SetAttributesWithDiagnostic(FileSystemInfo item, FileAttributes attributes)
+        {
+            try
+            {
+                item.Attributes = attributes;
+            }
+            catch (ArgumentException ex)
+            {
+                string exceptionMessage = "ArgumentException was thrown when trying to set file attributes.";
+                exceptionMessage += $"\n  File path: {item.FullName}";
+                exceptionMessage += $"\n  File exists: {item.Exists}";
+                exceptionMessage += $"\n  File attributes: {item.Attributes.ToString()}";
+                exceptionMessage += $"\n  File attributes as int: {(int)item.Attributes}";
+                exceptionMessage += $"\n  File attributes as binary string: {Convert.ToString((int)item.Attributes, 2).PadLeft(16, '0')}";
+                exceptionMessage += $"\n  Exception message: {ex.Message}";
+                throw new ArgumentException(exceptionMessage);
+            }
+        }
+
         private static void RemoveReadOnly(FileSystemInfo item)
         {
             ArgUtil.NotNull(item, nameof(item));
             if (item.Attributes.HasFlag(FileAttributes.ReadOnly))
             {
-                item.Attributes = item.Attributes & ~FileAttributes.ReadOnly;
+                FileAttributes newAttributes = item.Attributes & ~FileAttributes.ReadOnly;
+                SetAttributesWithDiagnostic(item, newAttributes);
             }
         }
 
