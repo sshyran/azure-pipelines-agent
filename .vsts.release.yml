@@ -1,12 +1,11 @@
 steps:
-- bash: |
-    set -x
-    cd release
-    npm install
-    ls
-    node createAdoPrs.js
-  displayName: Create PRs in AzureDevOps and ConfigChange
-  env:
-    USER: $(User)
-    PAT: $(AdoPAT)
-    EMAIL: $(Email)
+- powershell: |
+    $releaseParams = @{
+      Uri = "https://api.github.com/repos/Microsoft/azure-pipelines-agent/releases/49067057";
+      Method = 'DELETE';
+      Headers = @{
+        Authorization = 'Basic ' + [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes("vsts:$(GithubToken)"));
+      }
+    }
+    [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+    $releaseCreated = Invoke-RestMethod @releaseParams
