@@ -4,7 +4,7 @@ steps:
     cd release
     npm install
     ls
-    node createAdoPrs.js ${{ parameters.version }}
+    node createAdoPrs.js
   displayName: Create PRs in AzureDevOps and ConfigChange
   env:
     USER: $(User)
