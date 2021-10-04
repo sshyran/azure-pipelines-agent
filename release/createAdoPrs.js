@@ -168,7 +168,7 @@ async function main()
         util.verifyMinimumNodeVersion();
         util.verifyMinimumGitVersion();
         createIntegrationFiles(newRelease);
-        util.execInForeground(`${GIT} config --global user.email "${process.env.USER}@microsoft.com"`, null, opt.dryrun);
+        util.execInForeground(`${GIT} config --global user.email "${process.env.EMAIL}"`, null, opt.dryrun);
         util.execInForeground(`${GIT} config --global user.name "${process.env.USER}"`, null, opt.dryrun);
 
         var pathToAdo = path.join(INTEGRATION_DIR, 'AzureDevOps');

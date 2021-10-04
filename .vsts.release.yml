@@ -204,3 +204,4 @@ extends:
             env:
               USER: $(User)
               PAT: $(AdoPAT)
+              EMAIL: $(Email)
