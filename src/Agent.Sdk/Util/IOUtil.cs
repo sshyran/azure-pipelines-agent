@@ -453,20 +453,25 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
             }
         }
 
-        private static void SetAttributesWithDiagnostic(FileSystemInfo item, FileAttributes attributes)
+        private static string GetAttributesAsBinary(FileAttributes attributes)
+        {
+            return Convert.ToString((int)attributes, 2).PadLeft(16, '0');
+        }
+
+        private static void SetAttributesWithDiagnostics(FileSystemInfo item, FileAttributes newAttributes)
         {
             try
             {
-                item.Attributes = attributes;
+                item.Attributes = newAttributes;
             }
             catch (ArgumentException ex)
             {
-                string exceptionMessage = "ArgumentException was thrown when trying to set file attributes.";
+                string exceptionMessage = "Exception was thrown when trying to set file attributes.";
                 exceptionMessage += $"\n  File path: {item.FullName}";
                 exceptionMessage += $"\n  File exists: {item.Exists}";
-                exceptionMessage += $"\n  File attributes: {item.Attributes.ToString()}";
-                exceptionMessage += $"\n  File attributes as int: {(int)item.Attributes}";
-                exceptionMessage += $"\n  File attributes as binary string: {Convert.ToString((int)item.Attributes, 2).PadLeft(16, '0')}";
+                exceptionMessage += $"\n  File attributes: {item.Attributes.ToString()} -> {newAttributes.ToString()}";
+                exceptionMessage += $"\n    As int: {(int)item.Attributes} -> {(int)newAttributes}";
+                exceptionMessage += $"\n    As binary string: {GetAttributesAsBinary(item.Attributes)} -> {GetAttributesAsBinary(newAttributes)}";
                 exceptionMessage += $"\n  Exception message: {ex.Message}";
                 throw new ArgumentException(exceptionMessage);
             }
@@ -478,7 +483,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
             if (item.Attributes.HasFlag(FileAttributes.ReadOnly))
             {
                 FileAttributes newAttributes = item.Attributes & ~FileAttributes.ReadOnly;
-                SetAttributesWithDiagnostic(item, newAttributes);
+                SetAttributesWithDiagnostics(item, newAttributes);
             }
         }
 
