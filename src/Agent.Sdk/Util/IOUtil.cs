@@ -466,7 +466,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
             }
             catch (ArgumentException ex)
             {
-                string exceptionMessage = $@"Exception was thrown when trying to set file attributes.
+                string exceptionMessage = $@"ArgumentException was thrown when trying to set file attributes.
   File path: {item.FullName}
   File exists: {item.Exists}
   File attributes: {item.Attributes.ToString()} -> {newAttributes.ToString()}
