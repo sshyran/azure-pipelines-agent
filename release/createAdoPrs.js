@@ -104,7 +104,7 @@ async function createAdoPR(directory, release)
 }
 
 async function createConfigChangePR(repoPath, agentVersion) {
-    const gitUrl = `https://${process.env.PAT}@dev.azure.com/mseng/AzureDevOps/_git/AzureDevOps.ConfigChange`;
+    const gitUrl = `https://${process.env.PAT}@dev.azure.com/mseng/AzureDevOps/_git/AzureDevOps`;
 
     if (!agentVersion.match(/^\d\.\d\d\d.\d+$/)) {
         throw new Error(`Agent version should fit the pattern: x.xxx.xxx; received: ${agentVersion}`);
@@ -142,7 +142,7 @@ async function createConfigChangePR(repoPath, agentVersion) {
         title: 'Update agent',
         description: `Update agent publish script to version ${agentVersion}`
     };
-    const repo = 'AzureDevOps.ConfigChange';
+    const repo = 'AzureDevOps';
     const project = 'AzureDevOps';
     await gitApi.createPullRequest(pullRequest, repo, project);
 }
@@ -175,7 +175,7 @@ async function main()
         // var pathToAdo = path.join(INTEGRATION_DIR, 'AzureDevOps');
         // await createAdoPR(pathToAdo, newRelease);
 
-        const pathToAdoConfigChange = path.join(INTEGRATION_DIR, 'AzureDevOps.ConfigChange');
+        const pathToAdoConfigChange = path.join(INTEGRATION_DIR, 'AzureDevOps');
         await createConfigChangePR(pathToAdoConfigChange, '2.131.32');
 
         // console.log('done.');
