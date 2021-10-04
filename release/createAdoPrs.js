@@ -115,11 +115,12 @@ async function createConfigChangePR(repoPath, agentVersion) {
     }
 
     const sprint = await getCurrentSprint();
-    const publishScriptPathInRepo = path.join('tfs', `m${sprint}`, 'PipelinesAgentRelease', agentVersion, 'Publish.ps1');
+    const publishScriptPathInRepo = path.join('tfs', `m${sprint}`, 'PipelinesAgentRelease', agentVersion, 'some-file.txt');
     const publishScriptPathInSystem = path.join(repoPath, publishScriptPathInRepo);
     fs.mkdirSync(path.dirname(publishScriptPathInSystem), { recursive: true });
 
     const file = path.join(INTEGRATION_DIR, 'Publish.ps1');
+    fs.writeFileSync(file, 'some data');
 
     if (opt.options.dryrun) {
         console.log(`Fake copy file from ${file} to ${publishScriptPathInSystem}`);
@@ -159,25 +160,25 @@ async function getCurrentSprint() {
 async function main()
 {
     try {
-        var newRelease = opt.argv[0];
-        if (newRelease === undefined)
-        {
-            console.log('Error: You must supply a version');
-            process.exit(-1);
-        }
-        util.verifyMinimumNodeVersion();
-        util.verifyMinimumGitVersion();
-        createIntegrationFiles(newRelease);
+        // var newRelease = opt.argv[0];
+        // if (newRelease === undefined)
+        // {
+        //     console.log('Error: You must supply a version');
+        //     process.exit(-1);
+        // }
+        // util.verifyMinimumNodeVersion();
+        // util.verifyMinimumGitVersion();
+        // createIntegrationFiles(newRelease);
         util.execInForeground(`${GIT} config --global user.email "${process.env.EMAIL}"`, null, opt.dryrun);
         util.execInForeground(`${GIT} config --global user.name "${process.env.USER}"`, null, opt.dryrun);
 
-        var pathToAdo = path.join(INTEGRATION_DIR, 'AzureDevOps');
-        await createAdoPR(pathToAdo, newRelease);
+        // var pathToAdo = path.join(INTEGRATION_DIR, 'AzureDevOps');
+        // await createAdoPR(pathToAdo, newRelease);
 
         const pathToAdoConfigChange = path.join(INTEGRATION_DIR, 'AzureDevOps.ConfigChange');
-        await createConfigChangePR(pathToAdoConfigChange, newRelease);
+        await createConfigChangePR(pathToAdoConfigChange, '2.130.30');
 
-        console.log('done.');
+        // console.log('done.');
     }
     catch (err) {
         tl.setResult(tl.TaskResult.Failed, err.message || 'run() failed', true);
