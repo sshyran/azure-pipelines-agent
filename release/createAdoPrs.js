@@ -176,7 +176,7 @@ async function main()
         // await createAdoPR(pathToAdo, newRelease);
 
         const pathToAdoConfigChange = path.join(INTEGRATION_DIR, 'AzureDevOps.ConfigChange');
-        await createConfigChangePR(pathToAdoConfigChange, '2.130.30');
+        await createConfigChangePR(pathToAdoConfigChange, '2.131.32');
 
         // console.log('done.');
     }
