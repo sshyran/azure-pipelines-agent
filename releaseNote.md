@@ -1,5 +1,6 @@
 ## Features
  - Add prompt for autostarting service on Windows (#3534)
+ - Summarized view of Xunit hierarchal tests based on a FF (#3548)
 
 ## Bugs
  - Fixed error on finalize job (Could not load file or assembly 'Microsoft.VisualStudio.Services.Agent'...) (#3526)
