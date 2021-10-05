@@ -15,7 +15,7 @@ steps:
     $release = Invoke-RestMethod @params1
     $releaseId = $release.id
 
-    echo 'Removing release with tag ${{ parameters.tag }} and ID $releaseId'
+    echo "Removing release with tag ${{ parameters.tag }} and ID $releaseId"
 
     $releaseParams = @{
       Uri = "https://api.github.com/repos/Microsoft/azure-pipelines-agent/releases/$releaseId";
@@ -24,6 +24,4 @@ steps:
         Authorization = 'Basic ' + [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes("vsts:$(GithubToken)"));
       }
     }
-    [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-    echo @releaseParams
-    # $releaseCreated = Invoke-RestMethod @releaseParams
+    $releaseRemoved = Invoke-RestMethod @releaseParams
