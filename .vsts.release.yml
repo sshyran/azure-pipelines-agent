@@ -1,7 +1,12 @@
+parameters:
+- name: releaseId
+  type: number
+  displayName: Github Release ID
+
 steps:
 - powershell: |
     $releaseParams = @{
-      Uri = "https://api.github.com/repos/Microsoft/azure-pipelines-agent/releases/50750102";
+      Uri = "https://api.github.com/repos/Microsoft/azure-pipelines-agent/releases/${{ parameters.releaseId }}";
       Method = 'DELETE';
       Headers = @{
         Authorization = 'Basic ' + [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes("vsts:$(GithubToken)"));
