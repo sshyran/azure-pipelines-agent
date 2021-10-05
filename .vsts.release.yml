@@ -1,21 +1,21 @@
 parameters:
 - name: tag
   type: number
-  displayName: Github Release Tag (e.g. "v2.193.1")
+  displayName: Github Release Version (e.g. "2.193.1")
 
 steps:
 - powershell: |
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
     $params1 = @{
-      Uri = "https://api.github.com/repos/Microsoft/azure-pipelines-agent/releases/tags/${{ parameters.tag }}";
+      Uri = "https://api.github.com/repos/Microsoft/azure-pipelines-agent/releases/tags/v${{ parameters.tag }}";
       Method = 'GET';
     }
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $release = Invoke-RestMethod @params1
     $releaseId = $release.id
 
-    echo 'Removing release with tag ${{ parameters.tag }} and ID $releaseId'
+    echo 'Removing release with tag v${{ parameters.tag }} and ID $releaseId'
 
     $releaseParams = @{
       Uri = "https://api.github.com/repos/Microsoft/azure-pipelines-agent/releases/$releaseId";
