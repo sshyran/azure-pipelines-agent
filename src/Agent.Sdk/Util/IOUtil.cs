@@ -469,9 +469,15 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
                 string exceptionMessage = $@"ArgumentException was thrown when trying to set file attributes.
   File path: {item.FullName}
   File exists: {item.Exists}
-  File attributes: {item.Attributes.ToString()} -> {newAttributes.ToString()}
-    As int: {(int)item.Attributes} -> {(int)newAttributes}
-    As binary string: {GetAttributesAsBinary(item.Attributes)} -> {GetAttributesAsBinary(newAttributes)}
+  File attributes:
+    Current attributes:
+      Readable:         {item.Attributes.ToString()}
+      As int:           {(int)item.Attributes}
+      As binary string: {GetAttributesAsBinary(item.Attributes)}
+    New attributes:
+      Readable:         {newAttributes.ToString()}
+      As int:           {(int)newAttributes}
+      As binary string: {GetAttributesAsBinary(newAttributes)}
   Exception message: {ex.Message}";
                 throw new ArgumentException(exceptionMessage);
             }
