@@ -14,12 +14,19 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
             this.Trace = Trace;
         }
 
+        /// <summary>
+        /// Implementation of the custom callback function that writes SSL-related data from the web request to the agent's logs
+        /// </summary>
+        /// <returns>Returns `true` if web request was successful, otherwise `false`</returns>
         public bool ServerCertificateCustomValidation(HttpRequestMessage requestMessage, X509Certificate2 certificate, X509Chain chain, SslPolicyErrors sslErrors)
         {
             LoggingRequestDiagnosticData(requestMessage, certificate, chain, sslErrors);
             return sslErrors == SslPolicyErrors.None;
         }
 
+        /// <summary>
+        /// Writes SSL related data to agent logs
+        /// </summary>
         private void LoggingRequestDiagnosticData(HttpRequestMessage requestMessage, X509Certificate2 certificate, X509Chain chain, SslPolicyErrors sslErrors)
         {
             if (this.Trace != null)
