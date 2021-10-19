@@ -1,3 +1,14 @@
+## Features
+ - Add the ability to retry the pipeline task if execution failed (#3505)
+ - Validate agent package checksum during self-update (#3524)
+ - Add processing of target inputs in decorator task (#3550)
+
+## Bugs
+
+
+## Misc
+ - Improve the ArgumentException message for changing file attributes (#3555)
+
 
 ## Agent Downloads
 
