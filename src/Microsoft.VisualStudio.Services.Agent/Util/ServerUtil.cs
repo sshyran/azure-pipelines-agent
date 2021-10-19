@@ -19,14 +19,6 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
             _trace = trace;
         }
         
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA2000:Dispose objects before losing scope", MessageId = "locationServer")]
-        private async Task<Location.ConnectionData> GetConnectionData(string serverUrl, VssCredentials credentials, ILocationServer locationServer)
-        {
-            VssConnection connection = VssUtil.CreateConnection(new Uri(serverUrl), credentials, trace: _trace);
-            await locationServer.ConnectAsync(connection);
-            return await locationServer.GetConnectionDataAsync();
-        }
-
         /// <summary>
         /// Returns true if server deployment type is Hosted.
         /// An exception will be thrown if the type was not determined before.
@@ -61,6 +53,14 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
             }
 
             return IsDeploymentTypeHostedIfDetermined();
+        }
+        
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA2000:Dispose objects before losing scope", MessageId = "locationServer")]
+        private async Task<Location.ConnectionData> GetConnectionData(string serverUrl, VssCredentials credentials, ILocationServer locationServer)
+        {
+            VssConnection connection = VssUtil.CreateConnection(new Uri(serverUrl), credentials, trace: _trace);
+            await locationServer.ConnectAsync(connection);
+            return await locationServer.GetConnectionDataAsync();
         }
     }
 }

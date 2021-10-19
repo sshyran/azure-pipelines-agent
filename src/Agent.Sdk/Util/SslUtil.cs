@@ -37,7 +37,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
                 Trace.Info($"Expiration date: {certificate.GetExpirationDateString()}");
                 Trace.Info($"Issuer: {certificate.Issuer}");
                 Trace.Info($"Subject: {certificate.Subject}");
-                Trace.Info($"Errors: {sslErrors}");
+                Trace.Info($"SSL Policy Errors: {sslErrors}");
             }
         }
     }
