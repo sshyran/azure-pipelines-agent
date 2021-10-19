@@ -72,7 +72,11 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             Trace.Info($"Creating job server with URL: {jobServerUrl}");
             // jobServerQueue is the throttling reporter.
             _jobServerQueue = HostContext.GetService<IJobServerQueue>();
-            VssConnection jobConnection = VssUtil.CreateConnection(jobServerUrl, jobServerCredential, new DelegatingHandler[] { new ThrottlingReportHandler(_jobServerQueue) }, trace: Trace);
+            VssConnection jobConnection = VssUtil.CreateConnection(
+                jobServerUrl,
+                jobServerCredential,
+                new DelegatingHandler[] { new ThrottlingReportHandler(_jobServerQueue) },
+                trace: Trace);
             await jobServer.ConnectAsync(jobConnection);
 
             _jobServerQueue.Start(message);
