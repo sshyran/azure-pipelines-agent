@@ -228,7 +228,7 @@ namespace Agent.Sdk
             return path;
         }
 
-        public string TranslateToHostPath(string path)
+        public string TranslateToHostPath(string path, bool isCheckoutType)
         {
             if (!string.IsNullOrEmpty(path))
             {

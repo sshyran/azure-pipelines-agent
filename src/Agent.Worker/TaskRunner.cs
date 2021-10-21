@@ -210,7 +210,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
 
                 // Expand the inputs.
                 Trace.Verbose("Expanding inputs.");
-                runtimeVariables.ExpandValues(target: inputs);
+                runtimeVariables.ExpandValues(target: inputs, Pipelines.PipelineConstants.IsCheckoutTask(this.Task));
 
                 // We need to verify inputs of the tasks that were injected by decorators, to check if they contain secrets,
                 // for security reasons execution of tasks in this case should be skipped.

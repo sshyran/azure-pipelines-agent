@@ -50,10 +50,10 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
         private readonly Tracing _trace;
         private ConcurrentDictionary<string, Variable> _expanded;
 
-        public delegate string TranslationMethod(string val);
+        public delegate string TranslationMethod(string val, bool isCheckoutType);
         public TranslationMethod StringTranslator = DefaultStringTranslator;
 
-        public static string DefaultStringTranslator(string val)
+        public static string DefaultStringTranslator(string val, bool isCheckoutType)
         {
             return val;
         }
@@ -259,14 +259,14 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             "RequestedFor"
         };
 
-        public void ExpandValues(IDictionary<string, string> target)
+        public void ExpandValues(IDictionary<string, string> target, bool isCheckoutType)
         {
             ArgUtil.NotNull(target, nameof(target));
             _trace.Entering();
             var source = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             foreach (Variable variable in _expanded.Values)
             {
-                var value = StringTranslator(variable.Value);
+                var value = StringTranslator(variable.Value, isCheckoutType);
                 source[variable.Name] = value;
             }
 

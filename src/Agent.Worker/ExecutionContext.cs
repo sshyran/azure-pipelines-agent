@@ -72,7 +72,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
         string TranslateToHostPath(string path);
         ExecutionTargetInfo StepTarget();
         void SetStepTarget(Pipelines.StepTarget target);
-        string TranslatePathForStepTarget(string val);
+        string TranslatePathForStepTarget(string val, bool isCheckoutType);
         IHostContext GetHostContext();
         /// <summary>
         /// Re-initializes force completed - between next retry attempt
@@ -807,13 +807,13 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             return path;
         }
 
-        public string TranslatePathForStepTarget(string val)
+        public string TranslatePathForStepTarget(string val, bool isCheckoutType)
         {
             var stepTarget = StepTarget();
-            if (stepTarget != null)
+            if (!isCheckoutType && (_currentStepTarget != null || stepTarget is HostInfo) && stepTarget != null)
             {
                 return stepTarget.TranslateContainerPathForImageOS(PlatformUtil.HostOS, stepTarget.TranslateToContainerPath(val));
-            }
+            }            
             return val;
         }
 

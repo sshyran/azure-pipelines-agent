@@ -11,7 +11,7 @@ namespace Agent.Sdk
 
         string TranslateContainerPathForImageOS(PlatformUtil.OS runningOs, string path);
         string TranslateToContainerPath(string path);
-        string TranslateToHostPath(string path);
+        string TranslateToHostPath(string path, bool isCheckoutType);
     }
 
     public class HostInfo : ExecutionTargetInfo
@@ -24,7 +24,7 @@ namespace Agent.Sdk
             return path;
         }
 
-        public string TranslateToHostPath(string path)
+        public string TranslateToHostPath(string path, bool isCheckoutType)
         {
             return path;
         }
