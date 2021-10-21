@@ -20,8 +20,13 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
         /// <returns>Returns `true` if web request was successful, otherwise `false`</returns>
         public bool ServerCertificateCustomValidation(HttpRequestMessage requestMessage, X509Certificate2 certificate, X509Chain chain, SslPolicyErrors sslErrors)
         {
-            LoggingRequestDiagnosticData(requestMessage, certificate, chain, sslErrors);
-            return sslErrors == SslPolicyErrors.None;
+            bool isRequestSuccessful = (sslErrors == SslPolicyErrors.None);
+
+            if (!isRequestSuccessful) {
+                LoggingRequestDiagnosticData(requestMessage, certificate, chain, sslErrors);
+            }
+
+            return isRequestSuccessful;
         }
 
         /// <summary>
