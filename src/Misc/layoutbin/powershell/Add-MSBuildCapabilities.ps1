@@ -37,6 +37,17 @@ if ($vs16 -and $vs16.installationPath) {
     }
 }
 
+$vs17 = Get-VisualStudio -MajorVersion 17
+if ($vs17 -and $vs17.installationPath) {
+    # Add MSBuild_17.0.
+    # End with "\" for consistency with old MSBuildToolsPath value.
+    $msbuild17 = ([System.IO.Path]::Combine($vs17.installationPath, 'MSBuild\Current\Bin')) + '\'
+    if ((Test-Leaf -LiteralPath "$($msbuild17)MSBuild.exe")) {
+        Write-Capability -Name 'MSBuild_17.0' -Value $msbuild17
+        $latest = $msbuild17
+    }
+}
+
 if ($latest) {
     Write-Capability -Name "MSBuild" -Value $latest
 }
@@ -65,6 +76,16 @@ if ($vs16 -and $vs16.installationPath) {
     if ((Test-Leaf -LiteralPath "$($msbuild16)MSBuild.exe")) {
         Write-Capability -Name 'MSBuild_16.0_x64' -Value $msbuild16
         $latest = $msbuild16
+    }
+}
+
+if ($vs17 -and $vs17.installationPath) {
+    # Add MSBuild_17.0_x64.
+    # End with "\" for consistency with old MSBuildToolsPath value.
+    $msbuild17 = ([System.IO.Path]::Combine($vs17.installationPath, 'MSBuild\Current\Bin\amd64')) + '\'
+    if ((Test-Leaf -LiteralPath "$($msbuild17)MSBuild.exe")) {
+        Write-Capability -Name 'MSBuild_17.0_x64' -Value $msbuild17
+        $latest = $msbuild17
     }
 }
 

@@ -2,18 +2,18 @@ function Get-VisualStudio {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
-        [ValidateSet(15, 16)]
+        [ValidateSet(15, 16, 17)]
         [int]$MajorVersion)
 
     try {
-        # Query for the latest 15.*/16.* version.
+        # Query for the latest 15.*/16.*/17.* version.
         #
-        # Note, the capability is registered as VisualStudio_15.0/VisualStudio_16.0, however the actual
+        # Note, the capability is registered as VisualStudio_15.0/VisualStudio_16.0/VisualStudio_17.0 however the actual
         # version may something like 15.2/16.2.
         Write-Host "Getting latest Visual Studio $MajorVersion setup instance."
         $output = New-Object System.Text.StringBuilder
-        Write-Host "& $PSScriptRoot\..\..\..\externals\vswhere\vswhere.exe -version '[$MajorVersion.0,$($MajorVersion+1).0)' -latest -format json"
-        & $PSScriptRoot\..\..\..\externals\vswhere\vswhere.exe -version "[$MajorVersion.0,$($MajorVersion+1).0)" -latest -format json 2>&1 |
+        Write-Host "& $PSScriptRoot\..\..\..\externals\vswhere\vswhere.exe -version '[$MajorVersion.0,$($MajorVersion+1).0)' -latest -prerelease -format json"
+        & $PSScriptRoot\..\..\..\externals\vswhere\vswhere.exe -version "[$MajorVersion.0,$($MajorVersion+1).0)" -latest -prerelease -format json 2>&1 |
             ForEach-Object {
                 if ($_ -is [System.Management.Automation.ErrorRecord]) {
                     Write-Host "STDERR: $($_.Exception.Message)"

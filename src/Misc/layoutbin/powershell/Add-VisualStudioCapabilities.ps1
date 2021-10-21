@@ -34,6 +34,7 @@ $keyName12 = 'Software\Microsoft\VisualStudio\12.0'
 $keyName14 = 'Software\Microsoft\VisualStudio\14.0'
 $keyName15 = 'Software\Microsoft\VisualStudio\15.0'
 $keyName16 = 'Software\Microsoft\VisualStudio\16.0'
+$keyName17 = 'Software\Microsoft\VisualStudio\17.0'
 
 # Add the capabilities.
 $latestVS = $null
@@ -110,6 +111,36 @@ if ($vs16 -and $vs16.installationPath) {
     if ((Add-CapabilityFromRegistry -Name 'VisualStudio_16.0' -Hive 'LocalMachine' -View 'Registry32' -KeyName $keyName16 -ValueName 'ShellFolder' -Value ([ref]$latestVS))) {
         $null = Add-CapabilityFromRegistry -Name 'VisualStudio_IDE_16.0' -Hive 'LocalMachine' -View 'Registry32' -KeyName $keyName16 -ValueName 'InstallDir' -Value ([ref]$latestIde)
         Add-TestCapability -Name 'VSTest_16.0' -ShellPath $latestVS -Value ([ref]$latestTest)
+    }
+}
+
+$vs17 = Get-VisualStudio -MajorVersion 17
+if ($vs17 -and $vs17.installationPath) {
+    # Add VisualStudio_17.0.
+    # End with "\" for consistency with old ShellFolder values.
+    $shellFolder17 = $vs17.installationPath.TrimEnd('\'[0]) + "\"
+    Write-Capability -Name 'VisualStudio_17.0' -Value $shellFolder17
+    $latestVS = $shellFolder17
+
+    # Add VisualStudio_IDE_17.0.
+    # End with "\" for consistency with old InstallDir values.
+    $installDir17 = ([System.IO.Path]::Combine($shellFolder17, 'Common7', 'IDE')) + '\'
+    if ((Test-Container -LiteralPath $installDir17)) {
+        Write-Capability -Name 'VisualStudio_IDE_17.0' -Value $installDir17
+        $latestIde = $installDir17
+    }
+
+    # Add VSTest_17.0.
+    $testWindowDir17 = [System.IO.Path]::Combine($installDir17, 'CommonExtensions\Microsoft\TestWindow')
+    $vstestConsole17 = [System.IO.Path]::Combine($testWindowDir17, 'vstest.console.exe')
+    if ((Test-Leaf -LiteralPath $vstestConsole17)) {
+        Write-Capability -Name 'VSTest_17.0' -Value $testWindowDir17
+        $latestTest = $testWindowDir17
+    }
+} else {
+    if ((Add-CapabilityFromRegistry -Name 'VisualStudio_17.0' -Hive 'LocalMachine' -View 'Registry32' -KeyName $keyName17 -ValueName 'ShellFolder' -Value ([ref]$latestVS))) {
+        $null = Add-CapabilityFromRegistry -Name 'VisualStudio_IDE_17.0' -Hive 'LocalMachine' -View 'Registry32' -KeyName $keyName17 -ValueName 'InstallDir' -Value ([ref]$latestIde)
+        Add-TestCapability -Name 'VSTest_17.0' -ShellPath $latestVS -Value ([ref]$latestTest)
     }
 }
 
