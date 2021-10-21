@@ -16,6 +16,7 @@ using Agent.Sdk;
 using System.Text.RegularExpressions;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio.Services.Content.Common.Tracing;
+using Minimatch;
 
 namespace Agent.Plugins.PipelineArtifact
 {
@@ -178,6 +179,11 @@ namespace Agent.Plugins.PipelineArtifact
         static readonly string buildVersionToDownloadLatest = "latest";
         static readonly string buildVersionToDownloadSpecific = "specific";
         static readonly string buildVersionToDownloadLatestFromBranch = "latestFromBranch";
+        static readonly Options minimatchOptions = new Options() {
+           Dot = true,
+           NoBrace = true,
+           AllowWindowsPaths = PlatformUtil.RunningOnWindows
+        };
 
         protected override async Task ProcessCommandInternalAsync(
             AgentTaskPluginExecutionContext context,
@@ -252,7 +258,8 @@ namespace Agent.Plugins.PipelineArtifact
                     ArtifactName = artifactName,
                     TargetDirectory = targetPath,
                     MinimatchFilters = minimatchPatterns,
-                    MinimatchFilterWithArtifactName = false
+                    MinimatchFilterWithArtifactName = false,
+                    CustomMinimatchOptions = minimatchOptions
                 };
             }
             else if (buildType == buildTypeSpecific)
@@ -300,7 +307,8 @@ namespace Agent.Plugins.PipelineArtifact
                     ArtifactName = artifactName,
                     TargetDirectory = targetPath,
                     MinimatchFilters = minimatchPatterns,
-                    MinimatchFilterWithArtifactName = false
+                    MinimatchFilterWithArtifactName = false,
+                    CustomMinimatchOptions = minimatchOptions
                 };
             }
             else
