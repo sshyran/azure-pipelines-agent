@@ -20,14 +20,13 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
         /// The enhanced key usage OID that should be present in the certificate used to
         /// authenticode sign cabinet files and mpb.
         /// </summary>
-        public const string AZURE_BACKUP_ENHANCED_KEY_USAGE = "1.3.6.1.4.1.311.76.52.1";
         public const string CODE_SIGNING_ENHANCED_KEY_USAGE = "1.3.6.1.5.5.7.3.3";
 
         /// <summary>
         /// Utility method to verify that mp was signed by Microsoft
         /// </summary>
         /// <param name="filePath">Path to the file to check the signature on.</param>
-        public static void VerifyFileSignedByMicrosoft(string filePath, Tracing trace, string expectedEKU = AZURE_BACKUP_ENHANCED_KEY_USAGE)
+        public static void VerifyFileSignedByMicrosoft(string filePath, Tracing trace, string expectedEKU = CODE_SIGNING_ENHANCED_KEY_USAGE)
         {
             // proceed with authenticode checks
             WinTrustData winTrustData = VerifyFileAuthenticodeSignatureHelper(filePath, trace);
@@ -88,7 +87,10 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
 
                             if (policyStatus.dwError != 0)
                             {
-                                throw new VerificationException(string.Format(CultureInfo.CurrentCulture, "File {0} does not have a valid MS or ms-test signature.", filePath));
+                                trace.Error("policyStatus: " + policyStatus.ToString());
+                                trace.Error("policyStatus.pvExtraPolicyStatus: " + policyStatus.pvExtraPolicyStatus);
+                                trace.Error(String.Format("Error occurred while calling WinVerifyTrust: {0}", string.Format(CultureInfo.CurrentCulture, "File {0} does not have a valid MS or ms-test signature.", filePath)));
+                               // throw new VerificationException(string.Format(CultureInfo.CurrentCulture, "File {0} does not have a valid MS or ms-test signature.", filePath));
                             }
                         }
 #else
@@ -154,20 +156,13 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
 
             try
             {
-                if (Utility.IsWin8OrAbove())
-                {
-                    result = UnsafeNativeMethods.Win8VerifyTrust(
-                    IntPtr.Zero,
-                    UnsafeNativeMethods.WINTRUST_ACTION_GENERIC_VERIFY_V2,
-                    (Win8TrustData)trustData);
-                }
-                else
-                {
+                
+                
                     result = UnsafeNativeMethods.WinVerifyTrust(
                     IntPtr.Zero,
                     UnsafeNativeMethods.WINTRUST_ACTION_GENERIC_VERIFY_V2,
                     trustData);
-                }
+                
 
                 if (result == WinVerifyTrustResult.FileNotSigned)
                 {
@@ -175,8 +170,10 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
                 }
                 else if (result != WinVerifyTrustResult.Success)
                 {
-                    throw new VerificationException(string.Format(CultureInfo.CurrentCulture, "WinVerifyTrustWrapper on file {0} failed with unexpected error {1}", filePath, result));
+                    var winTrustResultErrorString = String.Format("{0} ({1})", GetVerboseWinVerifyTrustResultErrorString(result), ConvertWinVerifyTrustResultToHex(result));
+                    throw new VerificationException(string.Format(CultureInfo.CurrentCulture, "WinVerifyTrustWrapper on file {0} failed with unexpected error: {1}", filePath, winTrustResultErrorString));
                 }
+                
             }
             catch (Exception ex)
             {
@@ -205,6 +202,32 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
             }
 
             return trustData;
+        }
+
+        private static string GetVerboseWinVerifyTrustResultErrorString(WinVerifyTrustResult result)
+        {
+            switch (result)
+            {
+                case WinVerifyTrustResult.ActionUnknown:
+                    return "Trust provider does not support the specified action";
+                case WinVerifyTrustResult.FileNotSigned:
+                    return "File was not signed";
+                case WinVerifyTrustResult.ProviderUnknown:
+                    return "Trust provider is not recognized on this system";
+                case WinVerifyTrustResult.SubjectFormUnknown:
+                    return "Trust provider does not support the form specified for the subject";
+                case WinVerifyTrustResult.SubjectNotTrusted:
+                    return "Subject failed the specified verification action";
+                case WinVerifyTrustResult.UntrustedRootCert:
+                    return "A certification chain processed correctly but terminated in a root certificate that is not trusted by the trust provider";
+                default:
+                    return "Unknown WinVerifyTrustResult value";
+            }
+        }
+
+        private static string ConvertWinVerifyTrustResultToHex(WinVerifyTrustResult result)
+        {
+            return "0x" + result.ToString("X");
         }
     }
 }
