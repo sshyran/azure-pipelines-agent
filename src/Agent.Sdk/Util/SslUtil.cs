@@ -8,7 +8,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
     public sealed class SslUtil
     {
         private ITraceWriter Trace { get; set; }
-        
+
         public SslUtil(ITraceWriter Trace)
         {
             this.Trace = Trace;
@@ -37,13 +37,13 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
         {
             if (this.Trace != null)
             {
-                Trace.Info($"Requested URI: {requestMessage.RequestUri}");
-                Trace.Info($"Requested Headers: {requestMessage.Headers}");
-                Trace.Info($"Effective date: {certificate.GetEffectiveDateString()}");
-                Trace.Info($"Expiration date: {certificate.GetExpirationDateString()}");
-                Trace.Info($"Issuer: {certificate.Issuer}");
-                Trace.Info($"Subject: {certificate.Subject}");
-                Trace.Info($"SSL Policy Errors: {sslErrors}");
+                Trace?.Info($"Requested URI: {requestMessage?.RequestUri}");
+                Trace?.Info($"Requested Headers: {requestMessage?.Headers}");
+                Trace?.Info($"Effective date: {certificate?.GetEffectiveDateString()}");
+                Trace?.Info($"Expiration date: {certificate?.GetExpirationDateString()}");
+                Trace?.Info($"Issuer: {certificate?.Issuer}");
+                Trace?.Info($"Subject: {certificate?.Subject}");
+                Trace?.Info($"SSL Policy Errors: {sslErrors}");
             }
         }
     }
