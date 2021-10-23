@@ -65,6 +65,8 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             var taskManager = HostContext.GetService<ITaskManager>();
             var handlerFactory = HostContext.GetService<IHandlerFactory>();
 
+            this.ExecutionContext.Variables.Set("_ISCHECKOUTTASK", Pipelines.PipelineConstants.IsCheckoutTask(this.Task).ToString());
+
             // Set the task id and display name variable.
             using (var scope = ExecutionContext.Variables.CreateScope())
             {
@@ -210,7 +212,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
 
                 // Expand the inputs.
                 Trace.Verbose("Expanding inputs.");
-                runtimeVariables.ExpandValues(target: inputs, Pipelines.PipelineConstants.IsCheckoutTask(this.Task));
+                runtimeVariables.ExpandValues(target: inputs);
 
                 // We need to verify inputs of the tasks that were injected by decorators, to check if they contain secrets,
                 // for security reasons execution of tasks in this case should be skipped.

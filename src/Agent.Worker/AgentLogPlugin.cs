@@ -146,7 +146,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
                 // TODO: look to see if there is a better way to not have translate these back
                 if (containerInfo != null)
                 {
-                    translateToHostPath = (string val, bool isCheckoutType) => { return containerInfo.TranslateToHostPath(val); };
+                    translateToHostPath = (string val) => { return containerInfo.TranslateToHostPath(val); };
                 }
                 // variables
                 context.Variables.CopyInto(pluginContext.Variables, translateToHostPath);

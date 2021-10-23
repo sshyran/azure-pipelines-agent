@@ -50,10 +50,10 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
         private readonly Tracing _trace;
         private ConcurrentDictionary<string, Variable> _expanded;
 
-        public delegate string TranslationMethod(string val, bool isCheckoutType);
+        public delegate string TranslationMethod(string val);
         public TranslationMethod StringTranslator = DefaultStringTranslator;
 
-        public static string DefaultStringTranslator(string val, bool isCheckoutType)
+        public static string DefaultStringTranslator(string val)
         {
             return val;
         }
@@ -259,14 +259,14 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             "RequestedFor"
         };
 
-        public void ExpandValues(IDictionary<string, string> target, bool isCheckoutType)
+        public void ExpandValues(IDictionary<string, string> target)
         {
             ArgUtil.NotNull(target, nameof(target));
             _trace.Entering();
             var source = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             foreach (Variable variable in _expanded.Values)
             {
-                var value = StringTranslator(variable.Value, isCheckoutType);
+                var value = StringTranslator(variable.Value);
                 source[variable.Name] = value;
             }
 
@@ -301,12 +301,16 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             return VarUtil.ExpandValues(_hostContext, source, target);
         }
 
-        public string Get(string name)
+        public string Get(string name, bool skipTranslator = false)
         {
             Variable variable;
             if (_expanded.TryGetValue(name, out variable))
             {
-                var value = StringTranslator(variable.Value);
+                var value = variable.Value;
+                if (!skipTranslator)
+                {
+                    value = StringTranslator(value);
+                }
                 _trace.Verbose($"Get '{name}': '{value}'");
                 return value;
             }

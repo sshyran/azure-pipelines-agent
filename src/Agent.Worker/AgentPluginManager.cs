@@ -111,7 +111,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
                     newInputs[entry.Key] = containerInfo.TranslateToHostPath(entry.Value);
                 }
                 inputs = newInputs;
-                translateToHostPath = (string val, bool isCheckoutType) => { return containerInfo.TranslateToHostPath(val); };
+                translateToHostPath = (string val) => { return containerInfo.TranslateToHostPath(val); };
             }
 
             AgentTaskPluginExecutionContext pluginContext = new AgentTaskPluginExecutionContext
