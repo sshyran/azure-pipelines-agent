@@ -807,7 +807,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             return path;
         }
 
-        public string TranslatePathForStepTarget(string val, bool isCheckoutType)
+        public string TranslatePathForStepTarget(string val)
         {
             var stepTarget = StepTarget();
             var isCheckoutType = Convert.ToBoolean(this.Variables.Get("_SKIPTRANSLATORFORCHECKOUT", true));
