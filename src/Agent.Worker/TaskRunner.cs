@@ -65,7 +65,9 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             var taskManager = HostContext.GetService<ITaskManager>();
             var handlerFactory = HostContext.GetService<IHandlerFactory>();
 
-            this.ExecutionContext.Variables.Set("_ISCHECKOUTTASK", Pipelines.PipelineConstants.IsCheckoutTask(this.Task).ToString());
+            // Enable skip for string translator in case of checkout task.
+            //It's required for support of multiply checkout tasks with repo alias "self" in container jobs.
+            this.ExecutionContext.Variables.Set("_SKIPTRANSLATORFORCHECKOUT", Pipelines.PipelineConstants.IsCheckoutTask(this.Task).ToString());
 
             // Set the task id and display name variable.
             using (var scope = ExecutionContext.Variables.CreateScope())
