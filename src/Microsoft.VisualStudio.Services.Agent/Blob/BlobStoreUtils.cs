@@ -60,7 +60,8 @@ namespace Microsoft.VisualStudio.Services.Agent.Blob
                 Task reportingTask = null;
                 if (enableReporting)
                 {
-                    reportingTask = StartReportingTask(traceOutput, (long)rootNode.TransitiveContentBytes, uploadSession, reportingCancelSrc);
+                    var report = new ReportHelper(traceOutput, rootNode, uploadSession);
+                    reportingTask = StartReportingTask(report, reportingCancelSrc);
                 }
 
                 // Upload the chunks
@@ -90,7 +91,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Blob
             return (fileNodes, rootNode.TransitiveContentBytes);
         }
 
-        private static Task StartReportingTask(Action<string> traceOutput, long totalBytes, IDedupUploadSession uploadSession, CancellationTokenSource reportingCancel)
+        private static Task StartReportingTask(ReportHelper report, CancellationTokenSource reportingCancel)
         {
             return Task.Run(async () =>
             {
@@ -98,7 +99,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Blob
                 {
                     while (!reportingCancel.IsCancellationRequested)
                     {
-                        traceOutput($"Uploaded {uploadSession.UploadStatistics.TotalContentBytes:N0} out of {totalBytes:N0} bytes.");
+                        report.PrintUploadStatus();
                         await Task.Delay(10000, reportingCancel.Token);
                     }
                 }
@@ -106,9 +107,56 @@ namespace Microsoft.VisualStudio.Services.Agent.Blob
                 {
                     // Expected
                 }
+
+                int SecondsToWait = 10;
+                while (!report.IsUploadCompleted() && SecondsToWait > 0)
+                {
+                    await Task.Delay(1000);
+                    SecondsToWait--;
+
+                }
+
                 // Print final result
-                traceOutput($"Uploaded {uploadSession.UploadStatistics.TotalContentBytes:N0} out of {totalBytes:N0} bytes.");
+                report.PrintUploadStatus(true);
             });
+        }
+
+        private class ReportHelper
+        {
+            private Action<string> Output;
+
+            private DedupNode Root;
+
+            private IDedupUploadSession Session;
+
+            public ReportHelper(Action<string> traceOutput, DedupNode rootNode, IDedupUploadSession uploadSession)
+            {
+                Output = traceOutput;
+                Root = rootNode;
+                Session = uploadSession;
+            }
+
+            public void PrintUploadStatus(bool isFinalResult = false)
+            {
+                if (isFinalResult)
+                {
+                    string prefix = "Final result: ";
+                    string suffix = IsUploadCompleted() ? " Upload completed." : " Possible data loss during upload.";
+                    Output(prefix + Message() + suffix);
+                }
+                else
+                {
+                    Output(Message());
+                }
+            }
+
+            public bool IsUploadCompleted() => Uploaded() == Total();
+
+            private string Message() => $"Uploaded {Uploaded()} out of {Total()} bytes.";
+
+            private string Total() => Root.TransitiveContentBytes.ToString("N0");
+
+            private string Uploaded() => Session.UploadStatistics.TotalContentBytes.ToString("N0");
         }
 
         private static async Task<List<BlobFileInfo>> GenerateHashes(IReadOnlyList<string> filePaths, CancellationToken cancellationToken)
