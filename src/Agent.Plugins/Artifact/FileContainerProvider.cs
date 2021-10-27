@@ -144,9 +144,12 @@ namespace Agent.Plugins
                 }
                 catch
                 {
+                    var requestHost = dedupClient.Client.BaseAddress.AbsoluteUri;
+                    var warningMessage = StringUtil.Loc("BlobStoreDownloadWarning", requestHost);
+
                     // Fall back to streaming through TFS if we cannot reach blobstore
                     downloadFromBlob = false;
-                    tracer.Warn(StringUtil.Loc("BlobStoreDownloadWarning"));
+                    tracer.Warn(warningMessage);
                 }
             }
 

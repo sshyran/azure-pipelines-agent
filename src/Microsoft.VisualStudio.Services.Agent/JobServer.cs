@@ -152,6 +152,8 @@ namespace Microsoft.VisualStudio.Services.Agent
             // Since we read this while calculating the hash, the position needs to be reset before we send this 
             blob.Position = 0;
 
+            // the process of creating a client for downloading logs is different
+            // from how a client for downloading artifacts and attachments is created need to clarify if we need add warning here
             using (var blobClient = CreateArtifactsClient(_connection, default(CancellationToken)))
             {
                 return await blobClient.UploadBlocksForBlobAsync(blobId, blob, default(CancellationToken));
@@ -160,6 +162,7 @@ namespace Microsoft.VisualStudio.Services.Agent
 
         public async Task<(DedupIdentifier dedupId, ulong length)> UploadAttachmentToBlobStore(bool verbose, string itemPath, Guid planId, Guid jobId, CancellationToken cancellationToken)
         {
+            // need to clarify if we need to add warnings if there are problems accessing BlobStore for the case when uploading attachments
             var (dedupClient, clientTelemetry) = await DedupManifestArtifactClientFactory.Instance
                     .CreateDedupClientAsync(verbose, (str) => Trace.Info(str), this._connection, cancellationToken);
 

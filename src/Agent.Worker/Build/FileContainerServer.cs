@@ -103,12 +103,16 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
                     {
                         try
                         {
+                            var warningMessage = this._connection.Uri.AbsoluteUri;
+                            // Fall back to FCS upload if we cannot upload to blob
+                            context.Warn(StringUtil.Loc("BlobStoreUploadWarningExtended", warningMessage));
                             uploadResult = await BlobUploadAsync(context, files, maxConcurrentUploads, _uploadCancellationTokenSource.Token);
                         }
                         catch
                         {
+                            var warningMessage = this._connection.Uri.AbsoluteUri;
                             // Fall back to FCS upload if we cannot upload to blob
-                            context.Warn(StringUtil.Loc("BlobStoreUploadWarning"));
+                            context.Warn(StringUtil.Loc("BlobStoreUploadWarningExtended", warningMessage));
                             uploadToBlob = false;
                         }
                     }
@@ -320,6 +324,8 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
 
         private async Task<UploadResult> BlobUploadAsync(IAsyncCommandContext context, IReadOnlyList<string> files, int concurrentUploads, CancellationToken token)
         {
+            
+            // System.Diagnostics.Debugger.Launch();
             // return files that fail to upload and total artifact size
             var uploadResult = new UploadResult();
 
@@ -333,10 +339,14 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
             var (dedupClient, clientTelemetry) = await DedupManifestArtifactClientFactory.Instance
                 .CreateDedupClientAsync(verbose, (str) => context.Output(str), this._connection, token);
 
+            var requestHost = dedupClient.Client.BaseAddress.AbsoluteUri;
+            context.Debug(StringUtil.Loc("BlobStoreUploadWarningExtended", requestHost));
             // Upload to blobstore
             var results = await BlobStoreUtils.UploadBatchToBlobstore(verbose, files, (level, uri, type) =>
                 new BuildArtifactActionRecord(level, uri, type, nameof(BlobUploadAsync), context), (str) => context.Output(str), dedupClient, clientTelemetry, token, enableReporting: true);
             
+            // context.Debug(dedupClient.);
+
             // Associate with TFS
             context.Output(StringUtil.Loc("AssociateFiles"));
             var queue = new ConcurrentQueue<BlobFileInfo>();
