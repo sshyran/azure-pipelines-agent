@@ -810,7 +810,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
         public string TranslatePathForStepTarget(string val)
         {
             var stepTarget = StepTarget();
-            var isCheckoutType = Convert.ToBoolean(this.Variables.Get("_SKIPTRANSLATORFORCHECKOUT", true));
+            var isCheckoutType = Convert.ToBoolean(this.Variables.Get(Constants.Variables.Task.SkipTranslatorForCheckout, true));
             if (stepTarget == null || (isCheckoutType && (_currentStepTarget == null || stepTarget is HostInfo)))
             {
                 return val;

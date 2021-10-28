@@ -208,7 +208,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             step.ExecutionContext.Section(StringUtil.Loc("StepStarting", step.DisplayName));
             step.ExecutionContext.SetTimeout(timeout: step.Timeout);
 
-            step.ExecutionContext.Variables.Set("_SKIPTRANSLATORFORCHECKOUT", Boolean.FalseString);
+            step.ExecutionContext.Variables.Set(Constants.Variables.Task.SkipTranslatorForCheckout, Boolean.FalseString);
 
             // Windows may not be on the UTF8 codepage; try to fix that
             await SwitchToUtf8Codepage(step);
