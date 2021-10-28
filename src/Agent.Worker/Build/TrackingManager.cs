@@ -149,7 +149,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
                 mergedConfig.CollectionUrl = newConfig.CollectionUrl;
             }
 
-            return previousConfig;
+            return mergedConfig;
         }
 
         public void UpdateTrackingConfig(
