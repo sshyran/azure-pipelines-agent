@@ -438,6 +438,8 @@ namespace Microsoft.VisualStudio.Services.Agent
                 /// <summary>
                 /// Declares requirement to skip translating of strings into checkout tasks.
                 /// It's required to prevent translating of agent system paths in container jobs.
+                /// This is for internal agent usage, set up during task execution and is not indented to be used in
+                /// cross-service communication/obtained by users.
                 /// </summary>
                 public static readonly string SkipTranslatorForCheckout = "task.skipTranslatorForCheckout";
             }
