@@ -149,6 +149,11 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
                 mergedConfig.CollectionUrl = newConfig.CollectionUrl;
             }
 
+            if (string.IsNullOrEmpty(mergedConfig.BuildDirectory))
+            {
+                mergedConfig.BuildDirectory = newConfig.BuildDirectory;
+            }
+
             return mergedConfig;
         }
 
