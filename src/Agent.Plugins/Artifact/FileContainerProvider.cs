@@ -24,6 +24,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
+using System.Runtime.InteropServices;
 
 namespace Agent.Plugins
 {
@@ -144,8 +145,23 @@ namespace Agent.Plugins
                 }
                 catch
                 {
+                    var hostOS = PlatformUtil.HostOS;
+                    var infoURL = "https://aka.ms/windows-agent-allowlist";
+                    switch (hostOS)
+                    {
+                        case PlatformUtil.OS.Linux:
+                            infoURL = "https://aka.ms/linux-agent-allowlist";
+                            break;
+                        case PlatformUtil.OS.OSX:
+                            infoURL = "https://aka.ms/macOS-agent-allowlist";
+                            break;
+                        default:
+                            infoURL = "https://aka.ms/windows-agent-allowlist";
+                            break;
+                    }
+
                     var requestHost = dedupClient.Client.BaseAddress.AbsoluteUri;
-                    var warningMessage = StringUtil.Loc("BlobStoreDownloadWarning", requestHost);
+                    var warningMessage = StringUtil.Loc("BlobStoreDownloadWarningExtended", requestHost, infoURL);
 
                     // Fall back to streaming through TFS if we cannot reach blobstore
                     downloadFromBlob = false;

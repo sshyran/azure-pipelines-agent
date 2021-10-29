@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using Agent.Sdk;
 using Agent.Sdk.Knob;
 using Microsoft.VisualStudio.Services.Agent.Blob;
 using Microsoft.VisualStudio.Services.Agent.Util;
@@ -18,6 +19,7 @@ using System.Net.Http;
 using System.Net;
 using Microsoft.TeamFoundation.DistributedTask.WebApi;
 using Microsoft.VisualStudio.Services.BlobStore.WebApi;
+using System.Runtime.InteropServices;
 
 namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
 {
@@ -386,7 +388,21 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
             catch (Exception ex)
             {
                 var warningMessage = dedupClient.Client.BaseAddress.AbsoluteUri;
-                context.Warn(StringUtil.Loc("BlobStoreUploadWarningExtended", warningMessage));
+                var hostOS = PlatformUtil.HostOS;
+                var infoURL = "https://aka.ms/windows-agent-allowlist";
+                switch (hostOS)
+                {
+                    case PlatformUtil.OS.Linux:
+                        infoURL = "https://aka.ms/linux-agent-allowlist";
+                        break;
+                    case PlatformUtil.OS.OSX:
+                        infoURL = "https://aka.ms/macOS-agent-allowlist";
+                        break;
+                    default:
+                        infoURL = "https://aka.ms/windows-agent-allowlist";
+                        break;
+                }
+                context.Warn(StringUtil.Loc("BlobStoreUploadWarningExtended", warningMessage, infoURL));
 
                 throw;
             }
