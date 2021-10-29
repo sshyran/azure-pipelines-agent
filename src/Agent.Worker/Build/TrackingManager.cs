@@ -131,6 +131,9 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
 
             TrackingConfig mergedConfig = previousConfig.Clone();
 
+            // Use build directory of new config
+            mergedConfig.BuildDirectory = newConfig.BuildDirectory;
+
             // Update the sources directory if we don't have one
             if (!string.IsNullOrEmpty(mergedConfig.SourcesDirectory))
             {
@@ -147,11 +150,6 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
             if (string.IsNullOrEmpty(mergedConfig.CollectionUrl))
             {
                 mergedConfig.CollectionUrl = newConfig.CollectionUrl;
-            }
-
-            if (string.IsNullOrEmpty(mergedConfig.BuildDirectory))
-            {
-                mergedConfig.BuildDirectory = newConfig.BuildDirectory;
             }
 
             return mergedConfig;
