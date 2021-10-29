@@ -67,7 +67,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             var handlerFactory = HostContext.GetService<IHandlerFactory>();
 
             // Enable skip for string translator in case of checkout task.
-            //It's required for support of multiply checkout tasks with repo alias "self" in container jobs.
+            // It's required for support of multiply checkout tasks with repo alias "self" in container jobs. Reported in issue 3520.
             this.ExecutionContext.Variables.Set(Constants.Variables.Task.SkipTranslatorForCheckout, this.Task.IsCheckoutTask().ToString());
 
             // Set the task id and display name variable.
