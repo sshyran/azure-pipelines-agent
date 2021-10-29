@@ -17,6 +17,7 @@ using Microsoft.VisualStudio.Services.WebApi;
 using System.Net.Http;
 using System.Net;
 using Microsoft.TeamFoundation.DistributedTask.WebApi;
+using Microsoft.VisualStudio.Services.BlobStore.WebApi;
 
 namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
 {
@@ -103,16 +104,11 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
                     {
                         try
                         {
-                            var warningMessage = this._connection.Uri.AbsoluteUri;
-                            // Fall back to FCS upload if we cannot upload to blob
-                            context.Warn(StringUtil.Loc("BlobStoreUploadWarningExtended", warningMessage));
                             uploadResult = await BlobUploadAsync(context, files, maxConcurrentUploads, _uploadCancellationTokenSource.Token);
                         }
                         catch
                         {
-                            var warningMessage = this._connection.Uri.AbsoluteUri;
                             // Fall back to FCS upload if we cannot upload to blob
-                            context.Warn(StringUtil.Loc("BlobStoreUploadWarningExtended", warningMessage));
                             uploadToBlob = false;
                         }
                     }
@@ -324,8 +320,6 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
 
         private async Task<UploadResult> BlobUploadAsync(IAsyncCommandContext context, IReadOnlyList<string> files, int concurrentUploads, CancellationToken token)
         {
-            
-            // System.Diagnostics.Debugger.Launch();
             // return files that fail to upload and total artifact size
             var uploadResult = new UploadResult();
 
@@ -335,59 +329,67 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
                 return uploadResult;
             }
 
-            var verbose = String.Equals(context.GetVariableValueOrDefault("system.debug"), "true", StringComparison.InvariantCultureIgnoreCase);
-            var (dedupClient, clientTelemetry) = await DedupManifestArtifactClientFactory.Instance
-                .CreateDedupClientAsync(verbose, (str) => context.Output(str), this._connection, token);
-
-            var requestHost = dedupClient.Client.BaseAddress.AbsoluteUri;
-            context.Debug(StringUtil.Loc("BlobStoreUploadWarningExtended", requestHost));
-            // Upload to blobstore
-            var results = await BlobStoreUtils.UploadBatchToBlobstore(verbose, files, (level, uri, type) =>
-                new BuildArtifactActionRecord(level, uri, type, nameof(BlobUploadAsync), context), (str) => context.Output(str), dedupClient, clientTelemetry, token, enableReporting: true);
-            
-            // context.Debug(dedupClient.);
-
-            // Associate with TFS
-            context.Output(StringUtil.Loc("AssociateFiles"));
-            var queue = new ConcurrentQueue<BlobFileInfo>();
-            foreach (var file in results.fileDedupIds)
+            DedupStoreClient dedupClient = null;
+            BlobStoreClientTelemetryTfs clientTelemetry = null;
+            try
             {
-                queue.Enqueue(file);
+                var verbose = String.Equals(context.GetVariableValueOrDefault("system.debug"), "true", StringComparison.InvariantCultureIgnoreCase);
+                (dedupClient, clientTelemetry) = await DedupManifestArtifactClientFactory.Instance
+                    .CreateDedupClientAsync(verbose, (str) => context.Output(str), this._connection, token);
+
+                // Upload to blobstore
+                var results = await BlobStoreUtils.UploadBatchToBlobstore(verbose, files, (level, uri, type) =>
+                    new BuildArtifactActionRecord(level, uri, type, nameof(BlobUploadAsync), context), (str) => context.Output(str), dedupClient, clientTelemetry, token, enableReporting: true);
+
+                // Associate with TFS
+                context.Output(StringUtil.Loc("AssociateFiles"));
+                var queue = new ConcurrentQueue<BlobFileInfo>();
+                foreach (var file in results.fileDedupIds)
+                {
+                    queue.Enqueue(file);
+                }
+
+                // Start associate monitor
+                var uploadFinished = new TaskCompletionSource<int>();
+                var associateMonitor = AssociateReportingAsync(context, files.Count(), uploadFinished, token);
+
+                // Start parallel associate tasks.
+                var parallelAssociateTasks = new List<Task<UploadResult>>();
+                for (int uploader = 0; uploader < concurrentUploads; uploader++)
+                {
+                    parallelAssociateTasks.Add(AssociateAsync(context, queue, token));
+                }
+
+                // Wait for parallel associate tasks to finish.
+                await Task.WhenAll(parallelAssociateTasks);
+                foreach (var associateTask in parallelAssociateTasks)
+                {
+                    // record all failed files.
+                    uploadResult.AddUploadResult(await associateTask);
+                }
+
+                // Stop monitor task
+                uploadFinished.SetResult(0);
+                await associateMonitor;
+
+                // report telemetry
+                if (!Guid.TryParse(context.GetVariableValueOrDefault(WellKnownDistributedTaskVariables.PlanId), out var planId))
+                {
+                    planId = Guid.Empty;
+                }
+                if (!Guid.TryParse(context.GetVariableValueOrDefault(WellKnownDistributedTaskVariables.JobId), out var jobId))
+                {
+                    jobId = Guid.Empty;
+                }
+                await clientTelemetry.CommitTelemetryUpload(planId, jobId);
             }
-
-            // Start associate monitor
-            var uploadFinished = new TaskCompletionSource<int>();
-            var associateMonitor = AssociateReportingAsync(context, files.Count(), uploadFinished, token);
-
-            // Start parallel associate tasks.
-            var parallelAssociateTasks = new List<Task<UploadResult>>();
-            for (int uploader = 0; uploader < concurrentUploads; uploader++)
+            catch (Exception ex)
             {
-                parallelAssociateTasks.Add(AssociateAsync(context, queue, token));
-            }
+                var warningMessage = dedupClient.Client.BaseAddress.AbsoluteUri;
+                context.Warn(StringUtil.Loc("BlobStoreUploadWarningExtended", warningMessage));
 
-            // Wait for parallel associate tasks to finish.
-            await Task.WhenAll(parallelAssociateTasks);
-            foreach (var associateTask in parallelAssociateTasks)
-            {
-                // record all failed files.
-                uploadResult.AddUploadResult(await associateTask);
+                throw;
             }
-
-            // Stop monitor task
-            uploadFinished.SetResult(0);
-            await associateMonitor;
-
-            // report telemetry
-            if (!Guid.TryParse(context.GetVariableValueOrDefault(WellKnownDistributedTaskVariables.PlanId), out var planId))
-            {
-                planId = Guid.Empty;
-            }
-            if (!Guid.TryParse(context.GetVariableValueOrDefault(WellKnownDistributedTaskVariables.JobId), out var jobId))
-            {
-                jobId = Guid.Empty;
-            }
-            await clientTelemetry.CommitTelemetryUpload(planId, jobId);
 
             return uploadResult;
         }
