@@ -113,7 +113,6 @@ namespace Microsoft.VisualStudio.Services.Agent.Blob
                 {
                     await Task.Delay(1000);
                     SecondsToWait--;
-
                 }
 
                 // Print final result
