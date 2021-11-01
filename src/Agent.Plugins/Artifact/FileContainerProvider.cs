@@ -147,7 +147,7 @@ namespace Agent.Plugins
                 {
                     var blobStoreHost = dedupClient.Client.BaseAddress.Host;
                     var warningMessage = BlobStoreWarningGenerator
-                        .GetPlatformSpecificWarningMessage("BlobStoreUploadWarningExtended", blobStoreHost);
+                        .GetPlatformSpecificWarningMessage("BlobStoreDownloadWarningExtended", blobStoreHost);
 
                     // Fall back to streaming through TFS if we cannot reach blobstore
                     downloadFromBlob = false;
