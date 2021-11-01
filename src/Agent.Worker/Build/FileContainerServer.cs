@@ -387,8 +387,9 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
             catch (Exception ex)
             {
                 var blobStoreHost = dedupClient.Client.BaseAddress.Host;
-                var warningMessage = BlobStoreWarningGenerator
-                    .GetPlatformSpecificWarningMessage("BlobStoreUploadWarning", blobStoreHost);
+                var allowListLink = BlobStoreWarningGenerator.GetPlatformAllowListLink();
+
+                var warningMessage = StringUtil.Loc("BlobStoreUploadWarning", blobStoreHost, allowListLink);
                 context.Warn(warningMessage);
 
                 throw;

@@ -8,12 +8,9 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
     public static class BlobStoreWarningGenerator
     {
         /// <summary>
-        /// Used to generate warning message with platform specific allow list of domains
+        /// Used to get platform-specific reference to allow list in agent documenation page
         /// </summary>
-        /// <param name="baseMessage">Base part of the message</param>
-        /// <param name="blobStoreHost">Blbe store host for which warning should be generated</param>
-        /// <returns></returns>
-        public static string GetPlatformSpecificWarningMessage(string baseMessage, string blobStoreHost)
+        public static void GetPlatformAllowListLink()
         {
             var hostOS = PlatformUtil.HostOS;
             var infoURL = PlatformSpecificAllowList.WindowsAllowList;
@@ -28,8 +25,6 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
                 default:
                     break;
             }
-
-            return StringUtil.Loc(baseMessage, blobStoreHost, infoURL);
         }
 
         internal static class PlatformSpecificAllowList
