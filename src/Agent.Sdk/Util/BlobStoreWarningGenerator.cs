@@ -10,7 +10,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
         /// <summary>
         /// Used to get platform-specific reference to allow list in agent documenation page
         /// </summary>
-        public static void GetPlatformAllowListLink()
+        public static string GetPlatformAllowListLink()
         {
             var hostOS = PlatformUtil.HostOS;
             var infoURL = PlatformSpecificAllowList.WindowsAllowList;
@@ -25,6 +25,8 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
                 default:
                     break;
             }
+
+            return infoURL;
         }
 
         internal static class PlatformSpecificAllowList
