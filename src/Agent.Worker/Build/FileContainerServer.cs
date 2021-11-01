@@ -387,22 +387,10 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
             }
             catch (Exception ex)
             {
-                var warningMessage = dedupClient.Client.BaseAddress.AbsoluteUri;
-                var hostOS = PlatformUtil.HostOS;
-                var infoURL = "https://aka.ms/windows-agent-allowlist";
-                switch (hostOS)
-                {
-                    case PlatformUtil.OS.Linux:
-                        infoURL = "https://aka.ms/linux-agent-allowlist";
-                        break;
-                    case PlatformUtil.OS.OSX:
-                        infoURL = "https://aka.ms/macOS-agent-allowlist";
-                        break;
-                    default:
-                        infoURL = "https://aka.ms/windows-agent-allowlist";
-                        break;
-                }
-                context.Warn(StringUtil.Loc("BlobStoreUploadWarningExtended", warningMessage, infoURL));
+                var blobStoreHost = dedupClient.Client.BaseAddress.Host;
+                var warningMessage = BlobStoreWarningGenerator
+                    .GetPlatformSpecificWarningMessage("BlobStoreUploadWarningExtended", blobStoreHost);
+                context.Warn(warningMessage);
 
                 throw;
             }
