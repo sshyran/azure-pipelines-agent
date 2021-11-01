@@ -57,7 +57,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Handlers
             {
                 // Node 6
                 if (data is NodeHandlerData) {       
-                    executionContext.Warning("This task uses Node 6 execution handler, which will be deprecated soon. If you are the owner of the task - please follow the migration to Node 10 handler. If you are the user - feel free to reach out to the owners of this task to proceed on migration.");
+                    executionContext.Warning(StringUtil.Loc("DepricatedNode6"));
                 }
                 // Node 6 and 10.
                 handler = HostContext.CreateService<INodeHandler>();
