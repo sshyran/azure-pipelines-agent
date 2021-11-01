@@ -1,7 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using Agent.Sdk;
 using Agent.Sdk.Knob;
 using Microsoft.VisualStudio.Services.Agent.Blob;
 using Microsoft.VisualStudio.Services.Agent.Util;
@@ -19,7 +18,7 @@ using System.Net.Http;
 using System.Net;
 using Microsoft.TeamFoundation.DistributedTask.WebApi;
 using Microsoft.VisualStudio.Services.BlobStore.WebApi;
-using System.Runtime.InteropServices;
+
 
 namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
 {
@@ -389,7 +388,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
             {
                 var blobStoreHost = dedupClient.Client.BaseAddress.Host;
                 var warningMessage = BlobStoreWarningGenerator
-                    .GetPlatformSpecificWarningMessage("BlobStoreUploadWarningExtended", blobStoreHost);
+                    .GetPlatformSpecificWarningMessage("BlobStoreUploadWarning", blobStoreHost);
                 context.Warn(warningMessage);
 
                 throw;

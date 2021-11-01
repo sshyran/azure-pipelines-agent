@@ -24,7 +24,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
-using System.Runtime.InteropServices;
 
 namespace Agent.Plugins
 {
@@ -147,7 +146,7 @@ namespace Agent.Plugins
                 {
                     var blobStoreHost = dedupClient.Client.BaseAddress.Host;
                     var warningMessage = BlobStoreWarningGenerator
-                        .GetPlatformSpecificWarningMessage("BlobStoreDownloadWarningExtended", blobStoreHost);
+                        .GetPlatformSpecificWarningMessage("BlobStoreDownloadWarning", blobStoreHost);
 
                     // Fall back to streaming through TFS if we cannot reach blobstore
                     downloadFromBlob = false;
