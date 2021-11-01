@@ -145,7 +145,7 @@ namespace Agent.Plugins
                 catch
                 {
                     var blobStoreHost = dedupClient.Client.BaseAddress.Host;
-                    var allowListLink = BlobStoreWarningGenerator.GetPlatformAllowListLink();
+                    var allowListLink = BlobStoreWarningGenerator.GetAllowListLinkForCurrentPlatform();
                     var warningMessage = StringUtil.Loc("BlobStoreDownloadWarning", blobStoreHost, allowListLink);
 
                     // Fall back to streaming through TFS if we cannot reach blobstore

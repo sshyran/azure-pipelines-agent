@@ -8,9 +8,9 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
     public static class BlobStoreWarningGenerator
     {
         /// <summary>
-        /// Used to get platform-specific reference to allow list in agent documenation page
+        /// Used to get platform-specific reference to allow list in documenation
         /// </summary>
-        public static string GetPlatformAllowListLink()
+        public static string GetAllowListLinkForCurrentPlatform()
         {
             var hostOS = PlatformUtil.HostOS;
             var infoURL = PlatformSpecificAllowList.WindowsAllowList;
