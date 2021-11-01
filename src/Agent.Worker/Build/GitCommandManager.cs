@@ -232,7 +232,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
                 refSpec = refSpec.Where(r => !string.IsNullOrEmpty(r)).ToList();
             }
 
-            // insert prune-tags if knob is false to sync tags with the remote and Git version is above 2.17
+            // insert prune-tags if DisableFetchPruneTags knob is false and Git version is above 2.17
             string pruneTags = !EnsureGitVersion(new Version(2, 17), throwOnNotMatch: false) ? string.Empty : AgentKnobs.DisableFetchPruneTags.GetValue(context).AsBoolean() ? string.Empty : "--prune-tags";
 
             // If shallow fetch add --depth arg
