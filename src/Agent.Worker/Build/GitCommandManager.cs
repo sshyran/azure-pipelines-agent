@@ -233,8 +233,12 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
             }
 
             // insert prune-tags if DisableFetchPruneTags knob is false and Git version is above 2.17
-            string pruneTags = !EnsureGitVersion(new Version(2, 17), throwOnNotMatch: false) ? string.Empty : AgentKnobs.DisableFetchPruneTags.GetValue(context).AsBoolean() ? string.Empty : "--prune-tags";
-
+            string pruneTags = string.Empty;
+            if (EnsureGitVersion(new Version(2, 17), throwOnNotMatch: false) && !AgentKnobs.DisableFetchPruneTags.GetValue(context).AsBoolean())
+            {
+                pruneTags = "--prune-tags";
+            }
+            
             // If shallow fetch add --depth arg
             // If the local repository is shallowed but there is no fetch depth provide for this build,
             // add --unshallow to convert the shallow repository to a complete repository

@@ -175,7 +175,11 @@ namespace Agent.Plugins.Repository
             string progress = reducedOutput ? string.Empty : "--progress";
 
             // insert prune-tags if knob is false to sync tags with the remote
-            string pruneTags = !EnsureGitVersion(new Version(2, 17), throwOnNotMatch: false) ? string.Empty : AgentKnobs.DisableFetchPruneTags.GetValue(context).AsBoolean() ? string.Empty : "--prune-tags";
+            string pruneTags = string.Empty;
+            if (EnsureGitVersion(new Version(2, 17), throwOnNotMatch: false) && !AgentKnobs.DisableFetchPruneTags.GetValue(context).AsBoolean())
+            {
+                pruneTags = "--prune-tags";
+            }
 
             // If shallow fetch add --depth arg
             // If the local repository is shallowed but there is no fetch depth provide for this build,
