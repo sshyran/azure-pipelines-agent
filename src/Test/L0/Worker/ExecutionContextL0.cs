@@ -549,7 +549,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Tests.Worker
                     string stringContainer = "C:\\__w";
                     if (ec.StepTarget().ExecutionOS != PlatformUtil.OS.Windows)
                     {
-                        stringContainer = ec.StepTarget().TranslateToContainerPath(stringContainer);
+                        stringContainer = "/__w";
                     }
                     Assert.Equal(stringContainer, stringAfterTranslation);
                 } else
