@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Globalization;
 using Microsoft.TeamFoundation.DistributedTask.Pipelines;
+using Agent.Sdk.Knob;
 
 namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
 {
@@ -39,7 +40,8 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
         TrackingConfig MergeTrackingConfigs(
             IExecutionContext executionContext,
             TrackingConfig newConfig,
-            TrackingConfig previousConfig);
+            TrackingConfig previousConfig,
+            bool overrideBuildDirectory);
 
         void UpdateTrackingConfig(
             IExecutionContext executionContext,
@@ -122,7 +124,9 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
         public TrackingConfig MergeTrackingConfigs(
             IExecutionContext executionContext,
             TrackingConfig newConfig,
-            TrackingConfig previousConfig)
+            TrackingConfig previousConfig,
+            bool overrideBuildDirectory
+            )
         {
             ArgUtil.NotNull(newConfig, nameof(newConfig));
             ArgUtil.NotNull(previousConfig, nameof(previousConfig));
@@ -135,6 +139,11 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
             if (!string.IsNullOrEmpty(mergedConfig.SourcesDirectory))
             {
                 mergedConfig.SourcesDirectory = newConfig.SourcesDirectory;
+            }
+
+            if (overrideBuildDirectory && !AgentKnobs.PreferPowershellHandlerOnContainers.GetValue(executionContext).AsBoolean())
+            {
+                mergedConfig.BuildDirectory = newConfig.BuildDirectory;
             }
 
             // Fill out repository type if it's not there.
