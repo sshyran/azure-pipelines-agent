@@ -1,3 +1,18 @@
+## Features
+ - Bump recommended Git version, fix prune-tags for older versions (#3581)
+ - Add warning message for Node 6 handler (#3592)
+
+## Bugs
+ - Add retries for http client calls in pipeline artifact plugin (#3492)
+ - HostContext.OnEventWritten check for null eventData.Message (#3570)
+ - Update PowerShellCapabilitiesProvider to work with Visual Studio 2022 (#3571)
+ - Fix for issue 3520 - disabling of inputs translating for checkout tasks (#3573)
+ - Don't show $3/$4 in the number of retries error message (#3578)
+ - Try to delete the workspace instead of fail (#3589)
+
+## Misc
+ - installdependencies.sh - added message about repositories for package manager (#3582)
+
 
 ## Agent Downloads
 
