@@ -5,7 +5,7 @@ using Agent.Sdk;
 
 namespace Microsoft.VisualStudio.Services.Agent.Util
 {
-    public static class BlobStoreWarningGenerator
+    public static class BlobStoreWarningInfoProvider
     {
         /// <summary>
         /// Used to get platform-specific reference to allow list in documenation
@@ -13,9 +13,13 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
         public static string GetAllowListLinkForCurrentPlatform()
         {
             var hostOS = PlatformUtil.HostOS;
-            var infoURL = PlatformSpecificAllowList.WindowsAllowList;
+            var infoURL = "";
+
             switch (hostOS)
             {
+                case PlatformUtil.OS.Windows:
+                    infoURL = PlatformSpecificAllowList.WindowsAllowList;
+                    break;
                 case PlatformUtil.OS.Linux:
                     infoURL = PlatformSpecificAllowList.LinuxAllowList;
                     break;
@@ -23,6 +27,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
                     infoURL = PlatformSpecificAllowList.MacOSAllowList;
                     break;
                 default:
+                    infoURL = PlatformSpecificAllowList.GenericAllowList;
                     break;
             }
 
@@ -31,6 +36,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
 
         internal static class PlatformSpecificAllowList
         {
+            public const string GenericAllowList = "https://aka.ms/adoallowlist";
             public const string WindowsAllowList = "https://aka.ms/windows-agent-allowlist";
             public const string MacOSAllowList = "https://aka.ms/macOS-agent-allowlist";
             public const string LinuxAllowList = "https://aka.ms/linux-agent-allowlist";

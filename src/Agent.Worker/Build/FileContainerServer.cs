@@ -384,10 +384,10 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
                 }
                 await clientTelemetry.CommitTelemetryUpload(planId, jobId);
             }
-            catch (Exception ex)
+            catch
             {
                 var blobStoreHost = dedupClient.Client.BaseAddress.Host;
-                var allowListLink = BlobStoreWarningGenerator.GetAllowListLinkForCurrentPlatform();
+                var allowListLink = BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform();
                 var warningMessage = StringUtil.Loc("BlobStoreUploadWarning", blobStoreHost, allowListLink);
 
                 context.Warn(warningMessage);
