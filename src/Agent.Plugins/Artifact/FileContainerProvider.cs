@@ -16,6 +16,7 @@ using Microsoft.VisualStudio.Services.FileContainer;
 using Microsoft.VisualStudio.Services.FileContainer.Client;
 using Microsoft.VisualStudio.Services.WebApi;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -24,6 +25,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
+using Minimatch;
 
 namespace Agent.Plugins
 {
@@ -221,16 +223,63 @@ namespace Agent.Plugins
                 containerIdAndRoot.Item2
             );
 
-            IEnumerable<Func<string, bool>> minimatcherFuncs = MinimatchHelper.GetMinimatchFuncs(
-                minimatchPatterns,
-                tracer,
-                downloadParameters.CustomMinimatchOptions
-            );
+            // Hashtable to keep track of matches.
+            Hashtable map = new Hashtable();
 
-            if (minimatcherFuncs != null && minimatcherFuncs.Count() != 0)
+            Options customMinimatchOptions;
+            if (!(downloadParameters.CustomMinimatchOptions is null))
             {
-                items = this.GetFilteredItems(items, minimatcherFuncs);
+                customMinimatchOptions = downloadParameters.CustomMinimatchOptions;
+            } else
+            {
+                customMinimatchOptions = new Options()
+                {
+                    Dot = true,
+                    NoBrace = true,
+                    AllowWindowsPaths = PlatformUtil.RunningOnWindows
+                };
             }
+
+            foreach (string minimatchPattern in minimatchPatterns)
+            {
+                tracer.Info($"Pattern: {minimatchPattern}");
+
+                // Trim and skip empty.
+                string currentPattern = minimatchPattern.Trim();
+                if (String.IsNullOrEmpty(currentPattern))
+                {
+                    tracer.Info($"Skipping empty pattern.");
+                    continue;
+                }
+
+                // Clone match options.
+                Options matchOptions = CloneMiniMatchOptions(customMinimatchOptions);
+
+                // Skip comments.
+                if (!matchOptions.NoComment && currentPattern.StartsWith('#'))
+                {
+                    tracer.Info($"Skipping comment.");
+                    continue;
+                }
+
+                // Set NoComment. Brace expansion could result in a leading '#'.
+                matchOptions.NoComment = true;
+
+
+            }
+
+            // Lines below are commented until porting of handling patterns by Minimatcher
+            //
+            // IEnumerable<Func<string, bool>> minimatcherFuncs = MinimatchHelper.GetMinimatchFuncs(
+            //    minimatchPatterns,
+            //     tracer,
+            //     downloadParameters.CustomMinimatchOptions
+            // );
+            // 
+            // if (minimatcherFuncs != null && minimatcherFuncs.Count() != 0)
+            // {
+            //     items = this.GetFilteredItems(items, minimatcherFuncs);
+            // }
 
             return items;
         }
@@ -454,5 +503,27 @@ namespace Agent.Plugins
                 }
             }
         }
+
+        // Clones MiniMatch options into separate object
+        private Options CloneMiniMatchOptions(Options currentMiniMatchOptions)
+        {
+            Options clonedMiniMatchOptions = new Options()
+            {
+                Dot = currentMiniMatchOptions.Dot,
+                FlipNegate = currentMiniMatchOptions.FlipNegate,
+                MatchBase = currentMiniMatchOptions.MatchBase,
+                NoBrace = currentMiniMatchOptions.NoBrace,
+                NoCase = currentMiniMatchOptions.NoCase,
+                NoComment = currentMiniMatchOptions.NoComment,
+                NoExt = currentMiniMatchOptions.NoExt,
+                NoGlobStar = currentMiniMatchOptions.NoGlobStar,
+                NoNegate = currentMiniMatchOptions.NoNegate,
+                NoNull = currentMiniMatchOptions.NoNull,
+                IgnoreCase = currentMiniMatchOptions.IgnoreCase,
+                AllowWindowsPaths = PlatformUtil.RunningOnWindows
+            };
+            return clonedMiniMatchOptions;
+        }
+
     }
 }
