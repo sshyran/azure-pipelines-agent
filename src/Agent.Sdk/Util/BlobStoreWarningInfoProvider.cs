@@ -8,7 +8,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
     public static class BlobStoreWarningInfoProvider
     {
         /// <summary>
-        /// Used to get platform-specific reference to allow list in documenation
+        /// Used to get platform-specific reference to allow list in documentation
         /// </summary>
         public static string GetAllowListLinkForCurrentPlatform()
         {
