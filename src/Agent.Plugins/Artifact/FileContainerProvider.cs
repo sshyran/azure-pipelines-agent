@@ -348,10 +348,10 @@ namespace Agent.Plugins
                         foreach (FileContainerItem matchResult in matchResults)
                         {
                             matchCount++;
-                            map[matchResult] = true;
+                            map[matchResult.Path] = Boolean.TrueString;
                         }
 
-                        tracer.Info($"{matchCount}' matches");
+                        tracer.Info($"{matchCount} matches");
                     }
                     else
                     {
@@ -364,26 +364,32 @@ namespace Agent.Plugins
                         foreach (FileContainerItem matchResult in matchResults)
                         {
                             matchCount++;
-                            map.Remove(matchResult);
+                            map.Remove(matchResult.Path);
                         }
 
-                        tracer.Info($"{matchCount}' matches");
+                        tracer.Info($"{matchCount} matches");
                     }
                 }
             }
 
             // return a filtered version of the original list (preserves order and prevents duplication)
-            List<FileContainerItem> result = new List<FileContainerItem>();
+            List<FileContainerItem> resultItems = new List<FileContainerItem>();
             foreach (FileContainerItem item in items)
             {
-                if ((bool)map[item])
+                if (Convert.ToBoolean(map[item.Path]))
                 {
-                    result.Add(item);
+                    resultItems.Add(item);
                 }
             }
-            tracer.Info($"{result.Count}' final results");
+            tracer.Info($"{resultItems.Count} final results");
 
-            return result;
+            var excludedItems = items.Except(resultItems);
+            foreach (FileContainerItem item in excludedItems)
+            {
+                tracer.Info($"Item excluded: {item.Path}");
+            }
+
+            return resultItems;
         }
 
         private void CheckDownloads(IEnumerable<FileContainerItem> items, string rootPath, string artifactName, bool includeArtifactName)
@@ -512,11 +518,7 @@ namespace Agent.Plugins
                     filteredItems.Add(item);
                 }
             }
-            var excludedItems = items.Except(filteredItems);
-            foreach (FileContainerItem item in excludedItems)
-            {
-                tracer.Info($"Item excluded: {item.Path}");
-            }
+
             return filteredItems;
         }
 
