@@ -341,7 +341,7 @@ namespace Agent.Plugins
                     {
                         // Apply the pattern.
                         tracer.Info($"Applying include pattern against original list.");
-                        var matchResults = this.GetFilteredItems(items, minimatcherFuncs);
+                        List<FileContainerItem> matchResults = this.GetFilteredItems(items, minimatcherFuncs);
 
                         // Union the results.
                         int matchCount = 0;
@@ -357,7 +357,7 @@ namespace Agent.Plugins
                     {
                         // Apply the pattern.
                         tracer.Info($"Applying exclude pattern against original list.");
-                        var matchResults = this.GetFilteredItems(items, minimatcherFuncs);
+                        List<FileContainerItem> matchResults = this.GetFilteredItems(items, minimatcherFuncs);
 
                         // Subtract the results.
                         int matchCount = 0;
@@ -373,12 +373,12 @@ namespace Agent.Plugins
             }
 
             // return a filtered version of the original list (preserves order and prevents duplication)
-            IEnumerable<FileContainerItem> result;
+            List<FileContainerItem> result = new List<FileContainerItem>();
             foreach (FileContainerItem item in items)
             {
                 if ((bool)map[item])
                 {
-                    //...
+                    result.Add(item);
                 }
             }
             tracer.Info($"{result.Count}' final results");
