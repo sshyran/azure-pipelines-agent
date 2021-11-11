@@ -22,7 +22,6 @@ steps:
           Write-Host "Something went wrong, failed to process $tree file"
         }
       }
-    pwsh: true
     ignoreLASTEXITCODE: true
 
 - ${{ if parameters.isWindows }}:
