@@ -6,28 +6,28 @@ parameters:
   default: true
 
 steps:
-- task: PowerShell@2
-  inputs:
-    targetType: 'inline'
-    script: |
-      $ErrorActionPreference = 'Stop'
-                  $windowsSdkPath=Get-ChildItem "${Env:ProgramFiles(x86)}\Windows Kits\10\bin\1*" | Select-Object FullName | Sort-Object -Descending { [version](Split-Path $_.FullName -leaf)} | Select-Object -first 1
-      foreach ($tree in Get-ChildItem -Path '${{ parameters.layoutRoot }}/bin' -Filter "*.dll" | select FullName) {
-          try {
-            Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-            Write-Host $tree
-            & "$($windowsSdkPath.FullName)\x64\signtool" remove /s "$($tree.FullName)"
-            Write-Host "---------------------------------------------------------------------------"
-            if ($lastexitcode -ne 0) {
-              Write-Warning "Something went wrong, failed to process $tree file in try"
-            }
-          } catch {
-            Write-Warning "Something went wrong, failed to process $tree file in catch"
-          }
-      }
-    ignoreLASTEXITCODE: true
-
 - ${{ if parameters.isWindows }}:
+  - task: PowerShell@2
+    inputs:
+      targetType: 'inline'
+      script: |
+        $ErrorActionPreference = 'Stop'
+                    $windowsSdkPath=Get-ChildItem "${Env:ProgramFiles(x86)}\Windows Kits\10\bin\1*" | Select-Object FullName | Sort-Object -Descending { [version](Split-Path $_.FullName -leaf)} | Select-Object -first 1
+        foreach ($tree in Get-ChildItem -Path '${{ parameters.layoutRoot }}/bin' -Filter "*.dll" | select FullName) {
+            try {
+              Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+              Write-Host $tree
+              & "$($windowsSdkPath.FullName)\x64\signtool" remove /s "$($tree.FullName)"
+              Write-Host "---------------------------------------------------------------------------"
+              if ($lastexitcode -ne 0) {
+                Write-Warning "Something went wrong, failed to process $tree file in try"
+              }
+            } catch {
+              Write-Warning "Something went wrong, failed to process $tree file in catch"
+            }
+        }
+      ignoreLASTEXITCODE: true
+
   - task: SFP.build-tasks.custom-build-task-1.EsrpCodeSigning@1
     inputs:
       ConnectedServiceName: VSTSAgentESRP
