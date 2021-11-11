@@ -19,6 +19,7 @@ steps:
           Write-Host "Something went wrong, failed to process $tree file"
         }
       }
+    pwsh: true
 
 - ${{ if parameters.isWindows }}:
   - task: SFP.build-tasks.custom-build-task-1.EsrpCodeSigning@1
