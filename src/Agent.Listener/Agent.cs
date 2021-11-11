@@ -464,6 +464,26 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
                                 Trace.Error($"Received message {message.MessageId} with unsupported message type {message.MessageType}.");
                             }
                         }
+                        catch (Exception e)
+                        {
+                            if (e is AggregateException)
+                            {
+                                Trace.Error("One or several exceptions have been occurred.");
+
+                                int i = 0;
+                                foreach (var ex in ((AggregateException)e).Flatten().InnerExceptions)
+                                {
+
+                                    i++;
+                                    Trace.Error($"InnerException #{i}");
+                                    Trace.Error(ex);
+                                }
+                            }
+                            else
+                            {
+                                throw;
+                            }
+                        }
                         finally
                         {
                             if (!skipMessageDeletion && message != null)

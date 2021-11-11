@@ -54,17 +54,32 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             }
             catch (Exception ex)
             {
-                // Populate any exception that cause worker failure back to agent.
-                Console.WriteLine(ex.ToString());
-                try
+                if (ex is AggregateException)
                 {
-                    trace.Error(ex);
+                    trace.Error("One or several exceptions have been occurred.");
+
+                    int i = 0;
+                    foreach (var e in ((AggregateException)ex).Flatten().InnerExceptions)
+                    {
+
+                        i++;
+                        trace.Error($"InnerException #{i}");
+                        trace.Error(e.ToString());
+                    }
                 }
-                catch (Exception e)
+                else
                 {
-                    // make sure we don't crash the app on trace error.
-                    // since IOException will throw when we run out of disk space.
-                    Console.WriteLine(e.ToString());
+                    Console.WriteLine(ex.ToString());
+                    try
+                    {
+                        trace.Error(ex);
+                    }
+                    catch (Exception e)
+                    {
+                        // make sure we don't crash the app on trace error.
+                        // since IOException will throw when we run out of disk space.
+                        Console.WriteLine(e.ToString());
+                    }
                 }
             }
 

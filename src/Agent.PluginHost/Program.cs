@@ -70,9 +70,24 @@ namespace Agent.PluginHost
                     }
                     catch (Exception ex)
                     {
-                        // any exception throw from plugin will fail the task.
-                        executionContext.Error(ex.Message);
-                        executionContext.Debug(ex.StackTrace);
+                        if (ex is AggregateException)
+                        {
+                            executionContext.Error("One or several exceptions have been occurred.");
+
+                            int i = 0;
+                            foreach (var e in ((AggregateException)ex).Flatten().InnerExceptions)
+                            {
+
+                                i++;
+                                executionContext.Error($"InnerException #{i}");
+                                executionContext.Error(e.ToString());
+                            }
+                        }
+                        else
+                        {
+                            executionContext.Error(ex.Message);
+                            executionContext.Debug(ex.StackTrace);
+                        }
                     }
                     finally
                     {

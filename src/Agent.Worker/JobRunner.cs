@@ -315,6 +315,26 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
                 Trace.Info("Completing the job execution context.");
                 return await CompleteJobAsync(jobServer, jobContext, message);
             }
+            catch (Exception e)
+            {
+                if (e is AggregateException)
+                {
+                    Trace.Error("One or several exceptions have been occurred.");
+
+                    int i = 0;
+                    foreach (var ex in ((AggregateException)e).Flatten().InnerExceptions)
+                    {
+
+                        i++;
+                        Trace.Error($"InnerException #{i}");
+                        Trace.Error(ex);
+                    }
+                }
+                else
+                {
+                    throw;
+                }
+            }
             finally
             {
                 if (agentShutdownRegistration != null)
@@ -372,10 +392,26 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             }
             catch (Exception ex)
             {
-                Trace.Error($"Caught exception from {nameof(JobServerQueue)}.{nameof(_jobServerQueue.ShutdownAsync)}");
-                Trace.Error("This indicate a failure during publish output variables. Fail the job to prevent unexpected job outputs.");
-                Trace.Error(ex);
-                result = TaskResultUtil.MergeTaskResults(result, TaskResult.Failed);
+                if (ex is AggregateException)
+                {
+                    Trace.Error("One or several exceptions have been occurred.");
+
+                    int i = 0;
+                    foreach (var e in ((AggregateException)ex).Flatten().InnerExceptions)
+                    {
+
+                        i++;
+                        Trace.Error($"InnerException #{i}");
+                        Trace.Error(e.ToString());
+                    }
+                }
+                else
+                {
+                    Trace.Error($"Caught exception from {nameof(JobServerQueue)}.{nameof(_jobServerQueue.ShutdownAsync)}");
+                    Trace.Error("This indicate a failure during publish output variables. Fail the job to prevent unexpected job outputs.");
+                    Trace.Error(ex);
+                    result = TaskResultUtil.MergeTaskResults(result, TaskResult.Failed);
+                }
             }
 
             // Clean TEMP after finish process jobserverqueue, since there might be a pending fileupload still use the TEMP dir.
@@ -438,8 +474,24 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
                 }
                 catch (Exception ex) when (!throwOnFailure)
                 {
-                    Trace.Error($"Caught exception from {nameof(JobServerQueue)}.{nameof(_jobServerQueue.ShutdownAsync)}");
-                    Trace.Error(ex);
+                    if (ex is AggregateException)
+                    {
+                        Trace.Error("One or several exceptions have been occurred.");
+
+                        int i = 0;
+                        foreach (var e in ((AggregateException)ex).Flatten().InnerExceptions)
+                        {
+
+                            i++;
+                            Trace.Error($"InnerException #{i}");
+                            Trace.Error(e.ToString());
+                        }
+                    }
+                    else
+                    {
+                        Trace.Error($"Caught exception from {nameof(JobServerQueue)}.{nameof(_jobServerQueue.ShutdownAsync)}");
+                        Trace.Error(ex);
+                    }
                 }
                 finally
                 {

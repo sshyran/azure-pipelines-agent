@@ -309,6 +309,26 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
             {
                 await RunAsync(message, previousJobDispatch, currentJobDispatch);
             }
+            catch(Exception e)
+            {
+                if (e is AggregateException)
+                {
+                    Trace.Error("One or several exceptions have been occurred.");
+
+                    int i = 0;
+                    foreach (var ex in ((AggregateException)e).Flatten().InnerExceptions)
+                    {
+
+                        i++;
+                        Trace.Error($"InnerException #{i}");
+                        Trace.Error(ex);
+                    }
+                }
+                else
+                {
+                    throw;
+                }
+            }
             finally
             {
                 Trace.Info("Fire signal for one time used agent.");
@@ -657,6 +677,26 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
 
                         // complete job request
                         await CompleteJobRequestAsync(_poolId, message, lockToken, resultOnAbandonOrCancel);
+                    }
+                    catch (Exception e)
+                    {
+                        if (e is AggregateException)
+                        {
+                            Trace.Error("One or several exceptions have been occurred.");
+
+                            int i = 0;
+                            foreach (var ex in ((AggregateException)e).Flatten().InnerExceptions)
+                            {
+
+                                i++;
+                                Trace.Error($"InnerException #{i}");
+                                Trace.Error(ex);
+                            }
+                        }
+                        else
+                        {
+                            throw;
+                        }
                     }
                     finally
                     {
