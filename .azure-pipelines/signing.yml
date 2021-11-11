@@ -151,7 +151,7 @@ steps:
     ConnectedServiceName: VSTSAgentESRP
     FolderPath: '${{ parameters.layoutRoot }}'
     Pattern: |
-      bin\*.dll
+      bin\**\*.dll
       externals\git\**\*.dll
       externals\git\**\*.exe
       externals\node\bin\node.exe
