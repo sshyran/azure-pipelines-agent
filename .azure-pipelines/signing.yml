@@ -12,15 +12,14 @@ steps:
     script: |
       $ErrorActionPreference = 'Stop'
       foreach ($tree in Get-ChildItem -Path '${{ parameters.layoutRoot }}/bin' -Filter "*.dll") {
-        try {
           Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
           Write-Host $tree
           $windowsSdkPath=Get-ChildItem "${Env:ProgramFiles(x86)}\Windows Kits\10\bin\1*" | Select-Object FullName | Sort-Object -Descending { [version](Split-Path $_.FullName -leaf)} | Select-Object -first 1
           & "$($windowsSdkPath.FullName)\x64\signtool" remove /s $tree 2>&1
           Write-Host "---------------------------------------------------------------------------"
-        } catch {
-          Write-Host "Something went wrong, failed to process $tree file"
-        }
+          if ($lastexitcode -ne 0) {
+            Write-Host "Something went wrong, failed to process $tree file"
+          }
       }
     ignoreLASTEXITCODE: true
 
