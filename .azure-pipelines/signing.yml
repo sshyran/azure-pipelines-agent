@@ -10,21 +10,14 @@ steps:
   inputs:
     targetType: 'inline'
     script: |
-      $errorList = New-Object Collections.Generic.List[String]
-      $successList = New-Object Collections.Generic.List[String]
+      $ErrorActionPreference = 'Stop'
       foreach ($tree in Get-ChildItem -Path '${{ parameters.layoutRoot }}/bin' -Filter "*.dll") {
         try {
           $windowsSdkPath=Get-ChildItem "${Env:ProgramFiles(x86)}\Windows Kits\10\bin\1*" | Select-Object FullName | Sort-Object -Descending { [version](Split-Path $_.FullName -leaf)} | Select-Object -first 1
-          & "$($windowsSdkPath.FullName)\x64\signtool" remove /s /q $tree 2>&1
+          & "$($windowsSdkPath.FullName)\x64\signtool" remove /s $tree 2>&1
         } catch {
-          $errorList.Add($tree)
+          Write-Host "Something went wrong, failed to process $tree file"
         }
-      }
-      foreach($failed in $errorList) {
-        Write-Warning "Something went wrong, failed to process $failed file"
-      }
-      foreach($success in $successList) {
-        Write-Host "Succeffully removed signing for $success"
       }
 
 - ${{ if parameters.isWindows }}:
