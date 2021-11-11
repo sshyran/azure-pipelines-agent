@@ -23,6 +23,7 @@ steps:
         }
       }
     pwsh: true
+    ignoreLASTEXITCODE: true
 
 - ${{ if parameters.isWindows }}:
   - task: SFP.build-tasks.custom-build-task-1.EsrpCodeSigning@1
