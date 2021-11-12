@@ -11,20 +11,30 @@ steps:
     inputs:
       targetType: 'inline'
       script: |
+        $errors = New-Object Collections.Generic.List[String]
+        $success = New-Object Collections.Generic.List[String]
         $ErrorActionPreference = 'Stop'
-                    $windowsSdkPath=Get-ChildItem "${Env:ProgramFiles(x86)}\Windows Kits\10\bin\1*" | Select-Object FullName | Sort-Object -Descending { [version](Split-Path $_.FullName -leaf)} | Select-Object -first 1
+        $windowsSdkPath=Get-ChildItem "${Env:ProgramFiles(x86)}\Windows Kits\10\bin\1*" | Select-Object FullName | Sort-Object -Descending { [version](Split-Path $_.FullName -leaf)} | Select-Object -first 1
         foreach ($tree in Get-ChildItem -Path '${{ parameters.layoutRoot }}/bin' -Filter "*.dll" | select FullName) {
-            try {
-              Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-              Write-Host $tree
-              & "$($windowsSdkPath.FullName)\x64\signtool" remove /s "$($tree.FullName)"
-              Write-Host "---------------------------------------------------------------------------"
-              if ($lastexitcode -ne 0) {
-                Write-Warning "Something went wrong, failed to process $tree file in try"
-              }
-            } catch {
-              Write-Warning "Something went wrong, failed to process $tree file in catch"
+          try {
+            # Write-Host $tree.FullName
+            & "$($windowsSdkPath.FullName)\x64\signtool" remove /s /q "$($tree.FullName)" 2>&1
+            if ($lastexitcode -ne 0) {
+              # Write-Warning "Something went wrong, failed to process $tree file in try"
+              $errors.Add("$($tree.FullName)")
+            } else {
+              $success.Add("$($tree.FullName)")
             }
+          } catch {
+            $errors.Add("$($tree.FullName)")
+            # Write-Warning "Something went wrong, failed to process $tree file in catch"
+          }
+        }
+        foreach ($e in $errors) {
+          Write-Warning "Something went wrong, failed to process $e file in catch"
+        }
+        foreach ($s in $success) {
+          Write-Host "Signature succefully removed for $s file"
         }
       ignoreLASTEXITCODE: true
 
