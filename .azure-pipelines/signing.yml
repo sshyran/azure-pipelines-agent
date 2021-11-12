@@ -22,6 +22,7 @@ steps:
           $systemBit = 86
           $x86ProgramFiles = ${Env:ProgramFiles(x86)}
         }
+        Write-Host $x86ProgramFiles
         $windowsSdkPath=Get-ChildItem "$x86ProgramFiles\Windows Kits\10\bin\1*" | Select-Object FullName | Sort-Object -Descending { [version](Split-Path $_.FullName -leaf)} | Select-Object -first 1
         # Write-Host $windowsSdkPath
         foreach ($tree in Get-ChildItem -Path '${{ parameters.layoutRoot }}/bin' -Filter "*.dll" | select FullName) {
