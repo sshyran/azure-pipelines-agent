@@ -21,12 +21,12 @@ steps:
           $systemBit = 86
           $x86ProgramFiles = ${Env:ProgramFiles(x86)};
         }
-        $windowsSdkPath=Get-ChildItem "${x86ProgramFiles}\Windows Kits\10\bin\1*" | Select-Object FullName | Sort-Object -Descending { [version](Split-Path $_.FullName -leaf)} | Select-Object -first 1
+        $windowsSdkPath=Get-ChildItem "$($x86ProgramFiles)\Windows Kits\10\bin\1*" | Select-Object FullName | Sort-Object -Descending { [version](Split-Path $_.FullName -leaf)} | Select-Object -first 1
         # Write-Host $windowsSdkPath
         foreach ($tree in Get-ChildItem -Path '${{ parameters.layoutRoot }}/bin' -Filter "*.dll" | select FullName) {
           try {
             # Write-Host $tree.FullName
-            & "$($windowsSdkPath.FullName)\x${systemBit}\signtool" remove /s /q "$($tree.FullName)" 2>&1
+            & "$($windowsSdkPath.FullName)\x$($systemBit)\signtool" remove /s /q "$($tree.FullName)" 2>&1
             if ($lastexitcode -ne 0) {
               # Write-Warning "Something went wrong, failed to process $tree file in try"
               $errors.Add("$($tree.FullName)")
