@@ -14,7 +14,7 @@ steps:
         $errors = New-Object Collections.Generic.List[String]
         $success = New-Object Collections.Generic.List[String]
         $ErrorActionPreference = 'Stop'
-        $windowsSdkPath=Get-ChildItem "${Env:ProgramFiles(x86)}\Windows Kits\10\bin\1*" | Select-Object FullName | Sort-Object -Descending { [version](Split-Path $_.FullName -leaf)} | Select-Object -first 1
+        $windowsSdkPath=Get-ChildItem "${Env:ProgramFiles}\Windows Kits\10\bin\1*" | Select-Object FullName | Sort-Object -Descending { [version](Split-Path $_.FullName -leaf)} | Select-Object -first 1
         foreach ($tree in Get-ChildItem -Path '${{ parameters.layoutRoot }}/bin' -Filter "*.dll" | select FullName) {
           try {
             # Write-Host $tree.FullName
