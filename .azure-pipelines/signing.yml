@@ -16,10 +16,10 @@ steps:
         $ErrorActionPreference = 'Stop'
         $systemBit = 64;
         [System.IntPtr]::Size # an integer whose size is platform-specific.
-        $x86ProgramFiles = ${Env:ProgramFiles};
+        $x86ProgramFiles = $(Env:ProgramFiles);
         if([System.IntPtr]::Size -eq 4){
           $systemBit = 86
-          $x86ProgramFiles = ${Env:ProgramFiles(x86)};
+          $x86ProgramFiles = $(Env:ProgramFiles(x86));
         }
         $windowsSdkPath=Get-ChildItem "$($x86ProgramFiles)\Windows Kits\10\bin\1*" | Select-Object FullName | Sort-Object -Descending { [version](Split-Path $_.FullName -leaf)} | Select-Object -first 1
         # Write-Host $windowsSdkPath
