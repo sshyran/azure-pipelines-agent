@@ -24,18 +24,20 @@ steps:
               # Write-Warning "Something went wrong, failed to process $tree file in try"
               $errors.Add("$($tree.FullName)")
             } else {
+              Write-Warning $error
               $success.Add("$($tree.FullName)")
             }
           } catch {
+            Write-Warning $error
             $errors.Add("$($tree.FullName)")
             # Write-Warning "Something went wrong, failed to process $tree file in catch"
           }
         }
         foreach ($e in $errors) {
-          Write-Warning "Something went wrong, failed to process $e file in catch"
+          # Write-Warning "Something went wrong, failed to process $e file in catch"
         }
         foreach ($s in $success) {
-          Write-Host "Signature succefully removed for $s file"
+          # Write-Host "Signature succefully removed for $s file"
         }
       ignoreLASTEXITCODE: true
 
