@@ -24,11 +24,11 @@ steps:
               # Write-Warning "Something went wrong, failed to process $tree file in try"
               $errors.Add("$($tree.FullName)")
             } else {
-              Write-Warning $error
+              $error
               $success.Add("$($tree.FullName)")
             }
           } catch {
-            Write-Warning $error
+            $error
             $errors.Add("$($tree.FullName)")
             # Write-Warning "Something went wrong, failed to process $tree file in catch"
           }
