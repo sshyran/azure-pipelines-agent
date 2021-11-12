@@ -412,8 +412,8 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
                     Trace.Error($"Caught exception from {nameof(JobServerQueue)}.{nameof(_jobServerQueue.ShutdownAsync)}");
                     Trace.Error("This indicate a failure during publish output variables. Fail the job to prevent unexpected job outputs.");
                     Trace.Error(ex);
-                    result = TaskResultUtil.MergeTaskResults(result, TaskResult.Failed);
                 }
+                result = TaskResultUtil.MergeTaskResults(result, TaskResult.Failed);
             }
 
             // Clean TEMP after finish process jobserverqueue, since there might be a pending fileupload still use the TEMP dir.
