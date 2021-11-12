@@ -329,6 +329,8 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
                         Trace.Error($"InnerException #{i}");
                         Trace.Error(ex);
                     }
+
+                    return TaskResult.Failed;
                 }
                 else
                 {
