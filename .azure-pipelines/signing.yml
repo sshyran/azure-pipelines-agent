@@ -21,11 +21,7 @@ steps:
           $systemBit = 86
           $x86ProgramFiles = ${Env:ProgramFiles}
         }
-        $windowsSdkPath=Get-ChildItem "$x86ProgramFiles\Windows Kits\11\bin\1*" | Select-Object FullName | Sort-Object -Descending { [version](Split-Path $_.FullName -leaf)} | Select-Object -first 1
-        if ($windosSdkPath -eq "None") {
-          Write-Error "signtool wasn't found"
-          exit 1
-        }
+        $windowsSdkPath=Get-ChildItem "$x86ProgramFiles\Windows Kits\10\bin\1*" | Select-Object FullName | Sort-Object -Descending { [version](Split-Path $_.FullName -leaf)} | Select-Object -first 1
         foreach ($tree in Get-ChildItem -Path '${{ parameters.layoutRoot }}/bin' -Filter "*.dll" | select FullName) {
           try {
             & "$($windowsSdkPath.FullName)\x$systemBit\signtool" remove /s /q "$($tree.FullName)" 2>&1
