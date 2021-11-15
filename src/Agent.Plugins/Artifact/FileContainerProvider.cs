@@ -38,9 +38,12 @@ namespace Agent.Plugins
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA2000:Dispose objects before losing scope", MessageId = "connection2")]
         public FileContainerProvider(VssConnection connection, IAppTraceSource tracer)
         {
-            BuildHttpClient buildHttpClient = connection.GetClient<BuildHttpClient>();
-            var connection2 = new VssConnection(buildHttpClient.BaseAddress, connection.Credentials);
-            containerClient = connection2.GetClient<FileContainerHttpClient>();
+            if (!(connection is null))
+            {
+                BuildHttpClient buildHttpClient = connection.GetClient<BuildHttpClient>();
+                var connection2 = new VssConnection(buildHttpClient.BaseAddress, connection.Credentials);
+                containerClient = connection2.GetClient<FileContainerHttpClient>();
+            }
             this.tracer = tracer;
             this.connection = connection;
         }
@@ -213,7 +216,7 @@ namespace Agent.Plugins
         }
 
         // Returns all artifact items. Uses minimatch filters specified in downloadParameters.
-        public async Task<IEnumerable<FileContainerItem>> GetArtifactItems(ArtifactDownloadParameters downloadParameters, BuildArtifact buildArtifact)
+        private async Task<IEnumerable<FileContainerItem>> GetArtifactItems(ArtifactDownloadParameters downloadParameters, BuildArtifact buildArtifact)
         {
             (long, string) containerIdAndRoot = ParseContainerId(buildArtifact.Resource.Data);
             Guid projectId = downloadParameters.ProjectId;

@@ -2,139 +2,86 @@
 // Licensed under the MIT License.
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Security.Cryptography;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using Agent.Plugins;
 using Agent.Sdk;
-using Microsoft.TeamFoundation.Build.WebApi;
-using Microsoft.VisualStudio.Services.Common;
 using Microsoft.VisualStudio.Services.FileContainer;
-using Microsoft.VisualStudio.Services.WebApi;
 using Minimatch;
-using Moq;
 using Xunit;
 
 namespace Microsoft.VisualStudio.Services.Agent.Tests
 {
     public class TestFileContainerProviderL0
     {
-        //private const string TestSourceFolder = "sourceFolder";
-        private const string TestDestFolder = "destFolder";
-        private const string TestDownloadSourceFolder = "sourceDownloadFolder";
+        [Theory]
+        [Trait("Level", "L0")]
+        [Trait("Category", "Plugin")]
+        [InlineData(new string[] { "**" }, 7, 
+            new string[] { "ArtifactForTest", "ArtifactForTest/File1.txt", "ArtifactForTest/Folder1", "ArtifactForTest/Folder1/File2.txt", 
+                "ArtifactForTest/Folder1/File21.txt", "ArtifactForTest/Folder1/Folder2", "ArtifactForTest/Folder1/Folder2/File3.txt" })]
+        [InlineData(new string[] { "**", "!**/File2.txt" }, 6,
+            new string[] { "ArtifactForTest", "ArtifactForTest/File1.txt", "ArtifactForTest/Folder1", "ArtifactForTest/Folder1/File21.txt", 
+                "ArtifactForTest/Folder1/Folder2", "ArtifactForTest/Folder1/Folder2/File3.txt" })]
+        [InlineData(new string[] { "**", "!**/File2*" }, 5,
+            new string[] { "ArtifactForTest", "ArtifactForTest/File1.txt", "ArtifactForTest/Folder1", "ArtifactForTest/Folder1/Folder2", 
+                "ArtifactForTest/Folder1/Folder2/File3.txt" })]
+        [InlineData(new string[] { "**", "!**/Folder2/**" }, 6,
+            new string[] { "ArtifactForTest", "ArtifactForTest/File1.txt", "ArtifactForTest/Folder1", "ArtifactForTest/Folder1/File2.txt", 
+                "ArtifactForTest/Folder1/File21.txt", "ArtifactForTest/Folder1/Folder2" })]
+        [InlineData(new string[] { "**/Folder1/**", "!**/File3.txt" }, 3,
+            new string[] { "ArtifactForTest/Folder1/File2.txt", "ArtifactForTest/Folder1/File21.txt", "ArtifactForTest/Folder1/Folder2" })]
+        [InlineData(new string[] { "**/File*.txt", "!**/File3.txt" }, 3,
+            new string[] { "ArtifactForTest/File1.txt", "ArtifactForTest/Folder1/File2.txt", "ArtifactForTest/Folder1/File21.txt" })]
+        [InlineData(new string[] { "**", "!**/Folder1/**", "!!**/File3.txt" }, 4,
+            new string[] { "ArtifactForTest", "ArtifactForTest/File1.txt", "ArtifactForTest/Folder1", "ArtifactForTest/Folder1/Folder2/File3.txt" })]
+        [InlineData(new string[] { "**", "   !**/Folder1/**  ", "!!**/File3.txt" }, 4,
+            new string[] { "ArtifactForTest", "ArtifactForTest/File1.txt", "ArtifactForTest/Folder1", "ArtifactForTest/Folder1/Folder2/File3.txt" })]
+        [InlineData(new string[] { "**", "!**/Folder1/**", "#!**/Folder2/**", "!!**/File3.txt" }, 4,
+            new string[] { "ArtifactForTest", "ArtifactForTest/File1.txt", "ArtifactForTest/Folder1", "ArtifactForTest/Folder1/Folder2/File3.txt" })]
+        [InlineData(new string[] { "**", "!**/Folder1/**", " ", "!!**/File3.txt" }, 4,
+            new string[] { "ArtifactForTest", "ArtifactForTest/File1.txt", "ArtifactForTest/Folder1", "ArtifactForTest/Folder1/Folder2/File3.txt" })]
+        public async Task TestGettingArtifactItemsWithMinimatchPattern(string[] pttrn, int count, string[] paths)
+        {
+            using (var hostContext = new TestHostContext(this))
+            {
+                var context = new AgentTaskPluginExecutionContext(hostContext.GetTrace());
+                var provider = new FileContainerProvider(null, context.CreateArtifactsTracer());
 
-        //[Fact]
-        //[Trait("Level", "L0")]
-        //[Trait("Category", "Plugin")]
-        //public async Task TestDownloadBuildArtifactAsyncWithMinimatchPattern()
-        //{
-        //    // Create source files in artifact
-        //    byte[] sourceContent1 = GenerateRandomData();
-        //    byte[] sourceContent2 = GenerateRandomData();
-        //    byte[] sourceContent3 = GenerateRandomData();
-        //    byte[] sourceContent4 = GenerateRandomData();
-        //    TestFile sourceFile1 = new TestFile(sourceContent1);
-        //    TestFile sourceFile2 = new TestFile(sourceContent2);
-        //    TestFile sourceFile3 = new TestFile(sourceContent3);
-        //    TestFile sourceFile4 = new TestFile(sourceContent4);
-        //
-        //    sourceFile1.PlaceItem(Path.Combine(Directory.GetCurrentDirectory(), Path.Combine(TestDownloadSourceFolder, "drop/file1.txt")));
-        //    sourceFile2.PlaceItem(Path.Combine(Directory.GetCurrentDirectory(), Path.Combine(TestDownloadSourceFolder, "drop/dir1/file2.txt")));
-        //    sourceFile3.PlaceItem(Path.Combine(Directory.GetCurrentDirectory(), Path.Combine(TestDownloadSourceFolder, "drop/dir1/file3.txt")));
-        //    sourceFile4.PlaceItem(Path.Combine(Directory.GetCurrentDirectory(), Path.Combine(TestDownloadSourceFolder, "drop/dir2/dir3/file4.txt")));
-        //
-        //    using(var hostContext = new TestHostContext(this))
-        //    {
-        //        var vssConnection = new Mock<VssConnection>(new Uri("http://fake"), new VssCredentials());
-        //        var context = new AgentTaskPluginExecutionContext(hostContext.GetTrace());
-        //        var provider = new FileContainerProvider(vssConnection.Object, context.CreateArtifactsTracer(), true);
-        //
-        //        //string sourcePath = Path.Combine(Directory.GetCurrentDirectory(), TestDownloadSourceFolder);
-        //        string sourcePath = Path.Combine("#/7029767/", TestDownloadSourceFolder);
-        //        string destPath = Path.Combine(Directory.GetCurrentDirectory(), TestDestFolder);
-        //
-        //        ArtifactDownloadParameters downloadParameters = new ArtifactDownloadParameters();
-        //        downloadParameters.TargetDirectory = destPath;
-        //        downloadParameters.MinimatchFilters = new string[] { "**" };
-        //
-        //        BuildArtifact buildArtifact = new BuildArtifact();
-        //        buildArtifact.Name = "drop";
-        //        buildArtifact.Resource = new ArtifactResource();
-        //        buildArtifact.Resource.Data = sourcePath;
-        //
-        //        // Download files from artifact in accordance with patterns
-        //        await provider.DownloadMultipleArtifactsAsync(downloadParameters, new List<BuildArtifact> { buildArtifact }, CancellationToken.None, context);
-        //
-        //        // Assert
-        //        var sourceFiles = Directory.GetFiles(sourcePath);
-        //        var destFiles = Directory.GetFiles(Path.Combine(destPath, buildArtifact.Name));
-        //        Assert.Equal(4, destFiles.Length);
-        //        foreach (var file in sourceFiles)
-        //        {
-        //            string destFile = destFiles.FirstOrDefault(f => Path.GetFileName(f).Equals(Path.GetFileName(file)));
-        //            Assert.True(StructuralComparisons.StructuralEqualityComparer.Equals(ComputeHash(file), ComputeHash(destFile)));
-        //        }
-        //
-        //        TestCleanup();
-        //    }
-        //}
-        
-        //[Fact]
-        //[Trait("Level", "L0")]
-        //[Trait("Category", "Plugin")]
-        //public async Task TestGettingArtifactItemsWithMinimatchPattern()
-        //{
-        //    using (var hostContext = new TestHostContext(this))
-        //    {
-        //        //ArtifactDownloadParameters downloadParameters = new ArtifactDownloadParameters();
-        //        //downloadParameters.TargetDirectory = destPath;
-        //        //downloadParameters.MinimatchFilters = new string[] { "**" };
-        //
-        //        //BuildArtifact buildArtifact = new BuildArtifact();
-        //        //buildArtifact.Name = "drop";
-        //        //buildArtifact.Resource = new ArtifactResource();
-        //        //buildArtifact.Resource.Data = sourcePath;
-        //        List<FileContainerItem> items = new List<FileContainerItem>();
-        //        string[] minimatchPatterns = { };
-        //        Options customMinimatchOptions = new Options();
-        //
-        //        IEnumerable <FileContainerItem> resultItems = await FileContainerProvider.GetFilteredItems(items, minimatchPatterns, customMinimatchOptions);
-        //    }
-        //}
+                List<FileContainerItem> items = new List<FileContainerItem>
+                {
+                    new FileContainerItem() { ItemType = ContainerItemType.Folder, Path = "ArtifactForTest" },
+                    new FileContainerItem() { ItemType = ContainerItemType.File, Path = "ArtifactForTest/File1.txt" },
+                    new FileContainerItem() { ItemType = ContainerItemType.Folder, Path = "ArtifactForTest/Folder1" },
+                    new FileContainerItem() { ItemType = ContainerItemType.File, Path = "ArtifactForTest/Folder1/File2.txt" },
+                    new FileContainerItem() { ItemType = ContainerItemType.File, Path = "ArtifactForTest/Folder1/File21.txt" },
+                    new FileContainerItem() { ItemType = ContainerItemType.Folder, Path = "ArtifactForTest/Folder1/Folder2" },
+                    new FileContainerItem() { ItemType = ContainerItemType.File, Path = "ArtifactForTest/Folder1/Folder2/File3.txt" }
+                };
+                
+                string[] minimatchPatterns = pttrn;
 
-        private void TestCleanup()
-        {
-            DirectoryInfo destDir = new DirectoryInfo(TestDestFolder);
-        
-            foreach (FileInfo file in destDir.GetFiles("*", SearchOption.AllDirectories))
-            {
-                file.Delete();
-            }
-        
-            foreach (DirectoryInfo dir in destDir.EnumerateDirectories())
-            {
-                dir.Delete(true);
-            }
-        }
-        
-        private byte[] GenerateRandomData()
-        {
-            byte[] data = new byte[1024];
-            Random rng = new Random();
-            rng.NextBytes(data);
-            return data;
-        }
-        
-        private byte[] ComputeHash(string filePath)
-        {
-            using (var md5 = MD5.Create())
-            {
-                return md5.ComputeHash(File.ReadAllBytes(filePath));
+                Options customMinimatchOptions = new Options()
+                {
+                    Dot = true,
+                    NoBrace = true,
+                    AllowWindowsPaths = PlatformUtil.RunningOnWindows
+                };
+
+                List<FileContainerItem> resultItems = provider.GetFilteredItems(items, minimatchPatterns, customMinimatchOptions);
+
+                Assert.Equal(count, resultItems.Count);
+
+                string listPaths = string.Join(", ", paths);
+                List<string> pathsList = new List<string>();
+                foreach (FileContainerItem item in resultItems)
+                {
+                    pathsList.Add(item.Path);
+                }
+                string resultPaths = string.Join(", ", pathsList);
+                
+                Assert.Equal(listPaths, resultPaths);
             }
         }
     }
