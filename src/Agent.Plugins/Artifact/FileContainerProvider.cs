@@ -38,16 +38,13 @@ namespace Agent.Plugins
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA2000:Dispose objects before losing scope", MessageId = "connection2")]
         public FileContainerProvider(VssConnection connection, IAppTraceSource tracer)
         {
-            try
+            if (connection != null)
             {
                 BuildHttpClient buildHttpClient = connection.GetClient<BuildHttpClient>();
                 VssConnection connection2 = new VssConnection(buildHttpClient.BaseAddress, connection.Credentials);
                 containerClient = connection2.GetClient<FileContainerHttpClient>();
             }
-            catch (Exception e)
-            {
-                tracer.Warn(e);
-            }
+            
             this.tracer = tracer;
             this.connection = connection;
         }
