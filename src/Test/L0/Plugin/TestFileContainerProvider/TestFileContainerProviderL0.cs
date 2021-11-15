@@ -42,7 +42,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Tests
             new string[] { "ArtifactForTest", "ArtifactForTest/File1.txt", "ArtifactForTest/Folder1", "ArtifactForTest/Folder1/Folder2/File3.txt" })]
         [InlineData(new string[] { "**", "!**/Folder1/**", " ", "!!**/File3.txt" }, 4,
             new string[] { "ArtifactForTest", "ArtifactForTest/File1.txt", "ArtifactForTest/Folder1", "ArtifactForTest/Folder1/Folder2/File3.txt" })]
-        public async Task TestGettingArtifactItemsWithMinimatchPattern(string[] pttrn, int count, string[] paths)
+        public void TestGettingArtifactItemsWithMinimatchPattern(string[] pttrn, int count, string[] paths)
         {
             using (var hostContext = new TestHostContext(this))
             {
