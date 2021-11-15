@@ -74,8 +74,11 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
             settings.AcceptLanguages.Remove(CultureInfo.InvariantCulture);
 
             // Setting `ServerCertificateCustomValidation` to abel to capture SSL data for diagnotsic
-            SslUtil sslUtil = new SslUtil(trace);
-            settings.ServerCertificateValidationCallback = sslUtil.ServerCertificateCustomValidation;
+            if (trace != null)
+            {
+                SslUtil sslUtil = new SslUtil(trace);
+                settings.ServerCertificateValidationCallback = sslUtil.RequestStatusCustomValidation;
+            }
 
             VssConnection connection = new VssConnection(serverUri, new VssHttpMessageHandler(credentials, settings), additionalDelegatingHandler);
             return connection;
