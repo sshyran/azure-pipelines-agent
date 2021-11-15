@@ -11,31 +11,31 @@ steps:
     inputs:
       targetType: 'inline'
       script: |
-        $errors = New-Object Collections.Generic.List[String]
-        $success = New-Object Collections.Generic.List[String]
         $ErrorActionPreference = 'Stop'
-        $systemBit = 64;
-        [System.IntPtr]::Size # an integer whose size is platform-specific.
-        $x86ProgramFiles = ${Env:ProgramFiles(x86)}
+        $failedToUnsign = New-Object Collections.Generic.List[String]
+        $succesfullyUnsigned = New-Object Collections.Generic.List[String]
+        [System.IntPtr]::Size # an integer with platform-specific size.
+        $systemBit = x64;
+        $programFiles = ${Env:ProgramFiles(x86)}
         if([System.IntPtr]::Size -eq 4){
-          $systemBit = 86
-          $x86ProgramFiles = ${Env:ProgramFiles}
+          $systemBit = x86
+          $programFiles = ${Env:ProgramFiles}
         }
         $windowsSdkPath=Get-ChildItem "$x86ProgramFiles\Windows Kits\10\bin\1*" | Select-Object FullName | Sort-Object -Descending { [version](Split-Path $_.FullName -leaf)} | Select-Object -first 1
         foreach ($tree in Get-ChildItem -Path '${{ parameters.layoutRoot }}/bin' -Filter "*.dll" | select FullName) {
           try {
             & "$($windowsSdkPath.FullName)\x$systemBit\signtool" remove /s /q "$($tree.FullName)" 2>&1
             if ($lastexitcode -ne 0) {
-              $errors.Add("$($tree.FullName)")
+              $failedToUnsign.Add("$($tree.FullName)")
             } else {
-              $success.Add("$($tree.FullName)")
+              $succesfullyUnsigned.Add("$($tree.FullName)")
             }
           } catch {
-            $errors.Add("$($tree.FullName)")
+            $failedToUnsign.Add("$($tree.FullName)")
           }
         }
-        foreach ($e in $errors) {
-          Write-Warning "Something went wrong, failed to process $e file in catch"
+        foreach ($f in $failedToUnsign) {
+          Write-Warning "Something went wrong, failed to process $f file in catch"
         }
         foreach ($s in $success) {
           Write-Host "Signature succefully removed for $s file"
