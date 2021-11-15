@@ -44,10 +44,10 @@ namespace Microsoft.VisualStudio.Services.Agent.Tests
             new string[] { "ArtifactForTest", "ArtifactForTest/File1.txt", "ArtifactForTest/Folder1", "ArtifactForTest/Folder1/Folder2/File3.txt" })]
         public void TestGettingArtifactItemsWithMinimatchPattern(string[] pttrn, int count, string[] paths)
         {
-            using (var hostContext = new TestHostContext(this))
+            using (TestHostContext hostContext = new TestHostContext(this))
             {
-                var context = new AgentTaskPluginExecutionContext(hostContext.GetTrace());
-                var provider = new FileContainerProvider(null, context.CreateArtifactsTracer());
+                AgentTaskPluginExecutionContext context = new AgentTaskPluginExecutionContext(hostContext.GetTrace());
+                FileContainerProvider provider = new FileContainerProvider(null, context.CreateArtifactsTracer());
 
                 List<FileContainerItem> items = new List<FileContainerItem>
                 {
