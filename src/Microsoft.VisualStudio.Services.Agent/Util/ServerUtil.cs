@@ -79,7 +79,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
             {
                 if (errorIfNotDetermined)
                 {
-                    throw ex;
+                    throw;
                 }
                 else
                 {
