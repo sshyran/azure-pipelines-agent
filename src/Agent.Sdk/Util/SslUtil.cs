@@ -4,6 +4,7 @@ using System.Net.Http;
 using Agent.Sdk;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 
 namespace Microsoft.VisualStudio.Services.Agent.Util
 {
@@ -24,7 +25,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
         {
             bool isRequestSuccessful = (sslErrors == SslPolicyErrors.None);
 
-            if (!isRequestSuccessful)
+            if (isRequestSuccessful)
             {
                 LoggingRequestDiagnosticData(requestMessage, certificate, chain, sslErrors);
             }
@@ -41,7 +42,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
 
             if (this.Trace != null)
             {
-                diagInfo += SslDiagnosticDataProvider.ResolveSslPolicyErrorMessage(sslErrors);
+                diagInfo += SslDiagnosticDataProvider.ResolveSslPolicyErrorsMessage(sslErrors);
                 diagInfo += SslDiagnosticDataProvider.GetRequestMessageData(requestMessage);
                 diagInfo += SslDiagnosticDataProvider.GetCertificateData(certificate);
 
@@ -55,11 +56,19 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
         /// <summary>
         /// A predefined list of headers to be extracted from request for diagnostic data. 
         /// </summary>
-        private static string[] requiredRequestHeaders = new[]
+        private static readonly string[] _requiredRequestHeaders = new[]
         {
             "X-TFS-Session",
             "X-VSS-E2EID",
             "User-Agent"
+        };
+
+        private static readonly Dictionary<SslPolicyErrors, string> _sslPolicyErrorsMapping = new Dictionary<SslPolicyErrors, string>
+        {
+            {SslPolicyErrors.None, "No SSL policy errors"},
+            {SslPolicyErrors.RemoteCertificateChainErrors, "ChainStatus has returned a non empty array"},
+            {SslPolicyErrors.RemoteCertificateNameMismatch, "Certificate name mismatch"},
+            {SslPolicyErrors.RemoteCertificateNotAvailable, "Certificate not available"}
         };
 
         public static string GetRequestMessageData(HttpRequestMessage requestMessage)
@@ -93,7 +102,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
             string headersDiagInfoHeader = "HttpRequestHeaders";
 
             var headersDiagInfo = new List<KeyValuePair<string, string>>();
-            foreach (var headerKey in requiredRequestHeaders)
+            foreach (var headerKey in _requiredRequestHeaders)
             {
                 IEnumerable<string> headerValues;
 
@@ -130,36 +139,36 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
             return GetFormattedData(diagInfoHeader, diagInfo);
         }
 
-        public static string ResolveSslPolicyErrorMessage(SslPolicyErrors sslErrors)
+        public static string ResolveSslPolicyErrorsMessage(SslPolicyErrors sslErrors)
         {
-            string sslErrorsStatus = string.Empty;
+            string diagInfoHeader = $"SSL Policy Errors";
+            var diagInfo = new List<KeyValuePair<string, string>>();
 
-            switch (sslErrors)
+            if (sslErrors == SslPolicyErrors.None)
             {
-                case SslPolicyErrors.None:
-                    sslErrorsStatus = "No SSL policy errors";
-                    break;
-
-                case SslPolicyErrors.RemoteCertificateChainErrors:
-                    sslErrorsStatus = "ChainStatus has returned a non empty array";
-                    break;
-
-                case SslPolicyErrors.RemoteCertificateNameMismatch:
-                    sslErrorsStatus = "Certificate name mismatch";
-                    break;
-
-                case SslPolicyErrors.RemoteCertificateNotAvailable:
-                    sslErrorsStatus = "Certificate not available";
-                    break;
-
-                default:
-                    sslErrorsStatus = sslErrors.ToString();
-                    break;
+                diagInfo.Add(new KeyValuePair<string, string>(sslErrors.ToString(), _sslPolicyErrorsMapping[sslErrors]));
+                return GetFormattedData(diagInfoHeader, diagInfo);
             }
 
-            string diagInfo = $"SSL Policy Errors: {sslErrorsStatus}\n";
+            System.Diagnostics.Debugger.Launch();
 
-            return diagInfo;
+            foreach (SslPolicyErrors errorCode in Enum.GetValues(typeof(SslPolicyErrors)))
+            {
+                if ((sslErrors & errorCode) != 0)
+                {
+                    string errorValue = errorCode.ToString();
+                    string errorMessage = string.Empty;
+
+                    if (!_sslPolicyErrorsMapping.TryGetValue(errorCode, out errorMessage))
+                    {
+                        errorMessage = "Could not resolve related error message";
+                    }
+
+                    diagInfo.Add(new KeyValuePair<string, string>(errorValue, errorMessage));
+                }
+            }
+
+            return GetFormattedData(diagInfoHeader, diagInfo);
         }
 
 
