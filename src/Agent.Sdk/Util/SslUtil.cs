@@ -150,8 +150,6 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
                 return GetFormattedData(diagInfoHeader, diagInfo);
             }
 
-            System.Diagnostics.Debugger.Launch();
-
             foreach (SslPolicyErrors errorCode in Enum.GetValues(typeof(SslPolicyErrors)))
             {
                 if ((sslErrors & errorCode) != 0)
