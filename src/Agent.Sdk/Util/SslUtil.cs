@@ -42,8 +42,8 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
             if (this.Trace != null)
             {
                 diagInfo += SslDiagnosticDataProvider.ResolveSslPolicyErrorMessage(sslErrors);
-                diagInfo += SslDiagnosticDataProvider.GetDataFromHttpRequestMessage(requestMessage);
-                diagInfo += SslDiagnosticDataProvider.GetDataFromCertificate(certificate);
+                diagInfo += SslDiagnosticDataProvider.GetRequestMessageData(requestMessage);
+                diagInfo += SslDiagnosticDataProvider.GetCertificateData(certificate);
 
                 Trace?.Info(diagInfo);
             }
@@ -62,7 +62,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
             "User-Agent"
         };
 
-        public static string GetDataFromHttpRequestMessage(HttpRequestMessage requestMessage)
+        public static string GetRequestMessageData(HttpRequestMessage requestMessage)
         {
             // Getting general information about request
             string requestDiagInfoHeader = "HttpRequest";
@@ -112,7 +112,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
             return diagInfo;
         }
 
-        public static string GetDataFromCertificate(X509Certificate2 certificate)
+        public static string GetCertificateData(X509Certificate2 certificate)
         {
             string diagInfoHeader = "Certificate";
             var diagInfo = new List<KeyValuePair<string, string>>();
@@ -168,9 +168,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
         /// </summary>
         private static string GetFormattedData(string diagInfoHeader, List<KeyValuePair<string, string>> diagInfo)
         {
-            string formattedData = string.Empty;
-
-            formattedData += $"[{diagInfoHeader}]\n";
+            string formattedData = $"[{diagInfoHeader}]\n";
 
             foreach (var record in diagInfo)
             {
