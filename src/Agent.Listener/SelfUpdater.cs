@@ -176,7 +176,20 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
                 return true;
             }
 
-            bool isHostedServer = await _serverUtil.IsDeploymentTypeHosted(_serverUrl, _creds, _locationServer);
+            bool isHostedServer;
+            try
+            {
+                isHostedServer = await _serverUtil.IsDeploymentTypeHosted(_serverUrl, _creds, _locationServer, Trace, errorIfNotDetermined:true);
+            }
+            catch (DeploymentTypeNotDeterminedException ex)
+            {
+                throw new DeploymentTypeNotDeterminedException(ex.Message + $@"
+This exception was thrown during checksum validation when performing the agent self-update process.
+There are possible reasons why this happened:
+  1) The response from the server was compromised.
+  2) The deployment type determination was not implemented for your server version (recommended to update TFS if you use it)
+You can skip checksum validation for the agent package by setting the environment variable DISABLE_HASH_VALIDATION=true");
+            }
 
             if (!isHostedServer)
             {

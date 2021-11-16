@@ -8,6 +8,24 @@ using Microsoft.VisualStudio.Services.WebApi;
 
 namespace Microsoft.VisualStudio.Services.Agent.Util
 {
+    public class DeploymentTypeNotDeterminedException : Exception
+    {
+        public DeploymentTypeNotDeterminedException() {}
+
+        public DeploymentTypeNotDeterminedException(string message) : base(message) {}
+
+        public DeploymentTypeNotDeterminedException(string message, Exception inner) : base(message, inner) {}
+    }
+
+    public class DeploymentTypeNotRecognizedException : Exception
+    {
+        public DeploymentTypeNotRecognizedException() {}
+
+        public DeploymentTypeNotRecognizedException(string message) : base(message) {}
+
+        public DeploymentTypeNotRecognizedException(string message, Exception inner) : base(message, inner) {}
+    }
+
     public class ServerUtil
     {
         private DeploymentFlags _deploymentType;
@@ -33,9 +51,9 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
                 case DeploymentFlags.OnPremises:
                     return false;
                 case DeploymentFlags.None:
-                    throw new Exception($"Deployment type has not been determined");
+                    throw new DeploymentTypeNotDeterminedException($"Deployment type has not been determined.");
                 default:
-                    throw new Exception($"Unable to recognize deployment type: '{_deploymentType}'");
+                    throw new DeploymentTypeNotRecognizedException($"Unable to recognize deployment type: '{_deploymentType}'");
             }
         }
 
@@ -43,7 +61,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
         /// Returns true if server deployment type is Hosted.
         /// Determines the type if it has not been determined yet.
         /// </summary>
-        public async Task<bool> IsDeploymentTypeHosted(string serverUrl, VssCredentials credentials, ILocationServer locationServer)
+        public async Task<bool> IsDeploymentTypeHosted(string serverUrl, VssCredentials credentials, ILocationServer locationServer, Tracing Trace, bool errorIfNotDetermined)
         {
             // Check if deployment type has not been determined yet
             if (_deploymentType == DeploymentFlags.None)
@@ -53,7 +71,22 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
                 _deploymentType = connectionData.DeploymentType;
             }
 
-            return IsDeploymentTypeHostedIfDetermined();
+            try
+            {
+                return IsDeploymentTypeHostedIfDetermined();
+            }
+            catch (DeploymentTypeNotDeterminedException ex)
+            {
+                if (errorIfNotDetermined)
+                {
+                    throw ex;
+                }
+                else
+                {
+                    Trace.Warning(ex.Message);
+                    return false;
+                }
+            }
         }
     }
 }
