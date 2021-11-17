@@ -9,37 +9,8 @@ steps:
 - ${{ if parameters.isWindows }}:
   - task: PowerShell@2
     inputs:
-      targetType: 'inline'
-      script: |
-        $ErrorActionPreference = 'Stop'
-        $failedToUnsign = New-Object Collections.Generic.List[String]
-        $succesfullyUnsigned = New-Object Collections.Generic.List[String]
-        [System.IntPtr]::Size # an integer with platform-specific size.
-        $systemBit = x64;
-        $programFiles = ${Env:ProgramFiles(x86)}
-        if([System.IntPtr]::Size -eq 4){
-          $systemBit = x86
-          $programFiles = ${Env:ProgramFiles}
-        }
-        $windowsSdkPath=Get-ChildItem "$programFiles\Windows Kits\10\bin\1*" | Select-Object FullName | Sort-Object -Descending { [version](Split-Path $_.FullName -leaf)} | Select-Object -first 1
-        foreach ($tree in Get-ChildItem -Path '${{ parameters.layoutRoot }}/bin' -Filter "*.dll" | select FullName) {
-          try {
-            & "$($windowsSdkPath.FullName)\x$systemBit\signtool" remove /s /q "$($tree.FullName)" 2>&1
-            if ($lastexitcode -ne 0) {
-              $failedToUnsign.Add("$($tree.FullName)")
-            } else {
-              $succesfullyUnsigned.Add("$($tree.FullName)")
-            }
-          } catch {
-            $failedToUnsign.Add("$($tree.FullName)")
-          }
-        }
-        foreach ($f in $failedToUnsign) {
-          Write-Warning "Something went wrong, failed to process $f file in catch"
-        }
-        foreach ($s in $success) {
-          Write-Host "Signature succefully removed for $s file"
-        }
+      targetType: 'filePath'
+      filePath: ./.azure-pipelines/scripts/Unsignig-ThirdPartyAssemlies.ps1
       ignoreLASTEXITCODE: true
       displayName: Remove signatures from the third party packages
 
