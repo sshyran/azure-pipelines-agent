@@ -312,16 +312,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
                             Trace.Error("SocketException occurred.");
                             Trace.Error(e);
                             Trace.Error($"Verify whether you have (network) access to { _targetPackage.DownloadUrl }");
-                            if (PlatformUtil.RunningOnWindows)
-                            {
-                                Trace.Error($"URLs the agent need communicate with - " +
-                                    $"https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/v2-windows?view=azure-devops#im-running-a-firewall-and-my-code-is-in-azure-repos-what-urls-does-the-agent-need-to-communicate-with");
-                            }
-                            else
-                            {
-                                Trace.Error($"URLs the agent need communicate with - " +
-                                    $"https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/v2-linux?view=azure-devops#im-running-a-firewall-and-my-code-is-in-azure-repos-what-urls-does-the-agent-need-to-communicate-with");
-                            }
+                            Trace.Error($"URLs the agent need communicate with - { BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform() }");
                         }
                         catch (Exception ex)
                         {
