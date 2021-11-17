@@ -307,10 +307,10 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
                             Trace.Info($"Agent download has been canceled.");
                             throw;
                         }
-                        catch (SocketException e)
+                        catch (SocketException ex)
                         {
                             Trace.Error("SocketException occurred.");
-                            Trace.Error(e);
+                            Trace.Error(ex);
                             Trace.Error($"Verify whether you have (network) access to { _targetPackage.DownloadUrl }");
                             Trace.Error($"URLs the agent need communicate with - { BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform() }");
                         }

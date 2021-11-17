@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.Services.Agent.Util;
@@ -45,6 +46,13 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Release
                 {
                     await _connection.ConnectAsync();
                     break;
+                }
+                catch (SocketException ex)
+                {
+                    Trace.Error("SocketException occurred.");
+                    Trace.Error(ex.Message);
+                    Trace.Error($"Verify whether you have (network) access to { _connection.Uri }");
+                    Trace.Error($"URLs the agent need communicate with - { BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform() }");
                 }
                 catch (Exception ex) when (attemptCount > 0)
                 {

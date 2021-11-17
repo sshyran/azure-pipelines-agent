@@ -4,9 +4,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Sockets;
 using System.Threading.Tasks;
 using Agent.Plugins.Log.TestResultParser.Contracts;
 using Agent.Sdk;
+using Microsoft.VisualStudio.Services.Agent.Util;
 using Pipelines = Microsoft.TeamFoundation.DistributedTask.Pipelines;
 
 namespace Agent.Plugins.Log.TestFilePublisher
@@ -52,6 +54,14 @@ namespace Agent.Plugins.Log.TestFilePublisher
                                      new TestFilePublisher(context.VssConnection, PipelineConfig, new TestFileTraceListener(context), _logger, _telemetry);
                 await _testFilePublisher.InitializeAsync();
                 _telemetry.AddOrUpdate(TelemetryConstants.PluginInitialized, true);
+            }
+            catch (SocketException ex)
+            {
+                _logger.Error("SocketException occurred.");
+                _logger.Error(ex.Message);
+                _logger.Error($"Verify whether you have (network) access to { context.VssConnection.Uri }");
+                _logger.Error($"URLs the agent need communicate with - { BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform() }");
+                return false;
             }
             catch (Exception ex)
             {

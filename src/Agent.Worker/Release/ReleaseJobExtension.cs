@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Sockets;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -122,6 +123,14 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Release
             {
                 await DownloadArtifacts(executionContext, ReleaseArtifacts, ArtifactsWorkingFolder);
                 await DownloadCommits(executionContext, TeamProjectId, ReleaseArtifacts);
+            }
+            catch (SocketException ex)
+            {
+                Trace.Error("SocketException occurred.");
+                Trace.Error(ex.Message);
+                Trace.Error($"Verify whether you have (network) access to { WorkerUtilities.GetVssConnection(executionContext).Uri }");
+                Trace.Error($"URLs the agent need communicate with - { BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform() }");
+                throw;
             }
             catch (Exception ex)
             {

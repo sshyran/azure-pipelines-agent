@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Sockets;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.Services.Common;
 using Microsoft.VisualStudio.Services.WebApi;
@@ -359,6 +360,14 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener.Configuration
                     {
                         azureSubscriptionId = string.Empty;
                     }
+                }
+                catch (SocketException e)
+                {
+                    azureSubscriptionId = string.Empty;
+                    Trace.Error("SocketException occurred.");
+                    Trace.Error(e.Message);
+                    Trace.Error($"Verify whether you have (network) access to { imdsUri }");
+                    Trace.Error($"URLs the agent need communicate with - { BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform() }");
                 }
                 catch (Exception ex)
                 {

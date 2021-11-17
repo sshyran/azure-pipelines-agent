@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.Services.WebApi;
@@ -144,6 +145,13 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.CodeCoverage
                 ChangeHtmExtensionToHtmlIfRequired(newReportDirectory, executionContext);
 
                 await codeCoveragePublisher.PublishCodeCoverageFilesAsync(commandContext, projectId, executionContext.Variables.System_JobId, containerId, filesToPublish, File.Exists(Path.Combine(newReportDirectory, CodeCoverageConstants.DefaultIndexFile)), cancellationToken);
+            }
+            catch (SocketException ex)
+            {
+                executionContext.Error("SocketException occurred.");
+                executionContext.Error(ex.Message);
+                executionContext.Error($"Verify whether you have (network) access to { WorkerUtilities.GetVssConnection(executionContext).Uri }");
+                executionContext.Error($"URLs the agent need communicate with - { BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform() }");
             }
             catch (Exception ex)
             {

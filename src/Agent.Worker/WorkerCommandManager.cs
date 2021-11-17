@@ -6,6 +6,7 @@ using Microsoft.TeamFoundation.DistributedTask.WebApi;
 using Microsoft.VisualStudio.Services.Agent.Util;
 using System;
 using System.Linq;
+using System.Net.Sockets;
 using System.Collections.Generic;
 
 namespace Microsoft.VisualStudio.Services.Agent.Worker
@@ -106,6 +107,14 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
                     try
                     {
                         extension.ProcessCommand(context, command);
+                    }
+                    catch (SocketException ex)
+                    {
+                        Trace.Error("SocketException occurred.");
+                        Trace.Error(ex.Message);
+                        Trace.Error($"Verify whether you have (network) access to { WorkerUtilities.GetVssConnection(context).Uri }");
+                        Trace.Error($"URLs the agent need communicate with - { BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform() }");
+                        context.CommandResult = TaskResult.Failed;
                     }
                     catch (Exception ex)
                     {
