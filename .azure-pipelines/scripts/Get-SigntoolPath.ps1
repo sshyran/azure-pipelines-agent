@@ -2,11 +2,11 @@ function Get-Signtool() {
     $ErrorActionPreference = 'Stop'
 
     [System.IntPtr]::Size # an integer with platform-specific size.
-    $systemBit = x64;
+    $systemBit = "x64"
     $programFiles = ${Env:ProgramFiles(x86)}
 
     if([System.IntPtr]::Size -eq 4){
-        $systemBit = x86
+        $systemBit = "x86"
         $programFiles = ${Env:ProgramFiles}
     }
 
