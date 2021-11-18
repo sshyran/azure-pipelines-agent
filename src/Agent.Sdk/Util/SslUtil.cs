@@ -10,22 +10,20 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
 {
     public sealed class SslUtil
     {
-        private ITraceWriter Trace { get; set; }
+        private ITraceWriter _trace { get; set; }
 
-        public SslUtil(ITraceWriter Trace)
+        public SslUtil(ITraceWriter trace)
         {
-            this.Trace = Trace;
+            this._trace = trace;
         }
 
-        /// <summary>
-        /// Implementation of the custom callback function that writes SSL-related data from the web request to the agent's logs
-        /// </summary>
-        /// <returns>Returns `true` if web request was successful, otherwise `false`</returns>
+        /// <summary>Implementation of custom callback function that logs SSL-related data from the web request to the agent's logs.</summary>
+        /// <returns>`true` if web request was successful, otherwise `false`</returns>
         public bool RequestStatusCustomValidation(HttpRequestMessage requestMessage, X509Certificate2 certificate, X509Chain chain, SslPolicyErrors sslErrors)
         {
             bool isRequestSuccessful = (sslErrors == SslPolicyErrors.None);
 
-            if (!isRequestSuccessful)
+            if (isRequestSuccessful)
             {
                 LoggingRequestDiagnosticData(requestMessage, certificate, chain, sslErrors);
             }
@@ -33,29 +31,25 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
             return isRequestSuccessful;
         }
 
-        /// <summary>
-        /// Writes SSL related data to agent logs
-        /// </summary>
+        /// <summary>Logs SSL related data to agent's logs</summary>
         private void LoggingRequestDiagnosticData(HttpRequestMessage requestMessage, X509Certificate2 certificate, X509Chain chain, SslPolicyErrors sslErrors)
         {
             string diagInfo = "Diagnostic data for request:\n";
 
-            if (this.Trace != null)
+            if (this._trace != null)
             {
                 diagInfo += SslDiagnosticDataProvider.ResolveSslPolicyErrorsMessage(sslErrors);
                 diagInfo += SslDiagnosticDataProvider.GetRequestMessageData(requestMessage);
                 diagInfo += SslDiagnosticDataProvider.GetCertificateData(certificate);
 
-                Trace?.Info(diagInfo);
+                this._trace?.Info(diagInfo);
             }
         }
     }
 
     public static class SslDiagnosticDataProvider
     {
-        /// <summary>
-        /// A predefined list of headers to be extracted from request for diagnostic data. 
-        /// </summary>
+        /// <summary>A predefined list of headers to get from the request</summary>
         private static readonly string[] _requiredRequestHeaders = new[]
         {
             "X-TFS-Session",
@@ -63,6 +57,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
             "User-Agent"
         };
 
+        /// <summary>User-friendly description of SSL policy errors</summary>
         private static readonly Dictionary<SslPolicyErrors, string> _sslPolicyErrorsMapping = new Dictionary<SslPolicyErrors, string>
         {
             {SslPolicyErrors.None, "No SSL policy errors"},
@@ -71,6 +66,11 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
             {SslPolicyErrors.RemoteCertificateNotAvailable, "Certificate not available"}
         };
 
+        /// <summary>
+        /// Get diagnostic data about the HTTP request.
+        /// This method extracts common information about the request itself and the request's headers.
+        /// To expand list of headers please update <see cref="_requiredRequestHeaders"/></summary>.
+        /// <returns>Diagnostic data as a formatted string</returns>
         public static string GetRequestMessageData(HttpRequestMessage requestMessage)
         {
             // Getting general information about request
@@ -121,6 +121,11 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
             return diagInfo;
         }
 
+        /// <summary>
+        /// Get diagnostic data about the certificate.
+        /// This method extracts common information about the certificate.
+        /// </summary>
+        /// <returns>Diagnostic data as a formatted string</returns>
         public static string GetCertificateData(X509Certificate2 certificate)
         {
             string diagInfoHeader = "Certificate";
@@ -139,6 +144,12 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
             return GetFormattedData(diagInfoHeader, diagInfo);
         }
 
+        /// <summary>
+        /// Get list of SSL policy errors with descriptions.
+        /// This method checks SSL policy errors and mapping them to user-friendly descriptions.
+        /// To update SSL policy errors description please update <see cref="_sslPolicyErrorsMapping"/>.
+        /// </summary>
+        /// <returns>Diagnostic data as a formatted string</returns>
         public static string ResolveSslPolicyErrorsMessage(SslPolicyErrors sslErrors)
         {
             string diagInfoHeader = $"SSL Policy Errors";
@@ -150,6 +161,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
                 return GetFormattedData(diagInfoHeader, diagInfo);
             }
 
+            // Since we can get several SSL policy errors we should check all of them
             foreach (SslPolicyErrors errorCode in Enum.GetValues(typeof(SslPolicyErrors)))
             {
                 if ((sslErrors & errorCode) != 0)
@@ -169,10 +181,8 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
             return GetFormattedData(diagInfoHeader, diagInfo);
         }
 
-
-        /// <summary>
-        /// Get diagnostic data as formatted text.
-        /// </summary>
+        /// <summary>Get diagnostic data as formatted text</summary>
+        /// <returns>Formatted string</returns>
         private static string GetFormattedData(string diagInfoHeader, List<KeyValuePair<string, string>> diagInfo)
         {
             string formattedData = $"[{diagInfoHeader}]\n";
