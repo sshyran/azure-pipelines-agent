@@ -27,7 +27,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             VssCredentials credentials = VssUtil.GetVssCredential(systemConnection);
             ArgUtil.NotNull(credentials, nameof(credentials));
             ITraceWriter trace = context.GetTraceWriter();
-            VssConnection connection = VssUtil.CreateConnection(systemConnection.Url, credentials);
+            VssConnection connection = VssUtil.CreateConnection(systemConnection.Url, credentials, trace);
             return connection;
         }
 

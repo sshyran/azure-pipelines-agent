@@ -75,8 +75,9 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             VssConnection jobConnection = VssUtil.CreateConnection(
                 jobServerUrl,
                 jobServerCredential,
-                new DelegatingHandler[] { new ThrottlingReportHandler(_jobServerQueue) },
-                trace: Trace);
+                trace: Trace,
+                new DelegatingHandler[] { new ThrottlingReportHandler(_jobServerQueue) }
+                );
             await jobServer.ConnectAsync(jobConnection);
 
             _jobServerQueue.Start(message);
