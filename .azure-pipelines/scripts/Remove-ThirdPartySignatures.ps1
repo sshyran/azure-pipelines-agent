@@ -2,12 +2,14 @@ function Remove-ThirdPartySignatures() {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $false)]
-        [string]$SigntoolPath)
+        [string]$SigntoolPath,
+        [Parameter(Mandatory = $false)]
+        [string]$LayoutRoot)
 
     $ErrorActionPreference = 'Stop'
     $failedToUnsign = New-Object Collections.Generic.List[String]
     $succesfullyUnsigned = New-Object Collections.Generic.List[String]
-    foreach ($tree in Get-ChildItem -Path '${{ parameters.layoutRoot }}/bin' -Filter "*.dll" -Recurse | select FullName) {
+    foreach ($tree in Get-ChildItem -Path "$LayoutRoot/bin" -Filter "*.dll" -Recurse | select FullName) {
         try {
             & "$SigntoolPath" remove /s /q "$($tree.FullName)" 2>&1
             if ($lastexitcode -ne 0) {
