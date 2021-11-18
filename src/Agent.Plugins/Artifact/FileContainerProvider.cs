@@ -232,7 +232,7 @@ namespace Agent.Plugins
             );
 
             Options customMinimatchOptions;
-            if (!(downloadParameters.CustomMinimatchOptions is null))
+            if (downloadParameters.CustomMinimatchOptions != null)
             {
                 customMinimatchOptions = downloadParameters.CustomMinimatchOptions;
             }
@@ -446,11 +446,7 @@ namespace Agent.Plugins
                 }
                 else
                 {
-                    // Convert slashes on Windows before calling braceExpand(). Unfortunately this means braces cannot
-                    // be escaped on Windows, this limitation is consistent with current limitations of minimatch (3.0.3).
-                    tracer.Info($"Expanding braces.");
-                    string convertedPattern = currentPattern.Replace("\\", "/");
-                    expandedPatterns = Minimatcher.BraceExpand(convertedPattern, matchOptions).ToArray();
+                    expandedPatterns = ExpandBraces(currentPattern, matchOptions);
                 }
 
                 // Set NoBrace.
@@ -478,42 +474,61 @@ namespace Agent.Plugins
                         matchOptions
                     );
 
-                    if (isIncludePattern)
-                    {
-                        // Apply the pattern.
-                        tracer.Info($"Applying include pattern against original list.");
-                        List<FileContainerItem> matchResults = this.FilterItemsByPatterns(items, minimatcherFuncs);
-
-                        // Union the results.
-                        int matchCount = 0;
-                        foreach (FileContainerItem matchResult in matchResults)
-                        {
-                            matchCount++;
-                            map[matchResult.Path] = Boolean.TrueString;
-                        }
-
-                        tracer.Info($"{matchCount} matches");
-                    }
-                    else
-                    {
-                        // Apply the pattern.
-                        tracer.Info($"Applying exclude pattern against original list.");
-                        List<FileContainerItem> matchResults = this.FilterItemsByPatterns(items, minimatcherFuncs);
-
-                        // Subtract the results.
-                        int matchCount = 0;
-                        foreach (FileContainerItem matchResult in matchResults)
-                        {
-                            matchCount++;
-                            map.Remove(matchResult.Path);
-                        }
-
-                        tracer.Info($"{matchCount} matches");
-                    }
+                    UpdatePatternsMap(isIncludePattern, items, minimatcherFuncs, ref map);
                 }
             }
 
             // return a filtered version of the original list (preserves order and prevents duplication)
+            return ApplyPatternsMapToItems(items, map);
+        }
+
+        private string[] ExpandBraces(string pattern, Options matchOptions)
+        {
+            // Convert slashes on Windows before calling braceExpand(). Unfortunately this means braces cannot
+            // be escaped on Windows, this limitation is consistent with current limitations of minimatch (3.0.3).
+            tracer.Info($"Expanding braces.");
+            string convertedPattern = pattern.Replace("\\", "/");
+            return Minimatcher.BraceExpand(convertedPattern, matchOptions).ToArray();
+        }
+
+        private void UpdatePatternsMap(bool isIncludePattern, List<FileContainerItem> items, IEnumerable<Func<string, bool>> minimatcherFuncs, ref Hashtable map)
+        {
+            if (isIncludePattern)
+            {
+                // Apply the pattern.
+                tracer.Info($"Applying include pattern against original list.");
+                List<FileContainerItem> matchResults = this.FilterItemsByPatterns(items, minimatcherFuncs);
+
+                // Union the results.
+                int matchCount = 0;
+                foreach (FileContainerItem matchResult in matchResults)
+                {
+                    matchCount++;
+                    map[matchResult.Path] = Boolean.TrueString;
+                }
+
+                tracer.Info($"{matchCount} matches");
+            }
+            else
+            {
+                // Apply the pattern.
+                tracer.Info($"Applying exclude pattern against original list.");
+                List<FileContainerItem> matchResults = this.FilterItemsByPatterns(items, minimatcherFuncs);
+
+                // Subtract the results.
+                int matchCount = 0;
+                foreach (FileContainerItem matchResult in matchResults)
+                {
+                    matchCount++;
+                    map.Remove(matchResult.Path);
+                }
+
+                tracer.Info($"{matchCount} matches");
+            }
+        }
+
+        private List<FileContainerItem> ApplyPatternsMapToItems(List<FileContainerItem> items, Hashtable map)
+        {
             List<FileContainerItem> resultItems = new List<FileContainerItem>();
             foreach (FileContainerItem item in items)
             {
