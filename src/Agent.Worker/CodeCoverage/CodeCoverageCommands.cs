@@ -150,7 +150,9 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.CodeCoverage
             {
                 executionContext.Error("SocketException occurred.");
                 executionContext.Error(ex.Message);
+                #pragma warning disable CA2000 // Dispose objects before losing scope
                 executionContext.Error($"Verify whether you have (network) access to { WorkerUtilities.GetVssConnection(executionContext).Uri }");
+                #pragma warning restore CA2000 // Dispose objects before losing scope
                 executionContext.Error($"URLs the agent need communicate with - { BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform() }");
             }
             catch (Exception ex)

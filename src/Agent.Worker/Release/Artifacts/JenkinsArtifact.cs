@@ -159,8 +159,8 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Release.Artifacts
                     }
                     catch (SocketException ex)
                     {
-                        context.AddIssue(new Issue { Type = IssueType.Error, Message = StringUtil.Loc($"SocketException occurred. Verify whether you have (network) access to { jenkinsDetails.Url }. " +
-                            $"URLs the agent need communicate with - { BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform() }.", jenkinsDetails.Alias, ex.ToString()) });
+                        context.AddIssue(new Issue { Type = IssueType.Error, Message = $"SocketException occurred. { ex.Message }." +
+                            $"Verify whether you have (network) access to { jenkinsDetails.Url }. URLs the agent need communicate with - { BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform() }."});
                         return;
                     }
                     catch (Exception ex)

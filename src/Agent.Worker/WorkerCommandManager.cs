@@ -112,7 +112,9 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
                     {
                         Trace.Error("SocketException occurred.");
                         Trace.Error(ex.Message);
+                        #pragma warning disable CA2000 // Dispose objects before losing scope
                         Trace.Error($"Verify whether you have (network) access to { WorkerUtilities.GetVssConnection(context).Uri }");
+                        #pragma warning restore CA2000 // Dispose objects before losing scope
                         Trace.Error($"URLs the agent need communicate with - { BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform() }");
                         context.CommandResult = TaskResult.Failed;
                     }
