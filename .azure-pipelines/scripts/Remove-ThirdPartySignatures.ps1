@@ -20,11 +20,9 @@ function Remove-ThirdPartySignatures() {
         }
     }
     foreach ($f in $failedToUnsign) {
-        Write-Host "Almost done"
         Write-Warning "Something went wrong, failed to process $f file in catch"
     }
     foreach ($s in $success) {
-        Write-Host "Done"
         Write-Host "Signature succefully removed for $s file"
     }
 }
