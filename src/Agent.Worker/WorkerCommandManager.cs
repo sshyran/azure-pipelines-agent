@@ -110,12 +110,12 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
                     }
                     catch (SocketException ex)
                     {
-                        Trace.Error("SocketException occurred.");
-                        Trace.Error(ex.Message);
+                        context.Error("SocketException occurred.");
+                        context.Error(ex.Message);
                         #pragma warning disable CA2000 // Dispose objects before losing scope
-                        Trace.Error($"Verify whether you have (network) access to { WorkerUtilities.GetVssConnection(context).Uri }");
+                        context.Error($"Verify whether you have (network) access to { WorkerUtilities.GetVssConnection(context).Uri }");
                         #pragma warning restore CA2000 // Dispose objects before losing scope
-                        Trace.Error($"URLs the agent need communicate with - { BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform() }");
+                        context.Error($"URLs the agent need communicate with - { BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform() }");
                         context.CommandResult = TaskResult.Failed;
                     }
                     catch (Exception ex)

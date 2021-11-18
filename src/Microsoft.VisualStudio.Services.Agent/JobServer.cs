@@ -71,10 +71,10 @@ namespace Microsoft.VisualStudio.Services.Agent
             {
                 _taskClient = _connection.GetClient<TaskHttpClient>();
             }
-            catch (SocketException ex)
+            catch (SocketException e)
             {
                 Trace.Error("SocketException occurred.");
-                Trace.Error(ex.Message);
+                Trace.Error(e.Message);
                 Trace.Error($"Verify whether you have (network) access to { _connection.Uri }");
                 Trace.Error($"URLs the agent need communicate with - { BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform() }");
                 throw;

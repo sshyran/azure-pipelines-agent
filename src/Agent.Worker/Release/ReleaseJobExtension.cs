@@ -126,6 +126,8 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Release
             }
             catch (SocketException ex)
             {
+                LogDownloadFailureTelemetry(executionContext, ex);
+
                 Trace.Error("SocketException occurred.");
                 Trace.Error(ex.Message);
                 Trace.Error($"Verify whether you have (network) access to { WorkerUtilities.GetVssConnection(executionContext).Uri }");

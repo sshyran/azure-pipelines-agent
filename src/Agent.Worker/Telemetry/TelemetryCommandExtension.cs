@@ -83,10 +83,10 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Telemetry
             }
             catch (SocketException ex)
             {
-                context.Error("SocketException occurred.");
-                context.Error(ex.Message);
-                context.Error($"Verify whether you have (network) access to { WorkerUtilities.GetVssConnection(context).Uri }");
-                context.Error($"URLs the agent need communicate with - { BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform() }");
+                context.Warning("SocketException occurred.");
+                context.Warning(ex.Message);
+                context.Warning($"Verify whether you have (network) access to { WorkerUtilities.GetVssConnection(context).Uri }");
+                context.Warning($"URLs the agent need communicate with - { BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform() }");
                 return;
             }
             catch (Exception ex)

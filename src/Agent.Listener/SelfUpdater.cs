@@ -309,10 +309,10 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
                         }
                         catch (SocketException ex)
                         {
-                            Trace.Error("SocketException occurred.");
-                            Trace.Error(ex.Message);
-                            Trace.Error($"Verify whether you have (network) access to { _targetPackage.DownloadUrl }");
-                            Trace.Error($"URLs the agent need communicate with - { BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform() }");
+                            Trace.Warning("SocketException occurred.");
+                            Trace.Warning(ex.Message);
+                            Trace.Warning($"Verify whether you have (network) access to { _targetPackage.DownloadUrl }");
+                            Trace.Warning($"URLs the agent need communicate with - { BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform() }");
                         }
                         catch (Exception ex)
                         {

@@ -148,12 +148,12 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.CodeCoverage
             }
             catch (SocketException ex)
             {
-                executionContext.Error("SocketException occurred.");
-                executionContext.Error(ex.Message);
+                executionContext.Warning("SocketException occurred.");
+                executionContext.Warning(ex.Message);
                 #pragma warning disable CA2000 // Dispose objects before losing scope
-                executionContext.Error($"Verify whether you have (network) access to { WorkerUtilities.GetVssConnection(executionContext).Uri }");
+                executionContext.Warning($"Verify whether you have (network) access to { WorkerUtilities.GetVssConnection(executionContext).Uri }");
                 #pragma warning restore CA2000 // Dispose objects before losing scope
-                executionContext.Error($"URLs the agent need communicate with - { BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform() }");
+                executionContext.Warning($"URLs the agent need communicate with - { BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform() }");
             }
             catch (Exception ex)
             {

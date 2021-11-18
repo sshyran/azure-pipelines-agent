@@ -56,10 +56,16 @@ namespace Agent.Plugins.Log.TestResultParser.Plugin
             }
             catch (SocketException ex)
             {
-                _logger.Error("SocketException occurred.");
-                _logger.Error(ex.Message);
-                _logger.Error($"Verify whether you have (network) access to { context.VssConnection.Uri }");
-                _logger.Error($"URLs the agent need communicate with - { BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform() }");
+                _logger.Warning("SocketException occurred.");
+                _logger.Warning(ex.Message);
+                _logger.Warning($"Verify whether you have (network) access to { context.VssConnection.Uri }");
+                _logger.Warning($"URLs the agent need communicate with - { BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform() }");
+
+                if (_telemetry != null)
+                {
+                    _telemetry?.AddOrUpdate(TelemetryConstants.InitialzieFailed, ex);
+                    await _telemetry.PublishCumulativeTelemetryAsync();
+                }
                 return false;
             }
             catch (Exception ex)

@@ -111,6 +111,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Release.Artifacts
                     Trace.Error(e.Message);
                     Trace.Error($"Verify whether you have (network) access to https://api.github.com");
                     Trace.Error($"URLs the agent need communicate with - { BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform() }");
+                    throw;
                 }
 
                 Trace.Info($"Found github repository url {repository.Clone_url}");

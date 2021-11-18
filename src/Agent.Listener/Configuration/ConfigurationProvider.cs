@@ -361,11 +361,11 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener.Configuration
                         azureSubscriptionId = string.Empty;
                     }
                 }
-                catch (SocketException e)
+                catch (SocketException ex)
                 {
                     azureSubscriptionId = string.Empty;
                     Trace.Error("SocketException occurred.");
-                    Trace.Error(e.Message);
+                    Trace.Error(ex.Message);
                     Trace.Error($"Verify whether you have (network) access to { imdsUri }");
                     Trace.Error($"URLs the agent need communicate with - { BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform() }");
                 }

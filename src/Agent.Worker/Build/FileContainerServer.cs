@@ -391,6 +391,8 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
                 context.Warn(e.Message);
                 context.Warn($"Verify whether you have (network) access to { this._connection.Uri }");
                 context.Warn($"URLs the agent need communicate with - { BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform() }");
+
+                throw;
             }
             catch
             {
