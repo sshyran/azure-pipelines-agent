@@ -11,7 +11,7 @@ steps:
     inputs:
       targetType: 'filePath'
       filePath: ./.azure-pipelines/scripts/Unsignig-ThirdPartyAssemlies.ps1
-      arguments: '-LayoutRoot {{ parameters.layoutRoot }}'
+      arguments: '-LayoutRoot ${{ parameters.layoutRoot }}'
       ignoreLASTEXITCODE: true
     displayName: Remove signatures from the third party packages
 
