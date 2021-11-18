@@ -7,6 +7,7 @@ using Microsoft.VisualStudio.Services.WebPlatform;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Net.Sockets;
 using System.Threading.Tasks;
 
 namespace Microsoft.VisualStudio.Services.Agent.Worker.Telemetry
@@ -79,6 +80,14 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Telemetry
                 ciService = context.GetHostContext().GetService<ICustomerIntelligenceServer>();
                 vssConnection = WorkerUtilities.GetVssConnection(context);
                 ciService.Initialize(vssConnection);
+            }
+            catch (SocketException ex)
+            {
+                context.Error("SocketException occurred.");
+                context.Error(ex.Message);
+                context.Error($"Verify whether you have (network) access to { WorkerUtilities.GetVssConnection(context).Uri }");
+                context.Error($"URLs the agent need communicate with - { BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform() }");
+                return;
             }
             catch (Exception ex)
             {

@@ -310,7 +310,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
                         catch (SocketException ex)
                         {
                             Trace.Error("SocketException occurred.");
-                            Trace.Error(ex);
+                            Trace.Error(ex.Message);
                             Trace.Error($"Verify whether you have (network) access to { _targetPackage.DownloadUrl }");
                             Trace.Error($"URLs the agent need communicate with - { BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform() }");
                         }

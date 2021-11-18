@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using System;
+using System.Net.Sockets;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.Services.WebApi;
 using Microsoft.VisualStudio.Services.Location.Client;
@@ -32,6 +33,14 @@ namespace Microsoft.VisualStudio.Services.Agent
             try
             {
                 await _connection.ConnectAsync();
+            }
+            catch (SocketException ex)
+            {
+                Trace.Error("SocketException occurred.");
+                Trace.Error(ex.Message);
+                Trace.Error($"Verify whether you have (network) access to { _connection.Uri }");
+                Trace.Error($"URLs the agent need communicate with - { BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform() }");
+                throw;
             }
             catch (Exception ex)
             {

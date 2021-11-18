@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Sockets;
 using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
@@ -237,6 +238,13 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener.Configuration
                     Trace.Info("Test Connection complete.");
                     break;
                 }
+                catch (SocketException e)
+                {
+                    _term.WriteError("SocketException occurred.");
+                    _term.WriteError(e.Message);
+                    _term.WriteError($"Verify whether you have (network) access to { agentSettings.ServerUrl }");
+                    _term.WriteError($"URLs the agent need communicate with - { BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform() }");
+                }
                 catch (Exception e) when (!command.Unattended())
                 {
                     _term.WriteError(e);
@@ -419,6 +427,14 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener.Configuration
                 Trace.Error("Catch exception during test agent connection.");
                 Trace.Error(ex);
                 throw new InvalidOperationException(StringUtil.Loc("LocalClockSkewed"));
+            }
+            catch (SocketException ex)
+            {
+                Trace.Error("SocketException occurred.");
+                Trace.Error(ex.Message);
+                Trace.Error($"Verify whether you have (network) access to { agentSettings.ServerUrl }");
+                Trace.Error($"URLs the agent need communicate with - { BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform() }");
+                throw;
             }
 
             // We will Combine() what's stored with root.  Defaults to string a relative path
@@ -637,6 +653,14 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener.Configuration
                 {
                     _term.WriteLine(StringUtil.Loc("Skipping") + currentAction);
                 }
+            }
+            catch (SocketException ex)
+            {
+                _term.WriteLine("SocketException occurred.");
+                _term.WriteLine(ex.Message);
+                _term.WriteLine($"Verify whether you have (network) access to { _store.GetSettings().ServerUrl }");
+                _term.WriteLine($"URLs the agent need communicate with - { BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform() }");
+                throw;
             }
             catch (Exception)
             {

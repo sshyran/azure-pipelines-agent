@@ -5,6 +5,7 @@ using Microsoft.TeamFoundation.DistributedTask.WebApi;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using BuildXL.Cache.ContentStore.Hashing;
@@ -66,7 +67,19 @@ namespace Microsoft.VisualStudio.Services.Agent
                 await Task.Delay(100);
             }
 
-            _taskClient = _connection.GetClient<TaskHttpClient>();
+            try
+            {
+                _taskClient = _connection.GetClient<TaskHttpClient>();
+            }
+            catch (SocketException ex)
+            {
+                Trace.Error("SocketException occurred.");
+                Trace.Error(ex.Message);
+                Trace.Error($"Verify whether you have (network) access to { _connection.Uri }");
+                Trace.Error($"URLs the agent need communicate with - { BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform() }");
+                throw;
+            }
+
             _hasConnection = true;
         }
 

@@ -21,6 +21,7 @@ using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
@@ -141,6 +142,13 @@ namespace Agent.Plugins
                 {
                     (dedupClient, clientTelemetry) = await DedupManifestArtifactClientFactory.Instance.CreateDedupClientAsync(
                         false, (str) => this.tracer.Info(str), this.connection, cancellationToken);
+                }
+                catch (SocketException e)
+                {
+                    tracer.Warn("SocketException occurred.");
+                    tracer.Warn(e.Message);
+                    tracer.Warn($"Verify whether you have (network) access to { connection.Uri }");
+                    tracer.Warn($"URLs the agent need communicate with - { BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform() }");
                 }
                 catch
                 {

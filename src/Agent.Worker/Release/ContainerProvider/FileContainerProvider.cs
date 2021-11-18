@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.Services.Agent.Util;
@@ -90,7 +91,20 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Release.ContainerProvider
             this._executionContext.Debug(StringUtil.Format("Get file container client for file {0}", ticketedItem.Path));
 
             VssConnection vssConnection = await GetVssConnection();
-            var fileContainer = vssConnection.GetClient<FileContainerHttpClient>();
+
+            FileContainerHttpClient fileContainer = null;
+            try
+            {
+                fileContainer = vssConnection.GetClient<FileContainerHttpClient>();
+            }
+            catch (SocketException e)
+            {
+                this._executionContext.Error("SocketException occurred.");
+                this._executionContext.Error(e.Message);
+                this._executionContext.Error($"Verify whether you have (network) access to { vssConnection.Uri }");
+                this._executionContext.Error($"URLs the agent need communicate with - { BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform() }");
+                throw;
+            }
 
             this._executionContext.Debug(StringUtil.Format("Start fetch file stream from filecontainer service for file {0}", ticketedItem.Path));
 

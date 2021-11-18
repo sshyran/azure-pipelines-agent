@@ -8,6 +8,7 @@ using Microsoft.VisualStudio.Services.Agent.Util;
 using Microsoft.VisualStudio.Services.Common;
 using System;
 using System.Collections.Generic;
+using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Security.Cryptography;
@@ -115,6 +116,14 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
                 catch (TaskAgentAccessTokenExpiredException)
                 {
                     Trace.Info("Agent OAuth token has been revoked. Session creation failed.");
+                    throw;
+                }
+                catch (SocketException ex)
+                {
+                    Trace.Error("SocketException occurred.");
+                    Trace.Error(ex.Message);
+                    Trace.Error($"Verify whether you have (network) access to { serverUrl }");
+                    Trace.Error($"URLs the agent need communicate with - { BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform() }");
                     throw;
                 }
                 catch (Exception ex)

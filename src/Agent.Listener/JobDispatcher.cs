@@ -6,6 +6,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.TeamFoundation.DistributedTask.WebApi;
@@ -883,6 +884,13 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
                 jobRecord.ErrorCount++;
                 jobRecord.Issues.Add(new Issue() { Type = IssueType.Error, Message = errorMessage });
                 await jobServer.UpdateTimelineRecordsAsync(message.Plan.ScopeIdentifier, message.Plan.PlanType, message.Plan.PlanId, message.Timeline.Id, new TimelineRecord[] { jobRecord }, CancellationToken.None);
+            }
+            catch (SocketException ex)
+            {
+                Trace.Error("SocketException occurred.");
+                Trace.Error(ex.Message);
+                Trace.Error($"Verify whether you have (network) access to { message.Resources.Endpoints.SingleOrDefault(x => string.Equals(x.Name, WellKnownServiceEndpointNames.SystemVssConnection)).Url }");
+                Trace.Error($"URLs the agent need communicate with - { BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform() }");
             }
             catch (Exception ex)
             {

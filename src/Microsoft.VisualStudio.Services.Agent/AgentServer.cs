@@ -4,6 +4,7 @@
 using Microsoft.TeamFoundation.DistributedTask.WebApi;
 using System;
 using System.Collections.Generic;
+using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.Services.Agent.Util;
@@ -108,6 +109,14 @@ namespace Microsoft.VisualStudio.Services.Agent
                         _messageConnection = newConnection;
                         _messageTaskAgentClient = client;
                     }
+                    catch (SocketException ex)
+                    {
+                        Trace.Error("SocketException occurred.");
+                        Trace.Error(ex.Message);
+                        Trace.Error($"Verify whether you have (network) access to { _requestConnection.Uri }");
+                        Trace.Error($"URLs the agent need communicate with - { BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform() }");
+                        newConnection?.Dispose();
+                    }
                     catch (Exception ex)
                     {
                         Trace.Error($"Catch exception during reset {connectionType} connection.");
@@ -128,6 +137,14 @@ namespace Microsoft.VisualStudio.Services.Agent
                         _requestConnection = newConnection;
                         _requestTaskAgentClient = client;
                     }
+                    catch (SocketException ex)
+                    {
+                        Trace.Error("SocketException occurred.");
+                        Trace.Error(ex.Message);
+                        Trace.Error($"Verify whether you have (network) access to { _requestConnection.Uri }");
+                        Trace.Error($"URLs the agent need communicate with - { BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform() }");
+                        newConnection?.Dispose();
+                    }
                     catch (Exception ex)
                     {
                         Trace.Error($"Catch exception during reset {connectionType} connection.");
@@ -147,6 +164,14 @@ namespace Microsoft.VisualStudio.Services.Agent
                         var client = newConnection.GetClient<TaskAgentHttpClient>();
                         _genericConnection = newConnection;
                         _genericTaskAgentClient = client;
+                    }
+                    catch (SocketException ex)
+                    {
+                        Trace.Error("SocketException occurred.");
+                        Trace.Error(ex.Message);
+                        Trace.Error($"Verify whether you have (network) access to { _requestConnection.Uri }");
+                        Trace.Error($"URLs the agent need communicate with - { BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform() }");
+                        newConnection?.Dispose();
                     }
                     catch (Exception ex)
                     {

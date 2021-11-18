@@ -16,6 +16,7 @@ using System.Diagnostics;
 using Microsoft.VisualStudio.Services.WebApi;
 using System.Net.Http;
 using System.Net;
+using System.Net.Sockets;
 using Microsoft.TeamFoundation.DistributedTask.WebApi;
 using Microsoft.VisualStudio.Services.BlobStore.WebApi;
 
@@ -383,6 +384,13 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
                     jobId = Guid.Empty;
                 }
                 await clientTelemetry.CommitTelemetryUpload(planId, jobId);
+            }
+            catch (SocketException e)
+            {
+                context.Warn("SocketException occurred.");
+                context.Warn(e.Message);
+                context.Warn($"Verify whether you have (network) access to { this._connection.Uri }");
+                context.Warn($"URLs the agent need communicate with - { BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform() }");
             }
             catch
             {
