@@ -5,6 +5,6 @@ param()
 . $PSScriptRoot\Remove-ThirdPartySignatures.ps1
 
 $signtoolPath = Get-Signtool
-if ( -not [string]::IsNullOrEmpty($signtoolPath)) {
-    Remove-ThirdPartySignatures -SigntoolPath $signToolPath
+if ( $signtoolPath -ne "" ) {
+  Remove-ThirdPartySignatures -SigntoolPath "$signToolPath"
 }

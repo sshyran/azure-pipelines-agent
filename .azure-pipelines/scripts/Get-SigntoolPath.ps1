@@ -10,13 +10,14 @@ function Get-Signtool() {
         $programFiles = ${Env:ProgramFiles}
     }
 
-    try {
-        $windowsSdkPath=Get-ChildItem "$programFiles\Windows Kits\10\bin\1*" | Select-Object FullName | Sort-Object -Descending { [version](Split-Path $_.FullName -leaf)} | Select-Object -first 1
+    $windowsSdkPath=Get-ChildItem "$programFiles\Windows Kits\10\bin\1*" | Select-Object FullName | Sort-Object -Descending { [version](Split-Path $_.FullName -leaf)} | Select-Object -first 1
 
-        $signtoolPath = "$($windowsSdkPath.FullName)\x$systemBit\signtool"
-        return $signtoolPath
-    } catch {
-        Write-Warning "Unbable to get signtool"
+    $signtoolPath = "$($windowsSdkPath.FullName)\$systemBit\signtool"
+    if (Test-Path -Path $signtoolPath)
+    {
+        return "$signtoolPath"
+    } else {
+        Write-Warning "Unable to find signtool"
         return ""
     }
 }
