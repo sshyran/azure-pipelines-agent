@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using Agent.Sdk;
+using Agent.Sdk.Util;
 using Microsoft.TeamFoundation.DistributedTask.WebApi;
 using Microsoft.VisualStudio.Services.Agent.Listener.Configuration;
 using Microsoft.VisualStudio.Services.Agent.Listener.Diagnostics;
@@ -468,16 +469,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
                         {
                             if (e is AggregateException)
                             {
-                                Trace.Error("One or several exceptions have been occurred.");
-
-                                int i = 0;
-                                foreach (var ex in ((AggregateException)e).Flatten().InnerExceptions)
-                                {
-
-                                    i++;
-                                    Trace.Error($"InnerException #{i}");
-                                    Trace.Error(ex);
-                                }
+                                ExceptionsUtil.HandleAggregateException((AggregateException)e);
                             }
                             else
                             {
