@@ -5,7 +5,7 @@ param(
 )
 
 . $PSScriptRoot\Get-SigntoolPath.ps1
-. $PSScriptRoot\Remove-ThirdPartySignatures.ps1
+. $PSScriptRoot\RemoveSignatureScript.ps1
 
 $signtoolPath = Get-Signtool
 if ( $signtoolPath -ne "" ) {
