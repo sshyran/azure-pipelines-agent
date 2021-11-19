@@ -74,6 +74,12 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
             return IsDeploymentTypeHostedIfDetermined();
         }
 
+        /// <summary>
+        /// Returns true if server deployment type is Hosted.
+        /// Determines the type if it has not been determined yet.
+        /// Returns false and writes a warning instead of throwing exception
+        /// if the deployment type determination has been failed.
+        /// </summary>
         public async Task<bool> TryIsDeploymentTypeHosted(string serverUrl, VssCredentials credentials, ILocationServer locationServer, Tracing Trace)
         {
             try

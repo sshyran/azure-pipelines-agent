@@ -186,7 +186,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
                 throw new DeploymentTypeNotDeterminedException(ex.Message + $@"
 This exception was thrown during checksum validation when performing the agent self-update process.
 Most likely you are using On-Premises solution and the deployment type determination was not implemented for your server version.
-Checksum validation implemented for Cloud solutions only.
+Checksum validation implemented for Hosted solutions only.
 You can skip checksum validation for the agent package by setting the environment variable DISABLE_HASH_VALIDATION=true");
             }
 
