@@ -23,10 +23,10 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
         {
             bool isRequestSuccessful = (sslErrors == SslPolicyErrors.None);
 
-            if (!isRequestSuccessful)
-            {
+            // if (!isRequestSuccessful)
+            // {
                 LoggingRequestDiagnosticData(requestMessage, certificate, chain, sslErrors);
-            }
+            // }
 
             return isRequestSuccessful;
         }
