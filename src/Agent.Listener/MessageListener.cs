@@ -17,6 +17,7 @@ using System.Text;
 using Microsoft.VisualStudio.Services.OAuth;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using Agent.Sdk.Util;
 
 namespace Microsoft.VisualStudio.Services.Agent.Listener
 {
@@ -120,10 +121,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
                 }
                 catch (SocketException ex)
                 {
-                    Trace.Error("SocketException occurred.");
-                    Trace.Error(ex.Message);
-                    Trace.Error($"Verify whether you have (network) access to { serverUrl }");
-                    Trace.Error($"URLs the agent need communicate with - { BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform() }");
+                    ExceptionsUtil.HandleSocketException(ex, serverUrl, Trace);
                     throw;
                 }
                 catch (Exception ex)

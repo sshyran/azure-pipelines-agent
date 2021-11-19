@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using Agent.Sdk.Knob;
+using Agent.Sdk.Util;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -887,10 +888,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
             }
             catch (SocketException ex)
             {
-                Trace.Error("SocketException occurred.");
-                Trace.Error(ex.Message);
-                Trace.Error($"Verify whether you have (network) access to { message.Resources.Endpoints.SingleOrDefault(x => string.Equals(x.Name, WellKnownServiceEndpointNames.SystemVssConnection)).Url }");
-                Trace.Error($"URLs the agent need communicate with - { BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform() }");
+                ExceptionsUtil.HandleSocketException(ex, message.Resources.Endpoints.SingleOrDefault(x => string.Equals(x.Name, WellKnownServiceEndpointNames.SystemVssConnection)).Url.ToString(), Trace);
             }
             catch (Exception ex)
             {

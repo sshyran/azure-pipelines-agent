@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using Agent.Sdk;
+using Agent.Sdk.Util;
 using Microsoft.TeamFoundation.DistributedTask.WebApi;
 using Microsoft.VisualStudio.Services.Agent.Capabilities;
 using Microsoft.VisualStudio.Services.Agent.Util;
@@ -240,10 +241,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener.Configuration
                 }
                 catch (SocketException e)
                 {
-                    _term.WriteError("SocketException occurred.");
-                    _term.WriteError(e.Message);
-                    _term.WriteError($"Verify whether you have (network) access to { agentSettings.ServerUrl }");
-                    _term.WriteError($"URLs the agent need communicate with - { BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform() }");
+                    ExceptionsUtil.HandleSocketException(e, agentSettings.ServerUrl, Trace);
                 }
                 catch (Exception e) when (!command.Unattended())
                 {
@@ -430,10 +428,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener.Configuration
             }
             catch (SocketException ex)
             {
-                Trace.Error("SocketException occurred.");
-                Trace.Error(ex.Message);
-                Trace.Error($"Verify whether you have (network) access to { agentSettings.ServerUrl }");
-                Trace.Error($"URLs the agent need communicate with - { BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform() }");
+                ExceptionsUtil.HandleSocketException(ex, agentSettings.ServerUrl, Trace);
                 throw;
             }
 
@@ -656,10 +651,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener.Configuration
             }
             catch (SocketException ex)
             {
-                _term.WriteLine("SocketException occurred.");
-                _term.WriteLine(ex.Message);
-                _term.WriteLine($"Verify whether you have (network) access to { _store.GetSettings().ServerUrl }");
-                _term.WriteLine($"URLs the agent need communicate with - { BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform() }");
+                ExceptionsUtil.HandleSocketException(ex, _store.GetSettings().ServerUrl, Trace);
                 throw;
             }
             catch (Exception)

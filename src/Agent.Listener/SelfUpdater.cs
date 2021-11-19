@@ -3,6 +3,7 @@
 
 using Agent.Sdk;
 using Agent.Sdk.Knob;
+using Agent.Sdk.Util;
 using Microsoft.TeamFoundation.DistributedTask.WebApi;
 using Microsoft.VisualStudio.Services.Agent.Listener.Configuration;
 using Microsoft.VisualStudio.Services.Agent.Util;
@@ -309,10 +310,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
                         }
                         catch (SocketException ex)
                         {
-                            Trace.Warning("SocketException occurred.");
-                            Trace.Warning(ex.Message);
-                            Trace.Warning($"Verify whether you have (network) access to { _targetPackage.DownloadUrl }");
-                            Trace.Warning($"URLs the agent need communicate with - { BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform() }");
+                            ExceptionsUtil.HandleSocketException(ex, _targetPackage.DownloadUrl, Trace);
                         }
                         catch (Exception ex)
                         {

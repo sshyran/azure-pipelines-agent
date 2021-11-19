@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using Agent.Sdk;
+using Agent.Sdk.Util;
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -160,10 +161,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener.Configuration
                     }
                     catch (SocketException e)
                     {
-                        trace.Error("SocketException occurred.");
-                        trace.Error(e.Message);
-                        trace.Error($"Verify whether you have (network) access to { serverUrl }");
-                        trace.Error($"URLs the agent need communicate with - { BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform() }");
+                        ExceptionsUtil.HandleSocketException(e, serverUrl, trace);
                         throw;
                     }
 
