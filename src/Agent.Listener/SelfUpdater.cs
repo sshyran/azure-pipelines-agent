@@ -179,7 +179,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
             bool isHostedServer;
             try
             {
-                isHostedServer = await _serverUtil.IsDeploymentTypeHosted(_serverUrl, _creds, _locationServer, Trace, errorIfNotDetermined:true);
+                isHostedServer = await _serverUtil.IsDeploymentTypeHosted(_serverUrl, _creds, _locationServer);
             }
             catch (DeploymentTypeNotDeterminedException ex)
             {
