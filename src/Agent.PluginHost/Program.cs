@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Agent.Sdk;
+using Agent.Sdk.Util;
 using Microsoft.TeamFoundation.DistributedTask.WebApi;
 using Microsoft.VisualStudio.Services.Agent.Util;
 
@@ -72,16 +73,7 @@ namespace Agent.PluginHost
                     {
                         if (ex is AggregateException)
                         {
-                            executionContext.Error("One or several exceptions have been occurred.");
-
-                            int i = 0;
-                            foreach (var e in ((AggregateException)ex).Flatten().InnerExceptions)
-                            {
-
-                                i++;
-                                executionContext.Error($"InnerException #{i}");
-                                executionContext.Error(e.ToString());
-                            }
+                            ExceptionsUtil.HandleAggregateException((AggregateException)ex, executionContext);
                         }
                         else
                         {

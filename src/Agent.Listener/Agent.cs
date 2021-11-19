@@ -469,7 +469,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
                         {
                             if (e is AggregateException)
                             {
-                                ExceptionsUtil.HandleAggregateException((AggregateException)e);
+                                ExceptionsUtil.HandleAggregateException((AggregateException)e, Trace);
                             }
                             else
                             {

@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using Agent.Sdk.Knob;
+using Agent.Sdk.Util;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -313,16 +314,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
             {
                 if (e is AggregateException)
                 {
-                    Trace.Error("One or several exceptions have been occurred.");
-
-                    int i = 0;
-                    foreach (var ex in ((AggregateException)e).Flatten().InnerExceptions)
-                    {
-
-                        i++;
-                        Trace.Error($"InnerException #{i}");
-                        Trace.Error(ex);
-                    }
+                    ExceptionsUtil.HandleAggregateException((AggregateException)e, Trace);
                 }
                 else
                 {
@@ -682,16 +674,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
                     {
                         if (e is AggregateException)
                         {
-                            Trace.Error("One or several exceptions have been occurred.");
-
-                            int i = 0;
-                            foreach (var ex in ((AggregateException)e).Flatten().InnerExceptions)
-                            {
-
-                                i++;
-                                Trace.Error($"InnerException #{i}");
-                                Trace.Error(ex);
-                            }
+                            ExceptionsUtil.HandleAggregateException((AggregateException)e, Trace);
                         }
                         else
                         {

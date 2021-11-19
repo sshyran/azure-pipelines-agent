@@ -3,6 +3,7 @@
 
 using Agent.Sdk;
 using Agent.Sdk.Knob;
+using Agent.Sdk.Util;
 using Microsoft.TeamFoundation.DistributedTask.WebApi;
 using Pipelines = Microsoft.TeamFoundation.DistributedTask.Pipelines;
 using Microsoft.VisualStudio.Services.Agent.Util;
@@ -319,16 +320,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             {
                 if (e is AggregateException)
                 {
-                    Trace.Error("One or several exceptions have been occurred.");
-
-                    int i = 0;
-                    foreach (var ex in ((AggregateException)e).Flatten().InnerExceptions)
-                    {
-
-                        i++;
-                        Trace.Error($"InnerException #{i}");
-                        Trace.Error(ex);
-                    }
+                    ExceptionsUtil.HandleAggregateException((AggregateException)e, Trace);
 
                     return TaskResult.Failed;
                 }
@@ -396,16 +388,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             {
                 if (ex is AggregateException)
                 {
-                    Trace.Error("One or several exceptions have been occurred.");
-
-                    int i = 0;
-                    foreach (var e in ((AggregateException)ex).Flatten().InnerExceptions)
-                    {
-
-                        i++;
-                        Trace.Error($"InnerException #{i}");
-                        Trace.Error(e.ToString());
-                    }
+                    ExceptionsUtil.HandleAggregateException((AggregateException)ex, Trace);
                 }
                 else
                 {
@@ -478,16 +461,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
                 {
                     if (ex is AggregateException)
                     {
-                        Trace.Error("One or several exceptions have been occurred.");
-
-                        int i = 0;
-                        foreach (var e in ((AggregateException)ex).Flatten().InnerExceptions)
-                        {
-
-                            i++;
-                            Trace.Error($"InnerException #{i}");
-                            Trace.Error(e.ToString());
-                        }
+                        ExceptionsUtil.HandleAggregateException((AggregateException)ex, Trace);
                     }
                     else
                     {

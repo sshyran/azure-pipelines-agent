@@ -6,6 +6,7 @@ using System;
 using System.Globalization;
 using System.Threading.Tasks;
 using Agent.Sdk;
+using Agent.Sdk.Util;
 
 namespace Microsoft.VisualStudio.Services.Agent.Worker
 {
@@ -56,16 +57,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             {
                 if (ex is AggregateException)
                 {
-                    trace.Error("One or several exceptions have been occurred.");
-
-                    int i = 0;
-                    foreach (var e in ((AggregateException)ex).Flatten().InnerExceptions)
-                    {
-
-                        i++;
-                        trace.Error($"InnerException #{i}");
-                        trace.Error(e.ToString());
-                    }
+                    ExceptionsUtil.HandleAggregateException((AggregateException)ex, trace);
                 }
                 else
                 {
