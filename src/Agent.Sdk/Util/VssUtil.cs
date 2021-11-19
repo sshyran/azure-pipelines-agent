@@ -74,7 +74,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
             // settings are applied to an HttpRequestMessage.
             settings.AcceptLanguages.Remove(CultureInfo.InvariantCulture);
 
-            // Setting `ServerCertificateCustomValidation` to able to capture SSL data for diagnotsic
+            // Setting `ServerCertificateCustomValidation` to able to capture SSL data for diagnostic
             if (trace != null)
             {
                 SslUtil sslUtil = new SslUtil(trace);
