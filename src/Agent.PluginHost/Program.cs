@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Agent.Sdk;
+using Agent.Sdk.Util;
 using Microsoft.TeamFoundation.DistributedTask.WebApi;
 using Microsoft.VisualStudio.Services.Agent.Util;
 
@@ -71,10 +72,7 @@ namespace Agent.PluginHost
                     }
                     catch (SocketException ex)
                     {
-                        executionContext.Error("SocketException occurred.");
-                        executionContext.Error(ex.Message);
-                        executionContext.Error($"Verify whether you have (network) access to { executionContext.VssConnection.Uri }");
-                        executionContext.Error($"URLs the agent need communicate with - { BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform() }");
+                        ExceptionsUtil.HandleSocketException(ex, executionContext.VssConnection.Uri.ToString(), executionContext);
                     }
                     catch (Exception ex)
                     {

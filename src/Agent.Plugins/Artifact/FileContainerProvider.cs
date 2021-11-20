@@ -3,6 +3,7 @@
 
 using Agent.Sdk;
 using Agent.Sdk.Knob;
+using Agent.Sdk.Util;
 using BuildXL.Cache.ContentStore.Hashing;
 using Microsoft.TeamFoundation.Build.WebApi;
 using Microsoft.TeamFoundation.DistributedTask.WebApi;
@@ -145,10 +146,7 @@ namespace Agent.Plugins
                 }
                 catch (SocketException e)
                 {
-                    tracer.Warn("SocketException occurred.");
-                    tracer.Warn(e.Message);
-                    tracer.Warn($"Verify whether you have (network) access to { connection.Uri }");
-                    tracer.Warn($"URLs the agent need communicate with - { BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform() }");
+                    ExceptionsUtil.HandleSocketException(e, connection.Uri.ToString(), context);
                 }
                 catch
                 {

@@ -18,6 +18,8 @@ using Microsoft.VisualStudio.Services.ReleaseManagement.WebApi.Contracts;
 
 using Newtonsoft.Json;
 
+using Agent.Sdk.Util;
+
 namespace Microsoft.VisualStudio.Services.Agent.Worker.Release.Artifacts
 {
     public class GitHubArtifact : AgentService, IArtifactExtension
@@ -107,10 +109,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Release.Artifacts
                 }
                 catch (SocketException e)
                 {
-                    Trace.Error("SocketException occurred.");
-                    Trace.Error(e.Message);
-                    Trace.Error($"Verify whether you have (network) access to https://api.github.com");
-                    Trace.Error($"URLs the agent need communicate with - { BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform() }");
+                    ExceptionsUtil.HandleSocketException(e, "https://api.github.com", Trace);
                     throw;
                 }
 

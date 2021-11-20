@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.Services.Agent.Util;
 using Microsoft.VisualStudio.Services.WebApi;
 using Microsoft.VisualStudio.Services.Common;
+using Agent.Sdk.Util;
 
 namespace Microsoft.VisualStudio.Services.Agent
 {
@@ -111,10 +112,7 @@ namespace Microsoft.VisualStudio.Services.Agent
                     }
                     catch (SocketException ex)
                     {
-                        Trace.Error("SocketException occurred.");
-                        Trace.Error(ex.Message);
-                        Trace.Error($"Verify whether you have (network) access to { _requestConnection.Uri }");
-                        Trace.Error($"URLs the agent need communicate with - { BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform() }");
+                        ExceptionsUtil.HandleSocketException(ex, _requestConnection.Uri.ToString(), Trace);
                         newConnection?.Dispose();
                     }
                     catch (Exception ex)
@@ -139,10 +137,7 @@ namespace Microsoft.VisualStudio.Services.Agent
                     }
                     catch (SocketException ex)
                     {
-                        Trace.Error("SocketException occurred.");
-                        Trace.Error(ex.Message);
-                        Trace.Error($"Verify whether you have (network) access to { _requestConnection.Uri }");
-                        Trace.Error($"URLs the agent need communicate with - { BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform() }");
+                        ExceptionsUtil.HandleSocketException(ex, _requestConnection.Uri.ToString(), Trace);
                         newConnection?.Dispose();
                     }
                     catch (Exception ex)
@@ -167,10 +162,7 @@ namespace Microsoft.VisualStudio.Services.Agent
                     }
                     catch (SocketException ex)
                     {
-                        Trace.Error("SocketException occurred.");
-                        Trace.Error(ex.Message);
-                        Trace.Error($"Verify whether you have (network) access to { _requestConnection.Uri }");
-                        Trace.Error($"URLs the agent need communicate with - { BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform() }");
+                        ExceptionsUtil.HandleSocketException(ex, _requestConnection.Uri.ToString(), Trace);
                         newConnection?.Dispose();
                     }
                     catch (Exception ex)

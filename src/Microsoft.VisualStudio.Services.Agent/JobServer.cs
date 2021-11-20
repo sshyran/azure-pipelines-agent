@@ -17,6 +17,7 @@ using VsoHash = Microsoft.VisualStudio.Services.BlobStore.Common.VsoHash;
 using Microsoft.VisualStudio.Services.BlobStore.WebApi;
 using Microsoft.VisualStudio.Services.Content.Common;
 using Microsoft.VisualStudio.Services.Content.Common.Tracing;
+using Agent.Sdk.Util;
 
 namespace Microsoft.VisualStudio.Services.Agent
 {
@@ -73,10 +74,7 @@ namespace Microsoft.VisualStudio.Services.Agent
             }
             catch (SocketException e)
             {
-                Trace.Error("SocketException occurred.");
-                Trace.Error(e.Message);
-                Trace.Error($"Verify whether you have (network) access to { _connection.Uri }");
-                Trace.Error($"URLs the agent need communicate with - { BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform() }");
+                ExceptionsUtil.HandleSocketException(e, _connection.Uri.ToString(), Trace);
                 throw;
             }
 

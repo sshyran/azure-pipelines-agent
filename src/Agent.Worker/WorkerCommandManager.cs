@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using Agent.Sdk.Knob;
+using Agent.Sdk.Util;
 using Microsoft.TeamFoundation.DistributedTask.WebApi;
 using Microsoft.VisualStudio.Services.Agent.Util;
 using System;
@@ -110,12 +111,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
                     }
                     catch (SocketException ex)
                     {
-                        context.Error("SocketException occurred.");
-                        context.Error(ex.Message);
-                        #pragma warning disable CA2000 // Dispose objects before losing scope
-                        context.Error($"Verify whether you have (network) access to { WorkerUtilities.GetVssConnection(context).Uri }");
-                        #pragma warning restore CA2000 // Dispose objects before losing scope
-                        context.Error($"URLs the agent need communicate with - { BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform() }");
+                        ExceptionsUtil.HandleSocketException(ex, WorkerUtilities.GetVssConnection(context).Uri.ToString(), Trace);
                         context.CommandResult = TaskResult.Failed;
                     }
                     catch (Exception ex)

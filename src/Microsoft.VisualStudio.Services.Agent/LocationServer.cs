@@ -8,6 +8,7 @@ using Microsoft.VisualStudio.Services.WebApi;
 using Microsoft.VisualStudio.Services.Location.Client;
 using Microsoft.VisualStudio.Services.Location;
 using Microsoft.VisualStudio.Services.Agent.Util;
+using Agent.Sdk.Util;
 
 namespace Microsoft.VisualStudio.Services.Agent
 {
@@ -36,10 +37,7 @@ namespace Microsoft.VisualStudio.Services.Agent
             }
             catch (SocketException ex)
             {
-                Trace.Error("SocketException occurred.");
-                Trace.Error(ex.Message);
-                Trace.Error($"Verify whether you have (network) access to { _connection.Uri }");
-                Trace.Error($"URLs the agent need communicate with - { BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform() }");
+                ExceptionsUtil.HandleSocketException(ex, _connection.Uri.ToString(), Trace);
                 throw;
             }
             catch (Exception ex)

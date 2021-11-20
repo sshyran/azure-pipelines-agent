@@ -11,6 +11,7 @@ using Microsoft.VisualStudio.Services.ReleaseManagement.WebApi.Clients;
 using Microsoft.VisualStudio.Services.ReleaseManagement.WebApi.Contracts;
 using Microsoft.VisualStudio.Services.WebApi;
 using RMContracts = Microsoft.VisualStudio.Services.ReleaseManagement.WebApi;
+using Agent.Sdk.Util;
 
 namespace Microsoft.VisualStudio.Services.Agent.Worker.Release
 {
@@ -49,10 +50,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Release
                 }
                 catch (SocketException ex)
                 {
-                    Trace.Error("SocketException occurred.");
-                    Trace.Error(ex.Message);
-                    Trace.Error($"Verify whether you have (network) access to { _connection.Uri }");
-                    Trace.Error($"URLs the agent need communicate with - { BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform() }");
+                    ExceptionsUtil.HandleSocketException(ex, _connection.Uri.ToString(), Trace);
                 }
                 catch (Exception ex) when (attemptCount > 0)
                 {

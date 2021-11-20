@@ -17,6 +17,8 @@ using Microsoft.VisualStudio.Services.Agent.Worker.Release.Artifacts.Definition;
 using Newtonsoft.Json;
 using Microsoft.TeamFoundation.DistributedTask.Pipelines;
 
+using Agent.Sdk.Util;
+
 namespace Microsoft.VisualStudio.Services.Agent.Worker.Release
 {
     public class ReleaseJobExtension : JobExtension
@@ -128,10 +130,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Release
             {
                 LogDownloadFailureTelemetry(executionContext, ex);
 
-                Trace.Error("SocketException occurred.");
-                Trace.Error(ex.Message);
-                Trace.Error($"Verify whether you have (network) access to { WorkerUtilities.GetVssConnection(executionContext).Uri }");
-                Trace.Error($"URLs the agent need communicate with - { BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform() }");
+                ExceptionsUtil.HandleSocketException(ex, WorkerUtilities.GetVssConnection(executionContext).Uri.ToString(), Trace);
                 throw;
             }
             catch (Exception ex)
