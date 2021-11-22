@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Threading.Tasks;
+using Agent.Worker.Util;
 
 namespace Microsoft.VisualStudio.Services.Agent.Worker.Telemetry
 {
@@ -83,10 +84,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Telemetry
             }
             catch (SocketException ex)
             {
-                context.Warning("SocketException occurred.");
-                context.Warning(ex.Message);
-                context.Warning($"Verify whether you have (network) access to { WorkerUtilities.GetVssConnection(context).Uri }");
-                context.Warning($"URLs the agent need communicate with - { BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform() }");
+                ExceptionsUtil.HandleSocketException(ex, WorkerUtilities.GetVssConnection(context).Uri.ToString(), context);
                 return;
             }
             catch (Exception ex)

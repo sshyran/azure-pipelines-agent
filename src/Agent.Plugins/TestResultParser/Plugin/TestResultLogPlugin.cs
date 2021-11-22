@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using Agent.Plugins.Log.TestResultParser.Contracts;
+using Agent.Plugins.Util;
 using Agent.Sdk;
 using Microsoft.VisualStudio.Services.Agent.Util;
 using Pipelines = Microsoft.TeamFoundation.DistributedTask.Pipelines;
@@ -56,10 +57,7 @@ namespace Agent.Plugins.Log.TestResultParser.Plugin
             }
             catch (SocketException ex)
             {
-                _logger.Warning("SocketException occurred.");
-                _logger.Warning(ex.Message);
-                _logger.Warning($"Verify whether you have (network) access to { context.VssConnection.Uri }");
-                _logger.Warning($"URLs the agent need communicate with - { BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform() }");
+                ExceptionsUtil.HandleSocketException(ex, context.VssConnection.Uri.ToString(), _logger);
 
                 if (_telemetry != null)
                 {

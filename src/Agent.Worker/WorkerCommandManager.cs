@@ -113,6 +113,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
                     {
                         #pragma warning disable CA2000 // Dispose objects before losing scope
                         ExceptionsUtil.HandleSocketException(ex, WorkerUtilities.GetVssConnection(context).Uri.ToString(), Trace);
+                        #pragma warning restore CA2000 // Dispose objects before losing scope
                         context.CommandResult = TaskResult.Failed;
                     }
                     catch (Exception ex)

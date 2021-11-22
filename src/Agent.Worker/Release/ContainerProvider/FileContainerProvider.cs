@@ -15,6 +15,7 @@ using Microsoft.VisualStudio.Services.Agent.Worker.Release.ContainerFetchEngine;
 using Microsoft.VisualStudio.Services.FileContainer;
 using Microsoft.VisualStudio.Services.FileContainer.Client;
 using Microsoft.VisualStudio.Services.WebApi;
+using Agent.Worker.Util;
 
 namespace Microsoft.VisualStudio.Services.Agent.Worker.Release.ContainerProvider.Helpers
 {
@@ -99,10 +100,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Release.ContainerProvider
             }
             catch (SocketException e)
             {
-                this._executionContext.Error("SocketException occurred.");
-                this._executionContext.Error(e.Message);
-                this._executionContext.Error($"Verify whether you have (network) access to { vssConnection.Uri }");
-                this._executionContext.Error($"URLs the agent need communicate with - { BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform() }");
+                ExceptionsUtil.HandleSocketException(e, vssConnection.Uri.ToString(), this._executionContext);
                 throw;
             }
 

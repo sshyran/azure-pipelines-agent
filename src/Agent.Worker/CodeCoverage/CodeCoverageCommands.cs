@@ -10,6 +10,7 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
+using Agent.Worker.Util;
 using Microsoft.VisualStudio.Services.WebApi;
 
 namespace Microsoft.VisualStudio.Services.Agent.Worker.CodeCoverage
@@ -148,12 +149,9 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.CodeCoverage
             }
             catch (SocketException ex)
             {
-                executionContext.Warning("SocketException occurred.");
-                executionContext.Warning(ex.Message);
                 #pragma warning disable CA2000 // Dispose objects before losing scope
-                executionContext.Warning($"Verify whether you have (network) access to { WorkerUtilities.GetVssConnection(executionContext).Uri }");
+                ExceptionsUtil.HandleSocketException(ex, WorkerUtilities.GetVssConnection(executionContext).Uri.ToString(), executionContext);
                 #pragma warning restore CA2000 // Dispose objects before losing scope
-                executionContext.Warning($"URLs the agent need communicate with - { BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform() }");
             }
             catch (Exception ex)
             {
