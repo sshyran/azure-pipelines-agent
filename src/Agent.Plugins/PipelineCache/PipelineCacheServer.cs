@@ -41,7 +41,7 @@ namespace Agent.Plugins.PipelineCache
             VssConnection connection = context.VssConnection;
             var (dedupManifestClient, clientTelemetry) = await DedupManifestArtifactClientFactory.Instance
                 .CreateDedupManifestClientAsync(context.IsSystemDebugTrue(), (str) => context.Output(str), connection, cancellationToken);
-            PipelineCacheClient pipelineCacheClient = await this.CreateClientWithRetryAsync(clientTelemetry, context, connection, cancellationToken);
+            PipelineCacheClient pipelineCacheClient = this.CreateClient(clientTelemetry, context, connection);
 
             using (clientTelemetry)
             {
@@ -122,23 +122,13 @@ namespace Agent.Plugins.PipelineCache
             VssConnection connection = context.VssConnection;
             var (dedupManifestClient, clientTelemetry) = await DedupManifestArtifactClientFactory.Instance
                 .CreateDedupManifestClientAsync(context.IsSystemDebugTrue(), (str) => context.Output(str), connection, cancellationToken);
-            PipelineCacheClient pipelineCacheClient = await this.CreateClientWithRetryAsync(clientTelemetry, context, connection, cancellationToken);
+            PipelineCacheClient pipelineCacheClient = this.CreateClient(clientTelemetry, context, connection);
 
             using (clientTelemetry)
             {
                 PipelineCacheActionRecord cacheRecord = clientTelemetry.CreateRecord<PipelineCacheActionRecord>((level, uri, type) =>
                         new PipelineCacheActionRecord(level, uri, type, PipelineArtifactConstants.RestoreCache, context));
-
-                PipelineCacheArtifact result = await AsyncHttpRetryHelper.InvokeAsync(
-                    async () =>
-                    {
-                        return await pipelineCacheClient.GetPipelineCacheArtifactAsync(fingerprints, cancellationToken, cacheRecord);
-                    },
-                    maxRetries: 3,
-                    tracer: tracer,
-                    canRetryDelegate: e => true, // this isn't great, but failing on upload stinks, so just try a couple of times
-                    cancellationToken: cancellationToken,
-                    continueOnCapturedContext: false);
+                PipelineCacheArtifact result = await pipelineCacheClient.GetPipelineCacheArtifactAsync(fingerprints, cancellationToken, cacheRecord);
 
                 // Send results to CustomerIntelligence
                 context.PublishTelemetry(area: PipelineArtifactConstants.AzurePipelinesAgent, feature: PipelineArtifactConstants.PipelineCache, record: cacheRecord);
@@ -191,32 +181,14 @@ namespace Agent.Plugins.PipelineCache
             }
         }
 
-
-        private Task<PipelineCacheClient> CreateClientWithRetryAsync(
-            BlobStoreClientTelemetry blobStoreClientTelemetry,
-            AgentTaskPluginExecutionContext context,
-            VssConnection connection,
-            CancellationToken cancellationToken)
-        {
-            // this uses location service so needs http retries.
-            return AsyncHttpRetryHelper.InvokeAsync(
-                async () => await this.CreateClientAsync(blobStoreClientTelemetry, context, connection),
-                maxRetries: 3,
-                tracer: tracer,
-                canRetryDelegate: e => true, // this isn't great, but failing on upload stinks, so just try a couple of times
-                cancellationToken: cancellationToken,
-                continueOnCapturedContext: false);
-        }
-
-        private async Task<PipelineCacheClient> CreateClientAsync(
+        private PipelineCacheClient CreateClient(
             BlobStoreClientTelemetry blobStoreClientTelemetry,
             AgentTaskPluginExecutionContext context,
             VssConnection connection)
         {
-
             var tracer = context.CreateArtifactsTracer();
             IClock clock = UtcClock.Instance;
-            var pipelineCacheHttpClient = await connection.GetClientAsync<PipelineCacheHttpClient>();
+            var pipelineCacheHttpClient = connection.GetClient<PipelineCacheHttpClient>();
             var pipelineCacheClient = new PipelineCacheClient(blobStoreClientTelemetry, pipelineCacheHttpClient, clock, tracer);
 
             return pipelineCacheClient;
