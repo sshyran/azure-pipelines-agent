@@ -19,7 +19,7 @@ function Remove-ThirdPartySignatures() {
   $succesfullyUnsigned = New-Object Collections.Generic.List[String]
   $filesWithoutSignatures = New-Object Collections.Generic.List[String]
 	$filesCounter = 0
-  foreach ($tree in Get-ChildItem -Path "$LayoutRoot/bin" -Filter "*.dll" -Recurse | select FullName) {
+  foreach ($tree in Get-ChildItem -Path "$LayoutRoot" -Include "*.dll","*.exe" -Recurse | select FullName) {
       $filesCounter = $filesCounter + 1
       try {
         # check that file contain a signature before removal
