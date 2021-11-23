@@ -22,25 +22,28 @@ function Remove-ThirdPartySignatures() {
   foreach ($tree in Get-ChildItem -Path "$LayoutRoot/bin" -Filter "*.dll" -Recurse | select FullName) {
       $filesCounter = $filesCounter + 1
       try {
-    # check that file contain a signature before removal
-    $verificationOutput = & "$SigntoolPath" verify /pa "$($tree.FullName)" 2>&1 | Write-Output
-    $fileDoesntContainSignature = $false;
+        # check that file contain a signature before removal
+        $verificationOutput = & "$SigntoolPath" verify /pa "$($tree.FullName)" 2>&1 | Write-Output
+        $fileDoesntContainSignature = $false;
 
-    if ($verificationOutput -match "No signature found.") {
-      $fileDoesntContainSignature = $true;
-      $filesWithoutSignatures.Add("$($tree.FullName)")
-    }
+        if (($verificationOutput -match "No signature found.") -or ($error -match "No signature found.")) {
+          $fileDoesntContainSignature = $true;
+          $filesWithoutSignatures.Add("$($tree.FullName)")
+          $Error.clear()
+        }
 
-    if ($fileDoesntContainSignature -ne $true) {
-      $removeOutput = & "$SigntoolPath" remove /s "$($tree.FullName)" 2>&1 | Write-Output	
-      if ($lastExitcode -ne 0) {
-        $failedToUnsign.Add("$($tree.FullName)")
-      } else {
-        $succesfullyUnsigned.Add("$($tree.FullName)")
-      }
-    }
+        if ($fileDoesntContainSignature -ne $true) {
+          $removeOutput = & "$SigntoolPath" remove /s "$($tree.FullName)" 2>&1 | Write-Output
+          if ($lastExitcode -ne 0) {
+            $failedToUnsign.Add("$($tree.FullName)")
+            $Error.clear()
+          } else {
+            $succesfullyUnsigned.Add("$($tree.FullName)")
+          }
+        }
       } catch {
           $failedToUnsign.Add("$($tree.FullName)")
+          $Error.clear()
       }
   }
 
