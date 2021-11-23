@@ -6,25 +6,51 @@ function Remove-ThirdPartySignatures() {
         [Parameter(Mandatory = $false)]
         [string]$LayoutRoot)
 
-    $ErrorActionPreference = 'Stop'
     $failedToUnsign = New-Object Collections.Generic.List[String]
     $succesfullyUnsigned = New-Object Collections.Generic.List[String]
+    $filesWithoutSignatures = New-Object Collections.Generic.List[String]
+	$filesCounter = 0
     foreach ($tree in Get-ChildItem -Path "$LayoutRoot/bin" -Filter "*.dll" -Recurse | select FullName) {
+        $filesCounter = $filesCounter + 1
         try {
-            & "$SigntoolPath" remove /s /q "$($tree.FullName)" 2>&1
-            if ($lastexitcode -ne 0) {
-                $failedToUnsign.Add("$($tree.FullName)")
-            } else {
-                $succesfullyUnsigned.Add("$($tree.FullName)")
-            }
+			# check that file contain a signature before removal
+			$verificationOutput = & "$SigntoolPath" verify /pa "$($tree.FullName)" 2>&1 | Write-Output
+			$fileDoesntContainSignature = $false;
+
+			if ($verificationOutput -match "No signature found.") {
+				$fileDoesntContainSignature = $true;
+				$filesWithoutSignatures.Add("$($tree.FullName)")
+			}
+
+			if ($fileDoesntContainSignature -ne $true) {
+				$removeOutput = & "$SigntoolPath" remove /s "$($tree.FullName)" 2>&1 | Write-Output	
+				if ($lastExitcode -ne 0) {
+					$failedToUnsign.Add("$($tree.FullName)")
+				} else {
+					$succesfullyUnsigned.Add("$($tree.FullName)")
+				}
+			}
         } catch {
             $failedToUnsign.Add("$($tree.FullName)")
         }
     }
-    foreach ($f in $failedToUnsign) {
-        Write-Warning "Something went wrong, failed to process $f file in catch"
+
+	Write-host "Failed to unsign - $($failedtounsign.Count)"
+	Write-host "Succesfully unsigned - $($succesfullyUnsigned.Count)"
+	Write-host "Files without signature - $($filesWithoutSignatures.Count)"
+    foreach ($s in $filesWithoutSignatures) {
+        write-host "File $s doesn't contain signature"
     }
-    foreach ($s in $success) {
-        Write-Host "Signature succefully removed for $s file"
+	foreach ($s in $succesfullyunsigned) {
+        write-host "Signature succefully removed for $s file"
     }
+
+	if ($failedToUnsign.Count -gt 0) {
+		foreach ($f in $failedtounsign) {
+			Write-Error "Something went wrong, failed to process $f file"
+		}
+		exit 1
+	} else {
+		exit 0
+	}
 }

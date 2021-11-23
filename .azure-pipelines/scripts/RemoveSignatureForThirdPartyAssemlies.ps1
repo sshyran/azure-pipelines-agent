@@ -7,7 +7,9 @@ param(
 . $PSScriptRoot\Get-SigntoolPath.ps1
 . $PSScriptRoot\RemoveSignatureScript.ps1
 
-$signtoolPath = Get-Signtool
-if ( $signtoolPath -ne "" ) {
-  Remove-ThirdPartySignatures -SigntoolPath "$signToolPath" -LayoutRoot "$LayoutRoot"
+if ( ($signToolPath -ne "") -and (Test-Path -Path $signtoolPath) ) {
+  Remove-ThirdPartySignatures -SigntoolPath "$signToolPath"
+} else {
+	Write-Error "$signToolPath is not a valid path"
+	exit 1
 }
