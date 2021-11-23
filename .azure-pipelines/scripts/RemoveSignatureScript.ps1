@@ -26,7 +26,7 @@ function Remove-ThirdPartySignatures() {
         $verificationOutput = & "$SigntoolPath" verify /pa "$($tree.FullName)" 2>&1 | Write-Output
         $fileDoesntContainSignature = $false;
 
-        if (($verificationOutput -match "No signature found.") -or ($error -match "No signature found.")) {
+        if ($verificationOutput -match "No signature found.") {
           $fileDoesntContainSignature = $true;
           $filesWithoutSignatures.Add("$($tree.FullName)")
           $Error.clear()
