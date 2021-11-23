@@ -10,7 +10,7 @@ steps:
       - task: PowerShell@2
         inputs:
           targetType: 'filePath'
-          filePath: ./.azure-pipelines/scripts/Unsignig-ThirdPartyAssemlies.ps1
+          filePath: ./.azure-pipelines/scripts/RemoveSignatureForThirdPartyAssemlies.ps1
           arguments: '-LayoutRoot ${{ parameters.layoutRoot }}'
           pwsh: true
         displayName: Remove signatures from the third party packages
