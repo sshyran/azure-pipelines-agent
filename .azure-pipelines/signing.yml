@@ -12,6 +12,7 @@ steps:
           targetType: 'filePath'
           filePath: ./.azure-pipelines/scripts/RemoveSignatureForThirdPartyAssemlies.ps1
           arguments: '-LayoutRoot ${{ parameters.layoutRoot }}'
+          errorActionPreference: 'continue'
         displayName: Remove signatures from the third party packages
 
       - task: SFP.build-tasks.custom-build-task-1.EsrpCodeSigning@1
