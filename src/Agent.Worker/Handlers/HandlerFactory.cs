@@ -57,7 +57,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Handlers
             if (data is BaseNodeHandlerData)
             {
                 // Node 6
-                if (data is NodeHandlerData && AgentKnobs.DisableNode6DeprecationWarning.GetValue(executionContext).AsBoolean()) {       
+                if (data is NodeHandlerData && !AgentKnobs.DisableNode6DeprecationWarning.GetValue(executionContext).AsBoolean()) {       
                     executionContext.Warning(StringUtil.Loc("DeprecatedNode6"));
                 }
                 // Node 6 and 10.
