@@ -30,9 +30,9 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
     public class ServerUtil
     {
         private DeploymentFlags _deploymentType;
-        private ITraceWriter _trace;
+        private Tracing _trace;
 
-        public ServerUtil(ITraceWriter trace = null)
+        public ServerUtil(Tracing trace = null)
         {
             _trace = trace;
         }
@@ -79,7 +79,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
         /// Returns false and writes a warning instead of throwing exception
         /// if the deployment type determination has been failed.
         /// </summary>
-        public async Task<bool> TryIsDeploymentTypeHosted(string serverUrl, VssCredentials credentials, ILocationServer locationServer, Tracing Trace)
+        public async Task<bool> TryIsDeploymentTypeHosted(string serverUrl, VssCredentials credentials, ILocationServer locationServer)
         {
             try
             {
@@ -87,7 +87,10 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
             }
             catch (DeploymentTypeNotDeterminedException ex)
             {
-                Trace.Warning(ex.Message);
+                if (_trace != null)
+                {
+                    _trace.Warning(ex.Message);
+                }
                 return false;
             }
         }
