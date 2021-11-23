@@ -14,6 +14,7 @@ steps:
           arguments: '-LayoutRoot ${{ parameters.layoutRoot }}'
           errorActionPreference: 'continue'
         displayName: Remove signatures from the third party packages
+        condition: ne(variables['DISABLE_SIGNATURE_REMOVAL'], 'true')
 
       - task: SFP.build-tasks.custom-build-task-1.EsrpCodeSigning@1
         inputs:
