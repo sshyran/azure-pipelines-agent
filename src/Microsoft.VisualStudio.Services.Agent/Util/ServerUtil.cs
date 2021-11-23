@@ -5,7 +5,6 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.Services.Common;
 using Microsoft.VisualStudio.Services.WebApi;
-using Agent.Sdk;
 
 namespace Microsoft.VisualStudio.Services.Agent.Util
 {
