@@ -272,5 +272,12 @@ namespace Agent.Sdk.Knob
             new RuntimeKnobSource("DISABLE_OVERRIDE_TFVC_BUILD_DIRECTORY"),
             new EnvironmentKnobSource("DISABLE_OVERRIDE_TFVC_BUILD_DIRECTORY"),
             new BuiltInDefaultKnobSource("false"));
+
+        public static readonly Knob DisableNode6DeprecationWarning = new Knob(
+            nameof(DisableNode6DeprecationWarning),
+            "Disables Node 6 deprecation warnings.",
+            new RuntimeKnobSource("DISABLE_NODE6_DEPRECATION_WARNING"),
+            new EnvironmentKnobSource("DISABLE_NODE6_DEPRECATION_WARNING"),
+            new BuiltInDefaultKnobSource("false"));
     }
 }

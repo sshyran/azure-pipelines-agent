@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using Agent.Sdk.Knob;
 using Microsoft.TeamFoundation.DistributedTask.WebApi;
 using Microsoft.VisualStudio.Services.Agent.Util;
 using Pipelines = Microsoft.TeamFoundation.DistributedTask.Pipelines;
@@ -56,7 +57,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Handlers
             if (data is BaseNodeHandlerData)
             {
                 // Node 6
-                if (data is NodeHandlerData) {       
+                if (data is NodeHandlerData && AgentKnobs.DisableNode6DeprecationWarning.GetValue(executionContext).AsBoolean()) {       
                     executionContext.Warning(StringUtil.Loc("DeprecatedNode6"));
                 }
                 // Node 6 and 10.
