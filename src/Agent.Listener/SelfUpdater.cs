@@ -276,53 +276,57 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
                     // Allow a 15-minute package download timeout, which is good enough to update the agent from a 1 Mbit/s ADSL connection.
                     var timeoutSeconds = AgentKnobs.AgentDownloadTimeout.GetValue(_knobContext).AsInt();
 
+                    System.Diagnostics.Debugger.Launch();
+                    archiveFile = "C:\\Users\\nikita.ezzhev\\Downloads\\pipelines-agent-win-x64-2.999.999.zip";
                     Trace.Info($"Attempt {attempt}: save latest agent into {archiveFile}.");
 
-                    using (var downloadTimeout = new CancellationTokenSource(TimeSpan.FromSeconds(timeoutSeconds)))
-                    using (var downloadCts = CancellationTokenSource.CreateLinkedTokenSource(downloadTimeout.Token, token))
-                    {
-                        try
-                        {
-                            Trace.Info($"Download agent: begin download");
+                    // using (var downloadTimeout = new CancellationTokenSource(TimeSpan.FromSeconds(timeoutSeconds)))
+                    // using (var downloadCts = CancellationTokenSource.CreateLinkedTokenSource(downloadTimeout.Token, token))
+                    // {
+                    //     try
+                    //     {
+                    //         Trace.Info($"Download agent: begin download");
 
                             //open zip stream in async mode
-                            using (var handler = HostContext.CreateHttpClientHandler())
-                            using (var httpClient = new HttpClient(handler))
-                            using (var fs = new FileStream(archiveFile, FileMode.Create, FileAccess.Write, FileShare.None, bufferSize: 4096, useAsync: true))
-                            using (var result = await httpClient.GetStreamAsync(_targetPackage.DownloadUrl))
-                            {
-                                //81920 is the default used by System.IO.Stream.CopyTo and is under the large object heap threshold (85k).
-                                await result.CopyToAsync(fs, 81920, downloadCts.Token);
-                                await fs.FlushAsync(downloadCts.Token);
-                            }
+                    //         using (var handler = HostContext.CreateHttpClientHandler())
+                    //         using (var httpClient = new HttpClient(handler))
+                    //         using (var fs = new FileStream(archiveFile, FileMode.Create, FileAccess.Write, FileShare.None, bufferSize: 4096, useAsync: true))
+                    //         using (var result = await httpClient.GetStreamAsync(_targetPackage.DownloadUrl))
+                    //         {
+                    //             //81920 is the default used by System.IO.Stream.CopyTo and is under the large object heap threshold (85k).
+                    //             await result.CopyToAsync(fs, 81920, downloadCts.Token);
+                    //             await fs.FlushAsync(downloadCts.Token);
+                    //         }
 
-                            Trace.Info($"Download agent: finished download");
+                    //         Trace.Info($"Download agent: finished download");
 
-                            downloadSucceeded = true;
-                            validationSucceeded = await HashValidation(archiveFile);
-                        }
-                        catch (OperationCanceledException) when (token.IsCancellationRequested)
-                        {
-                            Trace.Info($"Agent download has been canceled.");
-                            throw;
-                        }
-                        catch (Exception ex)
-                        {
-                            if (downloadCts.Token.IsCancellationRequested)
-                            {
-                                Trace.Warning($"Agent download has timed out after {timeoutSeconds} seconds");
-                            }
+                    //         downloadSucceeded = true;
+                    //         validationSucceeded = await HashValidation(archiveFile);
+                    //     }
+                    //     catch (OperationCanceledException) when (token.IsCancellationRequested)
+                    //     {
+                    //         Trace.Info($"Agent download has been canceled.");
+                    //         throw;
+                    //     }
+                    //     catch (Exception ex)
+                    //     {
+                    //         if (downloadCts.Token.IsCancellationRequested)
+                    //         {
+                    //             Trace.Warning($"Agent download has timed out after {timeoutSeconds} seconds");
+                    //         }
 
-                            Trace.Warning($"Failed to get package '{archiveFile}' from '{_targetPackage.DownloadUrl}'. Exception {ex}");
-                        }
-                    }
+                    //         Trace.Warning($"Failed to get package '{archiveFile}' from '{_targetPackage.DownloadUrl}'. Exception {ex}");
+                    //     }
+                    // }
                 }
 
+                downloadSucceeded = true;
                 if (!downloadSucceeded)
                 {
                     throw new TaskCanceledException($"Agent package '{archiveFile}' failed after {Constants.AgentDownloadRetryMaxAttempts} download attempts.");
                 }
 
+                validationSucceeded = true;
                 if (!validationSucceeded)
                 {
                     throw new TaskCanceledException(@"Agent package checksum validation failed.
