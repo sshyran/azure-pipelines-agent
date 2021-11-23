@@ -1,6 +1,14 @@
+<#
+  .SYNOPSIS
+    Script is used as a start point for the process of removing signature from the third party assemlies
+
+  .PARAMETER LayoutRoot
+    Parameter that contains path to the _layout directory for current agent build
+#>
+
 [CmdletBinding()]
 param(
-  [Parameter(Mandatory = $false)]
+  [Parameter(Mandatory = $true)]
   [string]$LayoutRoot
 )
 
