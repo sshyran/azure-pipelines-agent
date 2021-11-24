@@ -18,7 +18,7 @@ function Remove-ThirdPartySignatures() {
   $failedToUnsign = New-Object Collections.Generic.List[String]
   $succesfullyUnsigned = New-Object Collections.Generic.List[String]
   $filesWithoutSignatures = New-Object Collections.Generic.List[String]
-	$filesCounter = 0
+  $filesCounter = 0
   foreach ($tree in Get-ChildItem -Path "$LayoutRoot" -Include "*.dll","*.exe" -Recurse | select FullName) {
       $filesCounter = $filesCounter + 1
       try {
@@ -47,9 +47,9 @@ function Remove-ThirdPartySignatures() {
       }
   }
 
-	Write-host "Failed to unsign - $($failedtounsign.Count)"
-	Write-host "Succesfully unsigned - $($succesfullyUnsigned.Count)"
-	Write-host "Files without signature - $($filesWithoutSignatures.Count)"
+  Write-host "Failed to unsign - $($failedtounsign.Count)"
+  Write-host "Succesfully unsigned - $($succesfullyUnsigned.Count)"
+  Write-host "Files without signature - $($filesWithoutSignatures.Count)"
   foreach ($s in $filesWithoutSignatures) {
     write-host "File $s doesn't contain signature"
   }
