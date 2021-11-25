@@ -53,25 +53,22 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
                     pipeIn: args[1],
                     pipeOut: args[2]);
             }
+            catch (AggregateException ex)
+            {
+                ExceptionsUtil.HandleAggregateException((AggregateException)ex, trace);
+            }
             catch (Exception ex)
             {
-                if (ex is AggregateException)
+                Console.WriteLine(ex.ToString());
+                try
                 {
-                    ExceptionsUtil.HandleAggregateException((AggregateException)ex, trace);
+                    trace.Error(ex);
                 }
-                else
+                catch (Exception e)
                 {
-                    Console.WriteLine(ex.ToString());
-                    try
-                    {
-                        trace.Error(ex);
-                    }
-                    catch (Exception e)
-                    {
-                        // make sure we don't crash the app on trace error.
-                        // since IOException will throw when we run out of disk space.
-                        Console.WriteLine(e.ToString());
-                    }
+                    // make sure we don't crash the app on trace error.
+                    // since IOException will throw when we run out of disk space.
+                    Console.WriteLine(e.ToString());
                 }
             }
 

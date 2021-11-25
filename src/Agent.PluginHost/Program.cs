@@ -69,17 +69,14 @@ namespace Agent.PluginHost
                         ArgUtil.NotNull(taskPlugin, nameof(taskPlugin));
                         taskPlugin.RunAsync(executionContext, tokenSource.Token).GetAwaiter().GetResult();
                     }
+                    catch (AggregateException ex)
+                    {
+                        ExceptionsUtil.HandleAggregateException((AggregateException)ex, executionContext);
+                    }
                     catch (Exception ex)
                     {
-                        if (ex is AggregateException)
-                        {
-                            ExceptionsUtil.HandleAggregateException((AggregateException)ex, executionContext);
-                        }
-                        else
-                        {
-                            executionContext.Error(ex.Message);
-                            executionContext.Debug(ex.StackTrace);
-                        }
+                        executionContext.Error(ex.Message);
+                        executionContext.Debug(ex.StackTrace);
                     }
                     finally
                     {

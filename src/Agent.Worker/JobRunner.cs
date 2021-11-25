@@ -316,18 +316,15 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
                 Trace.Info("Completing the job execution context.");
                 return await CompleteJobAsync(jobServer, jobContext, message);
             }
-            catch (Exception e)
+            catch (AggregateException e)
             {
-                if (e is AggregateException)
-                {
-                    ExceptionsUtil.HandleAggregateException((AggregateException)e, Trace);
+                ExceptionsUtil.HandleAggregateException((AggregateException)e, Trace);
 
-                    return TaskResult.Failed;
-                }
-                else
-                {
-                    throw;
-                }
+                return TaskResult.Failed;
+            }
+            catch (Exception)
+            {
+                throw;
             }
             finally
             {
@@ -384,18 +381,18 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             {
                 await ShutdownQueue(throwOnFailure: true);
             }
+            catch (AggregateException ex)
+            {
+                ExceptionsUtil.HandleAggregateException((AggregateException)ex, Trace);
+
+                result = TaskResultUtil.MergeTaskResults(result, TaskResult.Failed);
+            }
             catch (Exception ex)
             {
-                if (ex is AggregateException)
-                {
-                    ExceptionsUtil.HandleAggregateException((AggregateException)ex, Trace);
-                }
-                else
-                {
-                    Trace.Error($"Caught exception from {nameof(JobServerQueue)}.{nameof(_jobServerQueue.ShutdownAsync)}");
-                    Trace.Error("This indicate a failure during publish output variables. Fail the job to prevent unexpected job outputs.");
-                    Trace.Error(ex);
-                }
+                Trace.Error($"Caught exception from {nameof(JobServerQueue)}.{nameof(_jobServerQueue.ShutdownAsync)}");
+                Trace.Error("This indicate a failure during publish output variables. Fail the job to prevent unexpected job outputs.");
+                Trace.Error(ex);
+
                 result = TaskResultUtil.MergeTaskResults(result, TaskResult.Failed);
             }
 
@@ -457,17 +454,14 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
                     Trace.Info("Shutting down the job server queue.");
                     await _jobServerQueue.ShutdownAsync();
                 }
+                catch (AggregateException ex)
+                {
+                    ExceptionsUtil.HandleAggregateException((AggregateException)ex, Trace);
+                }
                 catch (Exception ex) when (!throwOnFailure)
                 {
-                    if (ex is AggregateException)
-                    {
-                        ExceptionsUtil.HandleAggregateException((AggregateException)ex, Trace);
-                    }
-                    else
-                    {
-                        Trace.Error($"Caught exception from {nameof(JobServerQueue)}.{nameof(_jobServerQueue.ShutdownAsync)}");
-                        Trace.Error(ex);
-                    }
+                    Trace.Error($"Caught exception from {nameof(JobServerQueue)}.{nameof(_jobServerQueue.ShutdownAsync)}");
+                    Trace.Error(ex);
                 }
                 finally
                 {

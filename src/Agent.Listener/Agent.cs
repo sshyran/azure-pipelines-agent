@@ -465,16 +465,13 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
                                 Trace.Error($"Received message {message.MessageId} with unsupported message type {message.MessageType}.");
                             }
                         }
-                        catch (Exception e)
+                        catch (AggregateException e)
                         {
-                            if (e is AggregateException)
-                            {
-                                ExceptionsUtil.HandleAggregateException((AggregateException)e, Trace);
-                            }
-                            else
-                            {
-                                throw;
-                            }
+                            ExceptionsUtil.HandleAggregateException((AggregateException)e, Trace);
+                        }
+                        catch (Exception)
+                        {
+                            throw;
                         }
                         finally
                         {

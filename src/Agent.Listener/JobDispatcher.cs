@@ -310,16 +310,13 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
             {
                 await RunAsync(message, previousJobDispatch, currentJobDispatch);
             }
-            catch(Exception e)
+            catch (AggregateException e)
             {
-                if (e is AggregateException)
-                {
-                    ExceptionsUtil.HandleAggregateException((AggregateException)e, Trace);
-                }
-                else
-                {
-                    throw;
-                }
+                ExceptionsUtil.HandleAggregateException((AggregateException)e, Trace);
+            }
+            catch (Exception)
+            {
+                throw;
             }
             finally
             {
@@ -670,16 +667,13 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
                         // complete job request
                         await CompleteJobRequestAsync(_poolId, message, lockToken, resultOnAbandonOrCancel);
                     }
-                    catch (Exception e)
+                    catch (AggregateException e)
                     {
-                        if (e is AggregateException)
-                        {
-                            ExceptionsUtil.HandleAggregateException((AggregateException)e, Trace);
-                        }
-                        else
-                        {
-                            throw;
-                        }
+                        ExceptionsUtil.HandleAggregateException((AggregateException)e, Trace);
+                    }
+                    catch (Exception)
+                    {
+                        throw;
                     }
                     finally
                     {
