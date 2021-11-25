@@ -469,10 +469,6 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
                         {
                             ExceptionsUtil.HandleAggregateException((AggregateException)e, Trace);
                         }
-                        catch (Exception)
-                        {
-                            throw;
-                        }
                         finally
                         {
                             if (!skipMessageDeletion && message != null)

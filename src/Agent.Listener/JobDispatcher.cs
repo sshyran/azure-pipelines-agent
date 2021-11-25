@@ -314,10 +314,6 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
             {
                 ExceptionsUtil.HandleAggregateException((AggregateException)e, Trace);
             }
-            catch (Exception)
-            {
-                throw;
-            }
             finally
             {
                 Trace.Info("Fire signal for one time used agent.");
@@ -670,10 +666,6 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
                     catch (AggregateException e)
                     {
                         ExceptionsUtil.HandleAggregateException((AggregateException)e, Trace);
-                    }
-                    catch (Exception)
-                    {
-                        throw;
                     }
                     finally
                     {

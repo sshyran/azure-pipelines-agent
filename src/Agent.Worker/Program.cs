@@ -59,6 +59,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             }
             catch (Exception ex)
             {
+                // Populate any exception that cause worker failure back to agent.
                 Console.WriteLine(ex.ToString());
                 try
                 {
