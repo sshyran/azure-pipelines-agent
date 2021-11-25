@@ -9,7 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Threading.Tasks;
-using Agent.Worker.Util;
+using Agent.Sdk.Util;
 
 namespace Microsoft.VisualStudio.Services.Agent.Worker.Telemetry
 {
@@ -84,7 +84,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Telemetry
             }
             catch (SocketException ex)
             {
-                ExceptionsUtil.HandleSocketException(ex, WorkerUtilities.GetVssConnection(context).Uri.ToString(), context);
+                ExceptionsUtil.HandleSocketException(ex, WorkerUtilities.GetVssConnection(context).Uri.ToString(), context.Warning);
                 return;
             }
             catch (Exception ex)

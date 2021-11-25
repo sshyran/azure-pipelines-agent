@@ -888,7 +888,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
             }
             catch (SocketException ex)
             {
-                ExceptionsUtil.HandleSocketException(ex, message.Resources.Endpoints.SingleOrDefault(x => string.Equals(x.Name, WellKnownServiceEndpointNames.SystemVssConnection)).Url.ToString(), Trace);
+                ExceptionsUtil.HandleSocketException(ex, message.Resources.Endpoints.SingleOrDefault(x => string.Equals(x.Name, WellKnownServiceEndpointNames.SystemVssConnection)).Url.ToString(), Trace.Error);
             }
             catch (Exception ex)
             {

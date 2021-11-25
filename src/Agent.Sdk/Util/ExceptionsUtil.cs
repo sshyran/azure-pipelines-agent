@@ -12,12 +12,12 @@ namespace Agent.Sdk.Util
 {
     public class ExceptionsUtil
     {
-        public static void HandleSocketException(SocketException e, string url, ITraceWriter trace)
+        public static void HandleSocketException(SocketException e, string url, Action<string> action)
         {
-            trace.Info("SocketException occurred.");
-            trace.Info(e.Message);
-            trace.Info($"Verify whether you have (network) access to { url }");
-            trace.Info($"URLs the agent need communicate with - { BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform() }");
+            action("SocketException occurred.");
+            action(e.Message);
+            action($"Verify whether you have (network) access to { url }");
+            action($"URLs the agent need communicate with - { BlobStoreWarningInfoProvider.GetAllowListLinkForCurrentPlatform() }");
         }
     }
 }

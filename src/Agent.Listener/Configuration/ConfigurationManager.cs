@@ -241,7 +241,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener.Configuration
                 }
                 catch (SocketException e)
                 {
-                    ExceptionsUtil.HandleSocketException(e, agentSettings.ServerUrl, Trace);
+                    ExceptionsUtil.HandleSocketException(e, agentSettings.ServerUrl, _term.WriteError);
                 }
                 catch (Exception e) when (!command.Unattended())
                 {
@@ -428,7 +428,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener.Configuration
             }
             catch (SocketException ex)
             {
-                ExceptionsUtil.HandleSocketException(ex, agentSettings.ServerUrl, Trace);
+                ExceptionsUtil.HandleSocketException(ex, agentSettings.ServerUrl, Trace.Error);
                 throw;
             }
 
@@ -651,7 +651,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener.Configuration
             }
             catch (SocketException ex)
             {
-                ExceptionsUtil.HandleSocketException(ex, _store.GetSettings().ServerUrl, Trace);
+                ExceptionsUtil.HandleSocketException(ex, _store.GetSettings().ServerUrl, _term.WriteLine);
                 throw;
             }
             catch (Exception)

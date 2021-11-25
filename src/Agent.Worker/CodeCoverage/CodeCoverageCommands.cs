@@ -10,7 +10,7 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
-using Agent.Worker.Util;
+using Agent.Sdk.Util;
 using Microsoft.VisualStudio.Services.WebApi;
 
 namespace Microsoft.VisualStudio.Services.Agent.Worker.CodeCoverage
@@ -150,7 +150,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.CodeCoverage
             catch (SocketException ex)
             {
                 #pragma warning disable CA2000 // Dispose objects before losing scope
-                ExceptionsUtil.HandleSocketException(ex, WorkerUtilities.GetVssConnection(executionContext).Uri.ToString(), executionContext);
+                ExceptionsUtil.HandleSocketException(ex, WorkerUtilities.GetVssConnection(executionContext).Uri.ToString(), executionContext.Warning);
                 #pragma warning restore CA2000 // Dispose objects before losing scope
             }
             catch (Exception ex)

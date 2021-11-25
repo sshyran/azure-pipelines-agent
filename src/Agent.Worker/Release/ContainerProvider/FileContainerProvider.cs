@@ -15,7 +15,7 @@ using Microsoft.VisualStudio.Services.Agent.Worker.Release.ContainerFetchEngine;
 using Microsoft.VisualStudio.Services.FileContainer;
 using Microsoft.VisualStudio.Services.FileContainer.Client;
 using Microsoft.VisualStudio.Services.WebApi;
-using Agent.Worker.Util;
+using Agent.Sdk.Util;
 
 namespace Microsoft.VisualStudio.Services.Agent.Worker.Release.ContainerProvider.Helpers
 {
@@ -101,7 +101,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Release.ContainerProvider
             }
             catch (SocketException e)
             {
-                ExceptionsUtil.HandleSocketException(e, vssConnection.Uri.ToString(), this._executionContext);
+                ExceptionsUtil.HandleSocketException(e, vssConnection.Uri.ToString(), this._executionContext.Error);
                 throw;
             }
 

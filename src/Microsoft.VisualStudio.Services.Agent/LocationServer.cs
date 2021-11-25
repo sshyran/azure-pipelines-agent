@@ -37,7 +37,7 @@ namespace Microsoft.VisualStudio.Services.Agent
             }
             catch (SocketException ex)
             {
-                ExceptionsUtil.HandleSocketException(ex, _connection.Uri.ToString(), Trace);
+                ExceptionsUtil.HandleSocketException(ex, _connection.Uri.ToString(), Trace.Error);
                 throw;
             }
             catch (Exception ex)

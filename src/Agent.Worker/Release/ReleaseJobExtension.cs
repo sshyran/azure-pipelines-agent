@@ -130,7 +130,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Release
             {
                 LogDownloadFailureTelemetry(executionContext, ex);
 
-                ExceptionsUtil.HandleSocketException(ex, WorkerUtilities.GetVssConnection(executionContext).Uri.ToString(), Trace);
+                ExceptionsUtil.HandleSocketException(ex, WorkerUtilities.GetVssConnection(executionContext).Uri.ToString(), Trace.Error);
                 throw;
             }
             catch (Exception ex)

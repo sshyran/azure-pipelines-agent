@@ -72,7 +72,7 @@ namespace Agent.PluginHost
                     }
                     catch (SocketException ex)
                     {
-                        ExceptionsUtil.HandleSocketException(ex, executionContext.VssConnection.Uri.ToString(), executionContext);
+                        ExceptionsUtil.HandleSocketException(ex, executionContext.VssConnection.Uri.ToString(), executionContext.Error);
                     }
                     catch (Exception ex)
                     {

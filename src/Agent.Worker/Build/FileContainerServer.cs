@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 
 using Agent.Sdk.Knob;
-using Agent.Worker.Util;
+using Agent.Sdk.Util;
 using Microsoft.VisualStudio.Services.Agent.Blob;
 using Microsoft.VisualStudio.Services.Agent.Util;
 using Microsoft.VisualStudio.Services.FileContainer.Client;
@@ -388,7 +388,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
             }
             catch (SocketException e)
             {
-                ExceptionsUtil.HandleSocketExceptionAsync(e, this._connection.Uri.ToString(), context);
+                ExceptionsUtil.HandleSocketException(e, this._connection.Uri.ToString(), context.Warn);
 
                 throw;
             }

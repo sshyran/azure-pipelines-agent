@@ -365,7 +365,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener.Configuration
                 catch (SocketException ex)
                 {
                     azureSubscriptionId = string.Empty;
-                    ExceptionsUtil.HandleSocketException(ex, imdsUri, Trace);
+                    ExceptionsUtil.HandleSocketException(ex, imdsUri, Trace.Info);
                 }
                 catch (Exception ex)
                 {

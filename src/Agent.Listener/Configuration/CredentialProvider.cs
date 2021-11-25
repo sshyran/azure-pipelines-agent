@@ -161,7 +161,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener.Configuration
                     }
                     catch (SocketException e)
                     {
-                        ExceptionsUtil.HandleSocketException(e, serverUrl, trace);
+                        ExceptionsUtil.HandleSocketException(e, serverUrl, trace.Error);
                         throw;
                     }
 

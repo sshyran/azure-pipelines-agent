@@ -7,7 +7,7 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using Agent.Plugins.Log.TestResultParser.Contracts;
-using Agent.Plugins.Util;
+using Agent.Sdk.Util;
 using Agent.Sdk;
 using Pipelines = Microsoft.TeamFoundation.DistributedTask.Pipelines;
 
@@ -57,7 +57,7 @@ namespace Agent.Plugins.Log.TestFilePublisher
             }
             catch (SocketException ex)
             {
-                ExceptionsUtil.HandleSocketException(ex, context.VssConnection.Uri.ToString(), _logger);
+                ExceptionsUtil.HandleSocketException(ex, context.VssConnection.Uri.ToString(), _logger.Warning);
 
                 if (_telemetry != null)
                 {

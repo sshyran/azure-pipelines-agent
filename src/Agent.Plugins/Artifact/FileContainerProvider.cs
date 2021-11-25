@@ -146,7 +146,7 @@ namespace Agent.Plugins
                 }
                 catch (SocketException e)
                 {
-                    ExceptionsUtil.HandleSocketException(e, connection.Uri.ToString(), context);
+                    ExceptionsUtil.HandleSocketException(e, connection.Uri.ToString(), context.Warning);
                 }
                 catch
                 {
