@@ -327,10 +327,6 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
 
                 return TaskResult.Failed;
             }
-            catch (Exception)
-            {
-                throw;
-            }
             finally
             {
                 if (agentShutdownRegistration != null)
