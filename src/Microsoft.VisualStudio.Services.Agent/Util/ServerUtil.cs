@@ -66,12 +66,8 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
                 IsHosted = IsDeploymentTypeHostedIfDetermined();
                 return true;
             }
-            catch (DeploymentTypeNotDeterminedException ex)
+            catch (DeploymentTypeNotDeterminedException)
             {
-                if (_trace != null)
-                {
-                    _trace.Warning(ex.Message);
-                }
                 IsHosted = false;
                 return false;
             }
