@@ -4,11 +4,10 @@ function Get-Signtool() {
     Function used to get signtool from windows SDK
   #>
 
-  [System.IntPtr]::Size # an integer with platform-specific size.
   $systemBit = "x64"
   $programFiles = ${Env:ProgramFiles(x86)}
 
-  if([System.IntPtr]::Size -eq 4) {
+  if((Get-WmiObject Win32_Processor).AddressWidth -eq 64) {
     $systemBit = "x86"
     $programFiles = ${Env:ProgramFiles}
   }
@@ -20,7 +19,7 @@ function Get-Signtool() {
     $signtoolPath = "$($windowsSdkPath.FullName)\$systemBit\signtool.exe"
     return $signtoolPath
   } catch {
-    Write-Error "Unbable to get signtool in $signtoolPath"
+    Write-Host "##vso[task.logissue type=error]Unbable to get signtool in $signtoolPath"
     exit 1
   }
 }
