@@ -55,34 +55,12 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
             }
         }
 
-        /// <summary>
-        /// Returns true if server deployment type is Hosted.
-        /// Determines the type if it has not been determined yet.
-        /// </summary>
-        public async Task<bool> IsDeploymentTypeHosted(string serverUrl, VssCredentials credentials, ILocationServer locationServer)
-        {
-            // Check if deployment type has not been determined yet
-            if (_deploymentType == DeploymentFlags.None)
-            {
-                // Determine the service deployment type based on connection data. (Hosted/OnPremises)
-                var connectionData = await GetConnectionData(serverUrl, credentials, locationServer);
-                _deploymentType = connectionData.DeploymentType;
-            }
-
-            return IsDeploymentTypeHostedIfDetermined();
-        }
-
-        /// <summary>
-        /// Returns true if server deployment type is Hosted.
-        /// Determines the type if it has not been determined yet.
-        /// Returns false and writes a warning instead of throwing exception
-        /// if the deployment type determination has been failed.
-        /// </summary>
-        public async Task<bool> TryIsDeploymentTypeHosted(string serverUrl, VssCredentials credentials, ILocationServer locationServer)
+        public bool TryGetDeploymentType(out bool IsHosted)
         {
             try
             {
-                return await IsDeploymentTypeHosted(serverUrl, credentials, locationServer);
+                IsHosted = IsDeploymentTypeHostedIfDetermined();
+                return true;
             }
             catch (DeploymentTypeNotDeterminedException ex)
             {
@@ -90,7 +68,22 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
                 {
                     _trace.Warning(ex.Message);
                 }
+                IsHosted = false;
                 return false;
+            }
+        }
+
+        /// <summary>
+        /// Determine server deployment type based on connection data (Hosted/OnPremises) if it has not been determined yet.
+        /// </summary>
+        public async Task DetermineDeploymentType(string serverUrl, VssCredentials credentials, ILocationServer locationServer)
+        {
+            // Check if deployment type has not been determined yet
+            if (_deploymentType == DeploymentFlags.None)
+            {
+                // Determine the service deployment type based on connection data. (Hosted/OnPremises)
+                var connectionData = await GetConnectionData(serverUrl, credentials, locationServer);
+                _deploymentType = connectionData.DeploymentType;
             }
         }
 
