@@ -7,10 +7,12 @@ function Get-Signtool() {
   $systemBit = "x64"
   $programFiles = ${Env:ProgramFiles(x86)}
 
-  if((Get-WmiObject Win32_Processor).AddressWidth -eq 64) {
+  if((Get-WmiObject Win32_Processor).AddressWidth -ne 64) {
     $systemBit = "x86"
     $programFiles = ${Env:ProgramFiles}
   }
+
+  Write-Host "##[debug]System architecture is $systemBit"
 
   $signtoolPath = ""
   try {
@@ -19,7 +21,7 @@ function Get-Signtool() {
     $signtoolPath = "$($windowsSdkPath.FullName)\$systemBit\signtool.exe"
     return $signtoolPath
   } catch {
-    Write-Host "##vso[task.logissue type=error]Unbable to get signtool in $signtoolPath"
+    Write-Host "##[error]Unbable to get signtool in $signtoolPath"
     exit 1
   }
 }

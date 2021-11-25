@@ -60,10 +60,10 @@ function Remove-ThirdPartySignatures() {
 
   if ($failedToUnsign.Count -gt 0) {
     foreach ($f in $failedtounsign) {
-      Write-Host "##vso[task.logissue type=error]Something went wrong, failed to process $f file"
+      Write-Host "##[error]Something went wrong, failed to process $f file"
     }
     exit 1
-  } else {
-    exit 0
   }
+
+  exit 0
 }
