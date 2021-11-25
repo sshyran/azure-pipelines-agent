@@ -180,8 +180,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
             await _serverUtil.DetermineDeploymentType(_serverUrl, _creds, _locationServer);
             if (!_serverUtil.TryGetDeploymentType(out isHostedServer))
             {
-                throw new DeploymentTypeNotDeterminedException($@"
-Server deployment type has not been determined.
+                throw new DeploymentTypeNotDeterminedException(@"Deployment type determination has been failed.
 This exception was thrown during checksum validation when performing the agent self-update process.
 Most likely you are using On-Premises DevOps solution and the deployment type determination was not implemented for your server version.
 Checksum validation implemented for Cloud DevOps solutions only.
