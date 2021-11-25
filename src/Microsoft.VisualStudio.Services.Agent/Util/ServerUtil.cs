@@ -55,6 +55,10 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
             }
         }
 
+        /// <summary>
+        /// Returns true if server deployment type was determined; otherwise, returns false and makes IsHosted equals to false.
+        /// Makes IsHosted equals to true if server deployment type was determined as Hosted; otherwise, makes IsHosted equals to false.
+        /// </summary>
         public bool TryGetDeploymentType(out bool IsHosted)
         {
             try
