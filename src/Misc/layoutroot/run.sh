@@ -37,32 +37,55 @@ DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
 # Run
 shopt -s nocasematch
-if [[ "$1" == "localRun" ]]; then
-    "$DIR"/bin/Agent.Listener $*
-else
-    "$DIR"/bin/Agent.Listener run $*
 
-    # Return code 4 means the run once agent received an update message.
-    # Sleep at least 5 seconds (to allow the update process to start) and
-    # at most 20 seconds (to allow it to finish) then run the new agent
-    # again.
-    returnCode=$?
-    if [[ $returnCode == 4 ]]; then
-        delay 5
-
-        retry=0
-        while [[ $retry != 15 ]] && [ ! -x "$DIR"/bin/Agent.Listener ]; do
-            delay 1
-            retry=$[retry+1]
-        done
-
-        if [ ! -x "$DIR"/bin/Agent.Listener ]; then
-            echo "Failed to update within 20 seconds." >&2
-            exit 1
-        fi
-        
-        "$DIR"/bin/Agent.Listener run $*
-    else
-        exit $returnCode
+# Determining if the "--once" flag was passed
+ONCE=false
+for a in $*; do
+    if [[ "$a" == "--once" ]]; then
+        ONCE=true
     fi
-fi
+done
+
+FIRST_ARG=$1
+ARGUMENTS=$*
+
+function runAgent {
+    if [[ "$FIRST_ARG" == "localRun" ]]; then
+        "$DIR"/bin/Agent.Listener
+    else
+        if [[ "$ONCE" = true ]]; then
+            "$DIR"/bin/Agent.Listener run $ARGUMENTS
+        else
+            echo "Starting Agent listener with startup type: service"
+            "$DIR"/bin/Agent.Listener run --startuptype service $ARGUMENTS
+        fi
+
+        # Return code 3 or 4 means the agent received an update message.
+        # Sleep at least 5 seconds (to allow the update process to start) and
+        # at most 20 seconds (to allow it to finish) then run the new agent
+        # again.
+        returnCode=$?
+        echo "Agent exit code $returnCode"
+
+        if [[ $returnCode == 3 || $returnCode == 4 ]]; then
+            delay 5
+
+            retry=0
+            while [[ $retry != 15 ]] && [ ! -x "$DIR"/bin/Agent.Listener ]; do
+                delay 1
+                retry=$[retry+1]
+            done
+
+            if [ ! -x "$DIR"/bin/Agent.Listener ]; then
+                echo "Failed to update within 20 seconds." >&2
+                exit 1
+            fi
+
+            runAgent
+        else
+            exit $returnCode
+        fi
+    fi
+}
+
+runAgent
