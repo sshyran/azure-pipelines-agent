@@ -323,7 +323,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             }
             catch (AggregateException e)
             {
-                ExceptionsUtil.HandleAggregateException((AggregateException)e, Trace);
+                ExceptionsUtil.HandleAggregateException((AggregateException)e, Trace.Error);
 
                 return TaskResult.Failed;
             }
@@ -384,7 +384,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             }
             catch (AggregateException ex)
             {
-                ExceptionsUtil.HandleAggregateException((AggregateException)ex, Trace);
+                ExceptionsUtil.HandleAggregateException((AggregateException)ex, Trace.Error);
 
                 result = TaskResultUtil.MergeTaskResults(result, TaskResult.Failed);
             }
@@ -457,7 +457,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
                 }
                 catch (AggregateException ex)
                 {
-                    ExceptionsUtil.HandleAggregateException((AggregateException)ex, Trace);
+                    ExceptionsUtil.HandleAggregateException((AggregateException)ex, Trace.Error);
                 }
                 catch (Exception ex) when (!throwOnFailure)
                 {

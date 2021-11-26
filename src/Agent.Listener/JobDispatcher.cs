@@ -312,7 +312,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
             }
             catch (AggregateException e)
             {
-                ExceptionsUtil.HandleAggregateException((AggregateException)e, Trace);
+                ExceptionsUtil.HandleAggregateException((AggregateException)e, Trace.Error);
             }
             finally
             {
@@ -665,7 +665,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
                     }
                     catch (AggregateException e)
                     {
-                        ExceptionsUtil.HandleAggregateException((AggregateException)e, Trace);
+                        ExceptionsUtil.HandleAggregateException((AggregateException)e, Trace.Error);
                     }
                     finally
                     {

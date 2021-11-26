@@ -71,7 +71,7 @@ namespace Agent.PluginHost
                     }
                     catch (AggregateException ex)
                     {
-                        ExceptionsUtil.HandleAggregateException((AggregateException)ex, executionContext);
+                        ExceptionsUtil.HandleAggregateException((AggregateException)ex, executionContext.Error);
                     }
                     catch (Exception ex)
                     {
