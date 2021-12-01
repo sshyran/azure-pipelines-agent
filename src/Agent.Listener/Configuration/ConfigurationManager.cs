@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using Agent.Sdk;
+using Agent.Sdk.Util;
 using Microsoft.TeamFoundation.DistributedTask.WebApi;
 using Microsoft.VisualStudio.Services.Agent.Capabilities;
 using Microsoft.VisualStudio.Services.Agent.Util;
@@ -12,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Sockets;
 using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
@@ -242,6 +244,10 @@ assume it is OnPremises and the deployment type determination was not implemente
                     Trace.Info("Test Connection complete.");
                     break;
                 }
+                catch (SocketException e)
+                {
+                    ExceptionsUtil.HandleSocketException(e, agentSettings.ServerUrl, _term.WriteError);
+                }
                 catch (Exception e) when (!command.Unattended())
                 {
                     _term.WriteError(e);
@@ -424,6 +430,11 @@ assume it is OnPremises and the deployment type determination was not implemente
                 Trace.Error("Catch exception during test agent connection.");
                 Trace.Error(ex);
                 throw new InvalidOperationException(StringUtil.Loc("LocalClockSkewed"));
+            }
+            catch (SocketException ex)
+            {
+                ExceptionsUtil.HandleSocketException(ex, agentSettings.ServerUrl, Trace.Error);
+                throw;
             }
 
             // We will Combine() what's stored with root.  Defaults to string a relative path
@@ -648,6 +659,11 @@ assume it is OnPremises and the deployment type determination was not implemente
                 {
                     _term.WriteLine(StringUtil.Loc("Skipping") + currentAction);
                 }
+            }
+            catch (SocketException ex)
+            {
+                ExceptionsUtil.HandleSocketException(ex, _store.GetSettings().ServerUrl, _term.WriteLine);
+                throw;
             }
             catch (Exception)
             {

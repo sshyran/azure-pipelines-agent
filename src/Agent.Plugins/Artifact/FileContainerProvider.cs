@@ -3,6 +3,7 @@
 
 using Agent.Sdk;
 using Agent.Sdk.Knob;
+using Agent.Sdk.Util;
 using BuildXL.Cache.ContentStore.Hashing;
 using Microsoft.TeamFoundation.Build.WebApi;
 using Microsoft.TeamFoundation.DistributedTask.WebApi;
@@ -22,6 +23,7 @@ using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
@@ -147,6 +149,10 @@ namespace Agent.Plugins
                 {
                     (dedupClient, clientTelemetry) = await DedupManifestArtifactClientFactory.Instance.CreateDedupClientAsync(
                         false, (str) => this.tracer.Info(str), this.connection, cancellationToken);
+                }
+                catch (SocketException e)
+                {
+                    ExceptionsUtil.HandleSocketException(e, connection.Uri.ToString(), context.Warning);
                 }
                 catch
                 {
