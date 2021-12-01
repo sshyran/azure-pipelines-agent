@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net.Sockets;
 using System.Reflection;
 using System.Runtime.Loader;
 using System.Text;
@@ -68,6 +69,10 @@ namespace Agent.PluginHost
                         var taskPlugin = Activator.CreateInstance(type) as IAgentTaskPlugin;
                         ArgUtil.NotNull(taskPlugin, nameof(taskPlugin));
                         taskPlugin.RunAsync(executionContext, tokenSource.Token).GetAwaiter().GetResult();
+                    }
+                    catch (SocketException ex)
+                    {
+                        ExceptionsUtil.HandleSocketException(ex, executionContext.VssConnection.Uri.ToString(), executionContext.Error);
                     }
                     catch (AggregateException ex)
                     {
