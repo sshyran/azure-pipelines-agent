@@ -10,13 +10,13 @@ namespace Agent.Sdk.Util
 {
     public class ExceptionsUtil
     {
-        public static void HandleAggregateException(AggregateException e, Action<string> action)
+        public static void HandleAggregateException(AggregateException e, Action<string> traceErrorAction)
         {
-            action("One or several exceptions have been occurred.");
+            traceErrorAction("One or several exceptions have been occurred.");
 
             foreach (var ex in ((AggregateException)e).Flatten().InnerExceptions)
             {
-                action(ex.ToString());
+                traceErrorAction(ex.ToString());
             }
         }
     }
