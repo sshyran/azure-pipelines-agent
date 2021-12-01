@@ -1,3 +1,12 @@
+## Features
+
+
+## Bugs
+ - Warnings instead of exceptions for ConfigurationManager if deployment type has not been determined (#3614)
+
+## Misc
+
+
 
 ## Agent Downloads
 
