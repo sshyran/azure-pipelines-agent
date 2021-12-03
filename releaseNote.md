@@ -11,6 +11,7 @@
  - Don't show $3/$4 in the number of retries error message (#3578)
  - Try to delete the workspace instead of fail (#3589)
  - Turn off Node 6 execution handler deprecation warning for in-the-box tasks (#3633)
+ - Suppressed Node 6 deprecation warnings (#3648)
 
 ## Misc
  - installdependencies.sh - added message about repositories for package manager (#3582)
