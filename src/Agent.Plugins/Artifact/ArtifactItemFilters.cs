@@ -36,6 +36,11 @@ namespace Agent.Plugins
         private readonly FileContainerProvider _fileContainerProvider;
         private readonly IAppTraceSource tracer;
 
+        public ArtifactItemFilters(IAppTraceSource tracer)
+        {
+            this.tracer = tracer;
+        }
+
         public async Task<IEnumerable<FileContainerItem>> GetArtifactItems(ArtifactDownloadParameters downloadParameters, BuildArtifact buildArtifact)
         {
             (long, string) containerIdAndRoot = _fileContainerProvider.ParseContainerId(buildArtifact.Resource.Data);

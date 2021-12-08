@@ -36,7 +36,7 @@ namespace Agent.Plugins
         private readonly VssConnection connection;
         public readonly FileContainerHttpClient containerClient;
         private readonly IAppTraceSource tracer;
-        private readonly ArtifactItemFilters _artifactItemFilers;
+        private readonly ArtifactItemFilters _artifactItemFilters;
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA2000:Dispose objects before losing scope", MessageId = "connection2")]
         public FileContainerProvider(VssConnection connection, IAppTraceSource tracer)
@@ -54,7 +54,7 @@ namespace Agent.Plugins
 
         public async Task DownloadSingleArtifactAsync(ArtifactDownloadParameters downloadParameters, BuildArtifact buildArtifact, CancellationToken cancellationToken, AgentTaskPluginExecutionContext context)
         {
-            IEnumerable<FileContainerItem> items = await _artifactItemFilers.GetArtifactItems(downloadParameters, buildArtifact);
+            IEnumerable<FileContainerItem> items = await _artifactItemFilters.GetArtifactItems(downloadParameters, buildArtifact);
             await this.DownloadFileContainerAsync(items, downloadParameters, buildArtifact, downloadParameters.TargetDirectory, context, cancellationToken);
 
             IEnumerable<string> fileArtifactPaths = items
@@ -77,7 +77,7 @@ namespace Agent.Plugins
                     ? Path.Combine(downloadParameters.TargetDirectory, buildArtifact.Name)
                     : downloadParameters.TargetDirectory;
 
-                IEnumerable<FileContainerItem> items = await _artifactItemFilers.GetArtifactItems(downloadParameters, buildArtifact);
+                IEnumerable<FileContainerItem> items = await _artifactItemFilters.GetArtifactItems(downloadParameters, buildArtifact);
                 IEnumerable<string> fileArtifactPaths = items
                     .Where((item) => item.ItemType == ContainerItemType.File)
                     .Select((fileItem) => Path.Combine(dirPath, fileItem.Path));
