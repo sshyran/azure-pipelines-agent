@@ -182,7 +182,7 @@ jobs:
       workingDirectory: src
       displayName: Package Release
 
-    - script: "${{ variables.devCommand }} hash"
+    - script: "${{ variables.devCommand }} hash ${{ parameters.os }}-${{ parameters.arch }}"
       workingDirectory: src
       displayName: Hash Package
 
