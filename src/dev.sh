@@ -222,6 +222,11 @@ function cmd_hash ()
 {
     pushd "$PACKAGE_DIR" > /dev/null
 
+    echo "-----------------------------------------"
+    echo "$PACKAGE_DIR"
+    echo ls
+    echo "-----------------------------------------"
+
     files=`ls -1`
 
     number_of_files=`wc -l <<< "$files"`
