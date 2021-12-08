@@ -48,6 +48,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Tests
             {
                 AgentTaskPluginExecutionContext context = new AgentTaskPluginExecutionContext(hostContext.GetTrace());
                 FileContainerProvider provider = new FileContainerProvider(null, context.CreateArtifactsTracer());
+                ArtifactItemFilters filters = new ArtifactItemFilters();
 
                 List<FileContainerItem> items = new List<FileContainerItem>
                 {
@@ -61,7 +62,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Tests
                 };
                 
                 string[] minimatchPatterns = pttrn;
-
+                        
                 Options customMinimatchOptions = new Options()
                 {
                     Dot = true,
@@ -69,7 +70,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Tests
                     AllowWindowsPaths = PlatformUtil.RunningOnWindows
                 };
 
-                List<FileContainerItem> resultItems = provider.GetFilteredItems(items, minimatchPatterns, customMinimatchOptions);
+                List<FileContainerItem> resultItems = filters.GetFilteredItems(items, minimatchPatterns, customMinimatchOptions);
 
                 Assert.Equal(count, resultItems.Count);
 
