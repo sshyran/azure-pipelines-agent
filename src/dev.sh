@@ -220,12 +220,12 @@ function cmd_package ()
 
 function cmd_hash ()
 {
-    pushd "$PACKAGE_DIR" > /dev/null
+    echo "-----------------------------------------"
+    echo "---- $PACKAGE_DIR ------"
+    echo `ls`
+    echo "-----------------------------------------"
 
-    echo "-----------------------------------------"
-    echo "$PACKAGE_DIR"
-    echo ls
-    echo "-----------------------------------------"
+    pushd "$PACKAGE_DIR" > /dev/null
 
     files=`ls -1`
 
