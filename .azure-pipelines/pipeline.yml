@@ -89,8 +89,7 @@ stages:
         jobName: build_windows_x86
         displayName: Windows (x86)
         pool:
-          name: buildDevs
-          demands: 'Agent.OSArchitecture -equals X86'
+          vmImage: vs2017-win2016
         os: win
         arch: x86
         branch: ${{ parameters.branch }}
