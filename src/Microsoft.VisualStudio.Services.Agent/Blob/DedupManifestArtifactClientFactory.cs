@@ -93,7 +93,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Blob
                 {
                     ArtifactHttpClientFactory factory = new ArtifactHttpClientFactory(
                         connection.Credentials,
-                        TimeSpan.FromSeconds(50),
+                        connection.Settings.SendTimeout,
                         tracer,
                         cancellationToken);
 
@@ -132,7 +132,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Blob
                 {
                     ArtifactHttpClientFactory factory = new ArtifactHttpClientFactory(
                         connection.Credentials,
-                        TimeSpan.FromSeconds(50),
+                        connection.Settings.SendTimeout, // copy timeout settings from connection provided by agent
                         tracer,
                         cancellationToken);
 
