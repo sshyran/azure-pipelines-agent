@@ -15,6 +15,8 @@ DEV_RUNTIME_ID=$3
 DEV_TEST_FILTERS=$4
 DEV_ARGS=("${ALL_ARGS[@]:4}")
 
+echo $DEV_RUNTIME_ID
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 source "$SCRIPT_DIR/.helpers.sh"
