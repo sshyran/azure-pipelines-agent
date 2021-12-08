@@ -105,6 +105,13 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
                 File.Copy(agentLogFile, destination);
             }
 
+            // Copy event logs for windows machines            
+            if (PlatformUtil.RunningOnWindows)
+            {
+                executionContext.Debug("Dumping event viewer logs.");
+                Task<string> eventLogs = DumpEventLogs(jobStartTimeUtc, HostContext.GetDirectory(WellKnownDirectory.Diag));
+            }
+
             executionContext.Debug("Zipping diagnostic files.");
 
             string buildNumber = executionContext.Variables.Build_Number ?? "UnknownBuildNumber";
@@ -346,5 +353,37 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
 
             return builder.ToString();
         }
+
+        private async Task<string> DumpEventLogs(DateTime jobStartTimeUtc, string diagFolder){
+            var builder = new StringBuilder();
+
+            string powerShellExe = HostContext.GetService<IPowerShellExeUtil>().GetPath();
+            string arguments = $@"Get-WinEvent -ListLog * | ForEach-Object {{ Get-WinEvent -ErrorAction SilentlyContinue -FilterHashtable @{{ LogName=$_.LogName; StartTime='{ jobStartTimeUtc }'; EndTime='{ DateTime.UtcNow }';}} }} | Format-List > { diagFolder }\EventViewer-{ jobStartTimeUtc.ToString("yyyyMMdd-HHmmss") }.log";
+            using (var processInvoker = HostContext.CreateService<IProcessInvoker>())
+            {
+                processInvoker.OutputDataReceived += (object sender, ProcessDataReceivedEventArgs args) =>
+                {
+                    builder.AppendLine(args.Data);
+                };
+
+                processInvoker.ErrorDataReceived += (object sender, ProcessDataReceivedEventArgs args) =>
+                {
+                    builder.AppendLine(args.Data);
+                };
+
+                await processInvoker.ExecuteAsync(
+                    workingDirectory: HostContext.GetDirectory(WellKnownDirectory.Bin),
+                    fileName: powerShellExe,
+                    arguments: arguments,
+                    environment: null,
+                    requireExitCodeZero: false,
+                    outputEncoding: null,
+                    killProcessOnCancel: false,
+                    cancellationToken: default(CancellationToken));
+            }
+
+            return builder.ToString();
+        }
+
     }
 }
