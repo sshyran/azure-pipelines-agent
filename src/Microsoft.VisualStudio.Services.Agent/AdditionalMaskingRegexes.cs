@@ -3,7 +3,7 @@
 
 namespace Microsoft.VisualStudio.Services.Agent
 {
-    internal static partial class AdditionalMaskingRegexes
+    public static partial class AdditionalMaskingRegexes
     {
         /// <summary>
         /// Regexp for unreserved characters - for more details see https://datatracker.ietf.org/doc/html/rfc3986#section-2.3
@@ -20,7 +20,7 @@ namespace Microsoft.VisualStudio.Services.Agent
         /// <summary>
         /// Match regexp for url
         /// </summary>
-        private static string urlMatch = string.Format("{0}|{1}|{2}", unreservedCharacters, percentEncoded, subDelims);
+        private static string urlMatch = string.Format("({0}|{1}|{2}|:)+", unreservedCharacters, percentEncoded, subDelims);
 
         // URLs can contain secrets if they have a userinfo part
         // in the authority. example: https://user:pass@example.com
