@@ -73,7 +73,13 @@ namespace Agent.Plugins
                 };
             }
 
-            List<FileContainerItem> resultItems = GetFilteredItems(items, minimatchPatterns, customMinimatchOptions);
+            List<string> paths = null;
+            foreach (FileContainerItem item in items)
+            {
+                paths.Add(item.Path);
+            }
+
+            List<FileContainerItem> resultItems = GetFilteredItems(paths, items.GetType(), minimatchPatterns, customMinimatchOptions);
 
             tracer.Info($"{resultItems.Count} final results");
 
@@ -86,10 +92,12 @@ namespace Agent.Plugins
             return resultItems;
         }
 
-        public List<FileContainerItem> GetFilteredItems(List<FileContainerItem> items, string[] minimatchPatterns, Options customMinimatchOptions)
+        public List<FileContainerItem> GetFilteredItems(List<string> items, Type typeofitems, string[] minimatchPatterns, Options customMinimatchOptions)
         {
             // Hashtable to keep track of matches.
             Hashtable map = new Hashtable();
+
+            Type typeOfIncomeItems = items.GetType();
 
             foreach (string minimatchPattern in minimatchPatterns)
             {
@@ -202,20 +210,20 @@ namespace Agent.Plugins
             return Minimatcher.BraceExpand(convertedPattern, matchOptions).ToArray();
         }
 
-        private void UpdatePatternsMap(bool isIncludePattern, List<FileContainerItem> items, IEnumerable<Func<string, bool>> minimatcherFuncs, ref Hashtable map)
+        private void UpdatePatternsMap(bool isIncludePattern, List<string> items, IEnumerable<Func<string, bool>> minimatcherFuncs, ref Hashtable map)
         {
             if (isIncludePattern)
             {
                 // Apply the pattern.
                 tracer.Info($"Applying include pattern against original list.");
-                List<FileContainerItem> matchResults = this.FilterItemsByPatterns(items, minimatcherFuncs);
+                List<string> matchResults = this.FilterItemsByPatterns(items, minimatcherFuncs);
 
                 // Union the results.
                 int matchCount = 0;
-                foreach (FileContainerItem matchResult in matchResults)
+                foreach (string matchResult in matchResults)
                 {
                     matchCount++;
-                    map[matchResult.Path] = Boolean.TrueString;
+                    map[matchResult] = Boolean.TrueString;
                 }
 
                 tracer.Info($"{matchCount} matches");
@@ -224,40 +232,40 @@ namespace Agent.Plugins
             {
                 // Apply the pattern.
                 tracer.Info($"Applying exclude pattern against original list.");
-                List<FileContainerItem> matchResults = this.FilterItemsByPatterns(items, minimatcherFuncs);
+                List<string> matchResults = this.FilterItemsByPatterns(items, minimatcherFuncs);
 
                 // Subtract the results.
                 int matchCount = 0;
-                foreach (FileContainerItem matchResult in matchResults)
+                foreach (string matchResult in matchResults)
                 {
                     matchCount++;
-                    map.Remove(matchResult.Path);
+                    map.Remove(matchResult);
                 }
 
                 tracer.Info($"{matchCount} matches");
             }
         }
 
-        private List<FileContainerItem> ApplyPatternsMapToItems(List<FileContainerItem> items, Hashtable map)
+        private List<FileContainerItem> ApplyPatternsMapToItems(List<string> items, Hashtable map)
         {
             List<FileContainerItem> resultItems = new List<FileContainerItem>();
-            foreach (FileContainerItem item in items)
+            foreach (string item in items)
             {
-                if (Convert.ToBoolean(map[item.Path]))
+                if (Convert.ToBoolean(map[item]))
                 {
-                    resultItems.Add(item);
+                    resultItems.Add(new FileContainerItem() { Path = item });
                 }
             }
 
             return resultItems;
         }
 
-        private List<FileContainerItem> FilterItemsByPatterns(List<FileContainerItem> items, IEnumerable<Func<string, bool>> minimatchFuncs)
+        private List<string> FilterItemsByPatterns(List<string> items, IEnumerable<Func<string, bool>> minimatchFuncs)
         {
-            List<FileContainerItem> filteredItems = new List<FileContainerItem>();
-            foreach (FileContainerItem item in items)
+            List<string> filteredItems = new List<string>();
+            foreach (string item in items)
             {
-                if (minimatchFuncs.Any(match => match(item.Path)))
+                if (minimatchFuncs.Any(match => match(item)))
                 {
                     filteredItems.Add(item);
                 }

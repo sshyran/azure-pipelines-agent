@@ -20,6 +20,7 @@ using Microsoft.VisualStudio.Services.BlobStore.WebApi;
 using Microsoft.VisualStudio.Services.Content.Common;
 using Microsoft.VisualStudio.Services.Content.Common.Tracing;
 using Microsoft.VisualStudio.Services.WebApi;
+using Minimatch;
 
 namespace Agent.Plugins
 {
@@ -82,7 +83,8 @@ namespace Agent.Plugins
             {
                 var downloadRootPath = Path.Combine(buildArtifact.Resource.Data, buildArtifact.Name);
                 var minimatchPatterns = downloadParameters.MinimatchFilters.Select(pattern => Path.Combine(buildArtifact.Resource.Data, pattern));
-                var record = await this.DownloadFileShareArtifactAsync(downloadRootPath, Path.Combine(downloadParameters.TargetDirectory, buildArtifact.Name), defaultParallelCount, cancellationToken, minimatchPatterns);
+                var customMinimatchOptions = downloadParameters.CustomMinimatchOptions;
+                var record = await this.DownloadFileShareArtifactAsync(downloadRootPath, Path.Combine(downloadParameters.TargetDirectory, buildArtifact.Name), defaultParallelCount, cancellationToken, minimatchPatterns, customMinimatchOptions);
                 totalContentSize += record.ContentSize;
                 totalFileCount += record.FileCount;
                 records.Add(record);
@@ -179,7 +181,8 @@ namespace Agent.Plugins
             string destPath,
             int parallelCount,
             CancellationToken cancellationToken,
-            IEnumerable<string> minimatchPatterns = null)
+            IEnumerable<string> minimatchPatterns = null,
+            Options customMinimatchOptions = null)
         {
             Stopwatch watch = Stopwatch.StartNew();
 
@@ -193,6 +196,15 @@ namespace Agent.Plugins
 
             IEnumerable<FileInfo> files =
                 new DirectoryInfo(sourcePath).EnumerateFiles("*", SearchOption.AllDirectories);
+
+            List<string> paths = null;
+            foreach (FileInfo file in files)
+            {
+                paths.Add(file.ToString());
+            }
+
+            ArtifactItemFilters filters = new ArtifactItemFilters(connection, tracer);
+            var filteredItems = filters.GetFilteredItems(paths, files.GetType(), minimatchPatterns.ToArray<string>(), customMinimatchOptions);
 
             var parallelism = new ExecutionDataflowBlockOptions()
             {
