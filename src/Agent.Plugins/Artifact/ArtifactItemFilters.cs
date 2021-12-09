@@ -41,6 +41,7 @@ namespace Agent.Plugins
             this.tracer = tracer;
         }
 
+        // Returns all artifact items. Uses minimatch filters specified in downloadParameters.
         public async Task<IEnumerable<FileContainerItem>> GetArtifactItems(ArtifactDownloadParameters downloadParameters, BuildArtifact buildArtifact)
         {
             (long, string) containerIdAndRoot = _fileContainerProvider.ParseContainerId(buildArtifact.Resource.Data);
