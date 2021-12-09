@@ -73,7 +73,7 @@ namespace Agent.Plugins
                 };
             }
 
-            List<string> paths = null;
+            List<string> paths = new List<string>();
             foreach (FileContainerItem item in items)
             {
                 paths.Add(item.Path);
@@ -92,12 +92,10 @@ namespace Agent.Plugins
             return resultItems;
         }
 
-        public List<FileContainerItem> GetFilteredItems(List<string> items, Type typeofitems, string[] minimatchPatterns, Options customMinimatchOptions)
+        public dynamic GetFilteredItems(List<string> items, Type typeofitems, string[] minimatchPatterns, Options customMinimatchOptions)
         {
             // Hashtable to keep track of matches.
             Hashtable map = new Hashtable();
-
-            Type typeOfIncomeItems = items.GetType();
 
             foreach (string minimatchPattern in minimatchPatterns)
             {
@@ -198,7 +196,7 @@ namespace Agent.Plugins
             }
 
             // return a filtered version of the original list (preserves order and prevents duplication)
-            return ApplyPatternsMapToItems(items, map);
+            return ApplyPatternsMapToItems(items, typeofitems, map);
         }
 
         private string[] ExpandBraces(string pattern, Options matchOptions)
@@ -246,18 +244,37 @@ namespace Agent.Plugins
             }
         }
 
-        private List<FileContainerItem> ApplyPatternsMapToItems(List<string> items, Hashtable map)
+        private dynamic ApplyPatternsMapToItems(List<string> items, Type typeofitems, Hashtable map)
         {
-            List<FileContainerItem> resultItems = new List<FileContainerItem>();
-            foreach (string item in items)
-            {
-                if (Convert.ToBoolean(map[item]))
-                {
-                    resultItems.Add(new FileContainerItem() { Path = item });
-                }
-            }
+            string genericType = typeofitems.GenericTypeArguments[0].Name;
 
-            return resultItems;
+            if (genericType == "FileContainerItem")
+            {
+                List<FileContainerItem> resultItems = new List<FileContainerItem>();
+                foreach (string item in items)
+                {
+                    if (Convert.ToBoolean(map[item]))
+                    {
+                        resultItems.Add(new FileContainerItem() { Path = item });
+                    }
+                }
+
+                return resultItems;
+            } else if (genericType == "FileInfo")
+            {
+                List<string> resultItems = new List<string>();
+                foreach (string item in items)
+                {
+                    if (Convert.ToBoolean(map[item]))
+                    {
+                        resultItems.Add( item );
+                    }
+                }
+
+                return resultItems;
+            }
+            
+            return items;
         }
 
         private List<string> FilterItemsByPatterns(List<string> items, IEnumerable<Func<string, bool>> minimatchFuncs)

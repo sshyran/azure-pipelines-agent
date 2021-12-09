@@ -84,7 +84,7 @@ namespace Agent.Plugins
                 var downloadRootPath = Path.Combine(buildArtifact.Resource.Data, buildArtifact.Name);
                 var minimatchPatterns = downloadParameters.MinimatchFilters.Select(pattern => Path.Combine(buildArtifact.Resource.Data, pattern));
                 var customMinimatchOptions = downloadParameters.CustomMinimatchOptions;
-                var record = await this.DownloadFileShareArtifactAsync(downloadRootPath, Path.Combine(downloadParameters.TargetDirectory, buildArtifact.Name), defaultParallelCount, cancellationToken, minimatchPatterns, customMinimatchOptions);
+                var record = await this.DownloadFileShareArtifactAsync(downloadRootPath, Path.Combine(downloadParameters.TargetDirectory, buildArtifact.Name), defaultParallelCount, downloadParameters, cancellationToken, minimatchPatterns);
                 totalContentSize += record.ContentSize;
                 totalFileCount += record.FileCount;
                 records.Add(record);
@@ -180,9 +180,9 @@ namespace Agent.Plugins
             string sourcePath,
             string destPath,
             int parallelCount,
+            ArtifactDownloadParameters downloadParameters,
             CancellationToken cancellationToken,
-            IEnumerable<string> minimatchPatterns = null,
-            Options customMinimatchOptions = null)
+            IEnumerable<string> minimatchPatterns = null)
         {
             Stopwatch watch = Stopwatch.StartNew();
 
@@ -197,10 +197,25 @@ namespace Agent.Plugins
             IEnumerable<FileInfo> files =
                 new DirectoryInfo(sourcePath).EnumerateFiles("*", SearchOption.AllDirectories);
 
-            List<string> paths = null;
+            List<string> paths = new List<string>();
             foreach (FileInfo file in files)
             {
                 paths.Add(file.ToString());
+            }
+
+            Options customMinimatchOptions;
+            if (downloadParameters.CustomMinimatchOptions != null)
+            {
+                customMinimatchOptions = downloadParameters.CustomMinimatchOptions;
+            }
+            else
+            {
+                customMinimatchOptions = new Options()
+                {
+                    Dot = true,
+                    NoBrace = true,
+                    AllowWindowsPaths = PlatformUtil.RunningOnWindows
+                };
             }
 
             ArtifactItemFilters filters = new ArtifactItemFilters(connection, tracer);
