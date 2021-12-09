@@ -1,3 +1,13 @@
+## Features
+
+
+## Bugs
+ - Corrected agent's process on updating in a container (#3636)
+ - Sync send timeout of dedup client to VssConnection timeout settings (#3642)
+
+## Misc
+ - Remove signing for third party libraries in agent release flow (#3611)
+
 
 ## Agent Downloads
 
