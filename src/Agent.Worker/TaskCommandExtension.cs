@@ -538,7 +538,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             var data = command.Data;
             if (!string.IsNullOrEmpty(data))
             {
-                context.GetHostContext().SecretMasker.AddValue(data);
+                context.GetHostContext().SecretMasker.AddValue(data, "Set secret command");
             }
         }
     }
@@ -610,7 +610,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
 
                 var unescapePercents = AgentKnobs.DecodePercents.GetValue(context).AsBoolean();
                 var commandEscapeData = CommandStringConvertor.Escape(command.Data, unescapePercents);
-                context.GetHostContext().SecretMasker.AddValue(commandEscapeData);
+                context.GetHostContext().SecretMasker.AddValue(commandEscapeData, "commandEscapeData");
             }
 
             var checker = context.GetHostContext().GetService<ITaskRestrictionsChecker>();
@@ -726,7 +726,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             // Mask auth parameter data upfront to avoid accidental secret exposure by invalid endpoint/key/data
             if (String.Equals(field, "authParameter", StringComparison.OrdinalIgnoreCase))
             {
-                context.GetHostContext().SecretMasker.AddValue(data);
+                context.GetHostContext().SecretMasker.AddValue(data, "authParameter");
             }
 
             String endpointIdInput;

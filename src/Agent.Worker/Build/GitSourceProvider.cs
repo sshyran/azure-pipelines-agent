@@ -87,7 +87,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
             string base64encodedAuthHeader = Convert.ToBase64String(Encoding.UTF8.GetBytes(authHeader));
 
             // add base64 encoding auth header into secretMasker.
-            HostContext.SecretMasker.AddValue(base64encodedAuthHeader);
+            HostContext.SecretMasker.AddValue(base64encodedAuthHeader, "base64 encoding auth header");
             return $"basic {base64encodedAuthHeader}";
         }
     }

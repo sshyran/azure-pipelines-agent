@@ -201,7 +201,7 @@ namespace Microsoft.VisualStudio.Services.Agent
 
                 if (!string.IsNullOrEmpty(ProxyPassword))
                 {
-                    HostContext.SecretMasker.AddValue(ProxyPassword);
+                    HostContext.SecretMasker.AddValue(ProxyPassword, "ProxyPassword");
                 }
 
                 if (string.IsNullOrEmpty(ProxyUsername) || string.IsNullOrEmpty(ProxyPassword))
