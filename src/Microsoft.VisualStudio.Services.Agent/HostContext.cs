@@ -125,6 +125,7 @@ namespace Microsoft.VisualStudio.Services.Agent
             }
 
             _trace = GetTrace(nameof(HostContext));
+            this.SecretMasker.setTrace(_trace);
 
             _vssTrace = GetTrace(nameof(VisualStudio) + nameof(VisualStudio.Services));  // VisualStudioService
 
