@@ -33,22 +33,24 @@ namespace Agent.Plugins
 {
     class ArtifactItemFilters
     {
-        private readonly FileContainerProvider _fileContainerProvider;
+        private readonly VssConnection connection;
         private readonly IAppTraceSource tracer;
 
-        public ArtifactItemFilters(IAppTraceSource tracer)
+        public ArtifactItemFilters(VssConnection connection, IAppTraceSource tracer)
         {
             this.tracer = tracer;
+            this.connection = connection;
         }
 
         // Returns all artifact items. Uses minimatch filters specified in downloadParameters.
         public async Task<IEnumerable<FileContainerItem>> GetArtifactItems(ArtifactDownloadParameters downloadParameters, BuildArtifact buildArtifact)
         {
-            (long, string) containerIdAndRoot = _fileContainerProvider.ParseContainerId(buildArtifact.Resource.Data);
+            FileContainerProvider fileContainerProvider = new FileContainerProvider(connection, tracer);
+            (long, string) containerIdAndRoot = fileContainerProvider.ParseContainerId(buildArtifact.Resource.Data);
             Guid projectId = downloadParameters.ProjectId;
             string[] minimatchPatterns = downloadParameters.MinimatchFilters;
 
-            List<FileContainerItem> items = await _fileContainerProvider.containerClient.QueryContainerItemsAsync(
+            List<FileContainerItem> items = await fileContainerProvider.containerClient.QueryContainerItemsAsync(
                 containerIdAndRoot.Item1,
                 projectId,
                 isShallow: false,

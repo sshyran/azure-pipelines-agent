@@ -53,7 +53,7 @@ namespace Agent.Plugins
 
         public async Task DownloadSingleArtifactAsync(ArtifactDownloadParameters downloadParameters, BuildArtifact buildArtifact, CancellationToken cancellationToken, AgentTaskPluginExecutionContext context)
         {
-            ArtifactItemFilters filters = new ArtifactItemFilters(tracer);
+            ArtifactItemFilters filters = new ArtifactItemFilters(connection, tracer);
             IEnumerable<FileContainerItem> items = await filters.GetArtifactItems(downloadParameters, buildArtifact);
             await this.DownloadFileContainerAsync(items, downloadParameters, buildArtifact, downloadParameters.TargetDirectory, context, cancellationToken);
 
@@ -77,7 +77,7 @@ namespace Agent.Plugins
                     ? Path.Combine(downloadParameters.TargetDirectory, buildArtifact.Name)
                     : downloadParameters.TargetDirectory;
 
-                ArtifactItemFilters filters = new ArtifactItemFilters(tracer);
+                ArtifactItemFilters filters = new ArtifactItemFilters(connection, tracer);
                 IEnumerable<FileContainerItem> items = await filters.GetArtifactItems(downloadParameters, buildArtifact);
                 IEnumerable<string> fileArtifactPaths = items
                     .Where((item) => item.ItemType == ContainerItemType.File)

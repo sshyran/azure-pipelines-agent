@@ -47,7 +47,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Tests
             using (TestHostContext hostContext = new TestHostContext(this))
             {
                 AgentTaskPluginExecutionContext context = new AgentTaskPluginExecutionContext(hostContext.GetTrace());
-                ArtifactItemFilters filters = new ArtifactItemFilters(context.CreateArtifactsTracer());
+                ArtifactItemFilters filters = new ArtifactItemFilters(null, context.CreateArtifactsTracer());
 
                 List<FileContainerItem> items = new List<FileContainerItem>
                 {
