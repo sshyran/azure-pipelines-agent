@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -219,7 +220,8 @@ namespace Agent.Plugins
             }
 
             ArtifactItemFilters filters = new ArtifactItemFilters(connection, tracer);
-            var filteredItems = filters.GetFilteredItems(paths, files.GetType(), minimatchPatterns.ToArray<string>(), customMinimatchOptions);
+            Hashtable map = filters.GetMapToFilterItems(paths, minimatchPatterns.ToArray<string>(), customMinimatchOptions);
+            var filteredFiles = filters.ApplyPatternsMapToFileShareItems(files, map);
 
             var parallelism = new ExecutionDataflowBlockOptions()
             {
@@ -253,7 +255,7 @@ namespace Agent.Plugins
                 },
                 dataflowBlockOptions: parallelism);
                 
-                await actionBlock.SendAllAndCompleteAsync(files, actionBlock, cancellationToken);
+                await actionBlock.SendAllAndCompleteAsync(filteredFiles, actionBlock, cancellationToken);
 
             watch.Stop();
 
