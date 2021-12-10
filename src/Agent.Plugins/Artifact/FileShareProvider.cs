@@ -195,10 +195,10 @@ namespace Agent.Plugins
 
             var artifactName =  new DirectoryInfo(destPath).Name;
 
-            IEnumerable<FileInfo> files =
-                new DirectoryInfo(sourcePath).EnumerateFiles("*", SearchOption.AllDirectories);
+            List<FileInfo> files =
+                new DirectoryInfo(sourcePath).EnumerateFiles("*", SearchOption.AllDirectories).ToList<FileInfo>();
 
-            // Getting list of item paths. It is useful to handle list of paths instead of items.
+            // Getting list of file paths. It is useful to handle list of paths instead of files.
             // Also it allows to use the same methods for FileContainerProvider and FileShareProvider.
             List<string> paths = new List<string>();
             foreach (FileInfo file in files)
@@ -232,7 +232,7 @@ namespace Agent.Plugins
             IEnumerable<FileInfo> excludedItems = files.Except(filteredFiles);
             foreach (FileInfo item in excludedItems)
             {
-                tracer.Info($"Item excluded: {item.FullName}");
+                tracer.Info($"File excluded: {item.FullName}");
             }
 
             var parallelism = new ExecutionDataflowBlockOptions()

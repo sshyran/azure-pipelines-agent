@@ -194,7 +194,7 @@ namespace Agent.Plugins
         }
 
         // Returns list of FileInfo items required to be downloaded. Used by FileShareProvider.
-        public IEnumerable<FileInfo> ApplyPatternsMapToFileShareItems(IEnumerable<FileInfo> files, Hashtable map, string sourcePath)
+        public List<FileInfo> ApplyPatternsMapToFileShareItems(IEnumerable<FileInfo> files, Hashtable map, string sourcePath)
         {
             List<FileInfo> resultItems = new List<FileInfo>();
             foreach (FileInfo file in files)
