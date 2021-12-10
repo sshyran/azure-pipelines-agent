@@ -12,7 +12,7 @@ namespace Microsoft.VisualStudio.Services.Agent
         /// <summary>
         /// Regexp for percent encoded characters - for more details see https://datatracker.ietf.org/doc/html/rfc3986#section-2.1
         /// </summary>
-        private const string percentEncoded = @"%[0-9a-fA-F]{2}";
+        private const string percentEncoded = @"(%|%AZP25)[0-9a-fA-F]{2}";
         /// <summary>
         /// Regexp for delimeters - for more details see https://datatracker.ietf.org/doc/html/rfc3986#section-2.2
         /// </summary>
