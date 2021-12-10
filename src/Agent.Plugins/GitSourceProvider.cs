@@ -662,6 +662,10 @@ namespace Agent.Plugins.Repository
                 executionContext.Debug("Remove http.extraheader setting from git config.");
                 await RemoveGitConfig(executionContext, gitCommandManager, targetPath, $"http.extraheader", string.Empty);
             }
+            if (await gitCommandManager.GitConfigRegexExist(executionContext, targetPath, ".*extraheader"))
+            {
+                executionContext.Warning($"Git config still contains extraheader keys. It may cause errors.  To remove the credential, execute \"git config --unset-all key-name\" from the repository root");
+            }
 
             // always remove any possible left proxy setting from git config, the proxy setting may contains credential
             if (await gitCommandManager.GitConfigExist(executionContext, targetPath, $"http.proxy"))
