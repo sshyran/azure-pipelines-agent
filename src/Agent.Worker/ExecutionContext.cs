@@ -57,6 +57,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
         bool WriteDebug { get; }
         long Write(string tag, string message);
         void QueueAttachFile(string type, string name, string filePath);
+        ITraceWriter GetTraceWriter();
 
         // timeline record update methods
         void Start(string currentOperation = null);
@@ -729,6 +730,11 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             _jobServerQueue.QueueFileUpload(_mainTimelineId, _record.Id, type, name, filePath, deleteSource: false);
         }
 
+        public ITraceWriter GetTraceWriter()
+        {
+            return Trace;
+        }
+
         private void InitializeTimelineRecord(Guid timelineId, Guid timelineRecordId, Guid? parentTimelineRecordId, string recordType, string displayName, string refName, int? order)
         {
             _mainTimelineId = timelineId;
@@ -810,11 +816,12 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
         public string TranslatePathForStepTarget(string val)
         {
             var stepTarget = StepTarget();
-            if (stepTarget != null)
+            var isCheckoutType = Convert.ToBoolean(this.Variables.Get(Constants.Variables.Task.SkipTranslatorForCheckout, true));
+            if (stepTarget == null || (isCheckoutType && (_currentStepTarget == null || stepTarget is HostInfo)))
             {
-                return stepTarget.TranslateContainerPathForImageOS(PlatformUtil.HostOS, stepTarget.TranslateToContainerPath(val));
+                return val;
             }
-            return val;
+            return stepTarget.TranslateContainerPathForImageOS(PlatformUtil.HostOS, stepTarget.TranslateToContainerPath(val));
         }
 
         public ExecutionTargetInfo StepTarget()
