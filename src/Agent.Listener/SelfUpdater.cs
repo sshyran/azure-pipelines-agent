@@ -630,6 +630,7 @@ You can skip checksum validation for the agent package by setting the environmen
         {
             if (!Directory.Exists(agentFolderPath))
             {
+                Trace.Error($"Agent folder {agentFolderPath} not found.");
                 return false;
             }
 
