@@ -90,7 +90,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
                                 trace.Error("policyStatus: " + policyStatus.ToString());
                                 trace.Error("policyStatus.pvExtraPolicyStatus: " + policyStatus.pvExtraPolicyStatus);
                                 trace.Error(String.Format("Error occurred while calling WinVerifyTrust: {0}", string.Format(CultureInfo.CurrentCulture, "File {0} does not have a valid MS or ms-test signature.", filePath)));
-                               // throw new VerificationException(string.Format(CultureInfo.CurrentCulture, "File {0} does not have a valid MS or ms-test signature.", filePath));
+                                // throw new VerificationException(string.Format(CultureInfo.CurrentCulture, "File {0} does not have a valid MS or ms-test signature.", filePath));
                             }
                         }
 #else
@@ -156,13 +156,13 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
 
             try
             {
-                
-                
-                    result = UnsafeNativeMethods.WinVerifyTrust(
-                    IntPtr.Zero,
-                    UnsafeNativeMethods.WINTRUST_ACTION_GENERIC_VERIFY_V2,
-                    trustData);
-                
+
+
+                result = UnsafeNativeMethods.WinVerifyTrust(
+                IntPtr.Zero,
+                UnsafeNativeMethods.WINTRUST_ACTION_GENERIC_VERIFY_V2,
+                trustData);
+
 
                 if (result == WinVerifyTrustResult.FileNotSigned)
                 {
@@ -173,7 +173,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
                     var winTrustResultErrorString = String.Format("{0} ({1})", GetVerboseWinVerifyTrustResultErrorString(result), ConvertWinVerifyTrustResultToHex(result));
                     throw new VerificationException(string.Format(CultureInfo.CurrentCulture, "WinVerifyTrustWrapper on file {0} failed with unexpected error: {1}", filePath, winTrustResultErrorString));
                 }
-                
+
             }
             catch (Exception ex)
             {
