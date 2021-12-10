@@ -401,15 +401,24 @@ You can skip checksum validation for the agent package by setting the environmen
             {
                 Trace.Warning("Authenticode validation skipped for downloaded agent package since it is disabled currently by agent settings.");
             }
-
-            var isValid = this.VerifyAgentAuthenticode(latestAgentDirectory);
-            if (!isValid)
-            {
-                throw new Exception("Authenticode validation of agent assemblies failed.");
-            }
             else
             {
-                Trace.Info("Authenticode validation of agent assemblies passed successfully.");
+                if (PlatformUtil.RunningOnWindows)
+                {
+                    var isValid = this.VerifyAgentAuthenticode(latestAgentDirectory);
+                    if (!isValid)
+                    {
+                        throw new Exception("Authenticode validation of agent assemblies failed.");
+                    }
+                    else
+                    {
+                        Trace.Info("Authenticode validation of agent assemblies passed successfully.");
+                    }
+                }
+                else
+                {
+                    Trace.Info("Authenticode validation skipped since it's not supported on non-Windows platforms at the moment.");
+                }
             }
 
             // copy latest agent into agent root folder
