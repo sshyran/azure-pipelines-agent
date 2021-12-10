@@ -207,12 +207,12 @@ namespace Agent.Plugins
             return resultItems;
         }
 
-        public IEnumerable<FileInfo> ApplyPatternsMapToFileShareItems(IEnumerable<FileInfo> files, Hashtable map)
+        public IEnumerable<FileInfo> ApplyPatternsMapToFileShareItems(IEnumerable<FileInfo> files, Hashtable map, string sourcePath)
         {
             List<FileInfo> resultItems = new List<FileInfo>();
             foreach (FileInfo file in files)
             {
-                if (Convert.ToBoolean(map[file]))
+                if (Convert.ToBoolean(map[file.FullName.Remove(0, sourcePath.Length)]))
                 {
                     resultItems.Add(file);
                 }

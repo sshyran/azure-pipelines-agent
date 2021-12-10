@@ -201,8 +201,11 @@ namespace Agent.Plugins
             List<string> paths = new List<string>();
             foreach (FileInfo file in files)
             {
-                paths.Add(file.ToString());
+                
+                paths.Add(file.ToString().Remove(0, sourcePath.Length));
             }
+
+            string[] shortPatterns = downloadParameters.MinimatchFilters;
 
             Options customMinimatchOptions;
             if (downloadParameters.CustomMinimatchOptions != null)
@@ -220,8 +223,8 @@ namespace Agent.Plugins
             }
 
             ArtifactItemFilters filters = new ArtifactItemFilters(connection, tracer);
-            Hashtable map = filters.GetMapToFilterItems(paths, minimatchPatterns.ToArray<string>(), customMinimatchOptions);
-            var filteredFiles = filters.ApplyPatternsMapToFileShareItems(files, map);
+            Hashtable map = filters.GetMapToFilterItems(paths, shortPatterns, customMinimatchOptions);
+            var filteredFiles = filters.ApplyPatternsMapToFileShareItems(files, map, sourcePath);
 
             var parallelism = new ExecutionDataflowBlockOptions()
             {
