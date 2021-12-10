@@ -92,5 +92,29 @@ namespace Microsoft.VisualStudio.Services.Agent.Tests
                "https://username_loooooooooooooooooooooooooooooooooooooooooong:***@example.com",
                testSecretMasker.MaskSecrets(@"https://username_loooooooooooooooooooooooooooooooooooooooooong:password_looooooooooooooooooooooooooooooooooooooooooooooooong@example.com"));
         }
+
+        [Fact]
+        [Trait("Level", "L0")]
+        [Trait("Category", "SecretMasker")]
+        public void IsUserInfoWithEncodedCharactersdInNameMaskedCorrectly()
+        {
+            var testSecretMasker = initSecretMasker();
+
+            Assert.Equal(
+               "https://username%10%A3%F6:***@example.com",
+               testSecretMasker.MaskSecrets(@"https://username%10%A3%F6:password123@example.com"));
+        }
+
+        [Fact]
+        [Trait("Level", "L0")]
+        [Trait("Category", "SecretMasker")]
+        public void IsUserInfoWithEncodedAndEscapedCharactersdInNameMaskedCorrectly()
+        {
+            var testSecretMasker = initSecretMasker();
+
+            Assert.Equal(
+               "https://username%AZP2510%AZP25A3%AZP25F6:***@example.com",
+               testSecretMasker.MaskSecrets(@"https://username%AZP2510%AZP25A3%AZP25F6:password123@example.com"));
+        }
     }
 }
