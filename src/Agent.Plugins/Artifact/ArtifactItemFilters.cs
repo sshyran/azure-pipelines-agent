@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,25 +10,8 @@ using Microsoft.TeamFoundation.Build.WebApi;
 using Microsoft.VisualStudio.Services.BlobStore.Common;
 using Microsoft.VisualStudio.Services.Content.Common.Tracing;
 using Microsoft.VisualStudio.Services.FileContainer;
-using Minimatch;
-
-using Agent.Sdk.Knob;
-using Agent.Sdk.Util;
-using BuildXL.Cache.ContentStore.Hashing;
-using Microsoft.TeamFoundation.DistributedTask.WebApi;
-using Microsoft.VisualStudio.Services.Agent.Blob;
-using Microsoft.VisualStudio.Services.Agent.Util;
-using Microsoft.VisualStudio.Services.BlobStore.WebApi;
-using Microsoft.VisualStudio.Services.Content.Common;
-using Microsoft.VisualStudio.Services.FileContainer.Client;
 using Microsoft.VisualStudio.Services.WebApi;
-using System.Diagnostics;
-using System.IO;
-using System.IO.Compression;
-using System.Net.Sockets;
-using System.Threading;
-using System.Threading.Tasks.Dataflow;
-
+using Minimatch;
 
 namespace Agent.Plugins
 {
@@ -42,6 +26,7 @@ namespace Agent.Plugins
             this.connection = connection;
         }
 
+        // Collects hashtable with items in accordance with patterns
         public dynamic GetMapToFilterItems(List<string> paths, string[] minimatchPatterns, Options customMinimatchOptions)
         {
             // Hashtable to keep track of matches.
@@ -193,6 +178,7 @@ namespace Agent.Plugins
             }
         }
 
+        // Returns list of FileContainerItem items required to be downloaded. Used by FileContainerProvider.
         public List<FileContainerItem> ApplyPatternsMapToContainerItems(List<FileContainerItem> items, Hashtable map)
         {
             List<FileContainerItem> resultItems = new List<FileContainerItem>();
@@ -207,6 +193,7 @@ namespace Agent.Plugins
             return resultItems;
         }
 
+        // Returns list of FileInfo items required to be downloaded. Used by FileShareProvider.
         public IEnumerable<FileInfo> ApplyPatternsMapToFileShareItems(IEnumerable<FileInfo> files, Hashtable map, string sourcePath)
         {
             List<FileInfo> resultItems = new List<FileInfo>();

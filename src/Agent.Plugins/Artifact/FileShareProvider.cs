@@ -198,14 +198,13 @@ namespace Agent.Plugins
             IEnumerable<FileInfo> files =
                 new DirectoryInfo(sourcePath).EnumerateFiles("*", SearchOption.AllDirectories);
 
+            // Getting list of item paths. It is useful to handle list of paths instead of items.
+            // Also it allows to use the same methods for FileContainerProvider and FileShareProvider.
             List<string> paths = new List<string>();
             foreach (FileInfo file in files)
             {
-                
                 paths.Add(file.ToString().Remove(0, sourcePath.Length));
             }
-
-            string[] shortPatterns = downloadParameters.MinimatchFilters;
 
             Options customMinimatchOptions;
             if (downloadParameters.CustomMinimatchOptions != null)
@@ -223,8 +222,18 @@ namespace Agent.Plugins
             }
 
             ArtifactItemFilters filters = new ArtifactItemFilters(connection, tracer);
-            Hashtable map = filters.GetMapToFilterItems(paths, shortPatterns, customMinimatchOptions);
-            var filteredFiles = filters.ApplyPatternsMapToFileShareItems(files, map, sourcePath);
+            Hashtable map = filters.GetMapToFilterItems(paths, downloadParameters.MinimatchFilters, customMinimatchOptions);
+
+            // Returns filtered list of artifact items. Uses minimatch filters specified in downloadParameters.
+            IEnumerable<FileInfo> filteredFiles = filters.ApplyPatternsMapToFileShareItems(files, map, sourcePath);
+
+            tracer.Info($"{filteredFiles.ToList().Count} final results");
+
+            IEnumerable<FileInfo> excludedItems = files.Except(filteredFiles);
+            foreach (FileInfo item in excludedItems)
+            {
+                tracer.Info($"Item excluded: {item.FullName}");
+            }
 
             var parallelism = new ExecutionDataflowBlockOptions()
             {

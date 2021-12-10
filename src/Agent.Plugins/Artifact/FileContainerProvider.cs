@@ -34,7 +34,7 @@ namespace Agent.Plugins
     internal class FileContainerProvider : IArtifactProvider
     {
         private readonly VssConnection connection;
-        public readonly FileContainerHttpClient containerClient;
+        private readonly FileContainerHttpClient containerClient;
         private readonly IAppTraceSource tracer;
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA2000:Dispose objects before losing scope", MessageId = "connection2")]
@@ -91,7 +91,7 @@ namespace Agent.Plugins
             }
         }
 
-        public (long, string) ParseContainerId(string resourceData)
+        private (long, string) ParseContainerId(string resourceData)
         {
             // Example of resourceData: "#/7029766/artifacttool-alpine-x64-Debug"
             string[] segments = resourceData.Split('/');
@@ -222,14 +222,13 @@ namespace Agent.Plugins
             }
         }
 
-        public async Task<IEnumerable<FileContainerItem>> GetArtifactItems(ArtifactDownloadParameters downloadParameters, BuildArtifact buildArtifact)
+        private async Task<IEnumerable<FileContainerItem>> GetArtifactItems(ArtifactDownloadParameters downloadParameters, BuildArtifact buildArtifact)
         {
-            FileContainerProvider fileContainerProvider = new FileContainerProvider(connection, tracer);
-            (long, string) containerIdAndRoot = fileContainerProvider.ParseContainerId(buildArtifact.Resource.Data);
+            (long, string) containerIdAndRoot = ParseContainerId(buildArtifact.Resource.Data);
             Guid projectId = downloadParameters.ProjectId;
             string[] minimatchPatterns = downloadParameters.MinimatchFilters;
 
-            List<FileContainerItem> items = await fileContainerProvider.containerClient.QueryContainerItemsAsync(
+            List<FileContainerItem> items = await containerClient.QueryContainerItemsAsync(
                 containerIdAndRoot.Item1,
                 projectId,
                 isShallow: false,
@@ -252,6 +251,8 @@ namespace Agent.Plugins
                 };
             }
 
+            // Getting list of item paths. It is useful to handle list of paths instead of items.
+            // Also it allows to use the same methods for FileContainerProvider and FileShareProvider.
             List<string> paths = new List<string>();
             foreach (FileContainerItem item in items)
             {
@@ -261,7 +262,7 @@ namespace Agent.Plugins
             ArtifactItemFilters filters = new ArtifactItemFilters(connection, tracer);
             Hashtable map = filters.GetMapToFilterItems(paths, minimatchPatterns, customMinimatchOptions);
 
-            // Returns all artifact items. Uses minimatch filters specified in downloadParameters.
+            // Returns filtered list of artifact items. Uses minimatch filters specified in downloadParameters.
             List<FileContainerItem> resultItems = filters.ApplyPatternsMapToContainerItems(items, map); ;
 
             tracer.Info($"{resultItems.Count} final results");
