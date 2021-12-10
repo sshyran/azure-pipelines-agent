@@ -53,8 +53,7 @@ namespace Agent.Plugins
 
         public async Task DownloadSingleArtifactAsync(ArtifactDownloadParameters downloadParameters, BuildArtifact buildArtifact, CancellationToken cancellationToken, AgentTaskPluginExecutionContext context)
         {
-            ArtifactItemFilters filters = new ArtifactItemFilters(connection, tracer);
-            IEnumerable<FileContainerItem> items = await filters.GetArtifactItems(downloadParameters, buildArtifact);
+            IEnumerable<FileContainerItem> items = await GetArtifactItems(downloadParameters, buildArtifact);
             await this.DownloadFileContainerAsync(items, downloadParameters, buildArtifact, downloadParameters.TargetDirectory, context, cancellationToken);
 
             IEnumerable<string> fileArtifactPaths = items
@@ -77,8 +76,7 @@ namespace Agent.Plugins
                     ? Path.Combine(downloadParameters.TargetDirectory, buildArtifact.Name)
                     : downloadParameters.TargetDirectory;
 
-                ArtifactItemFilters filters = new ArtifactItemFilters(connection, tracer);
-                IEnumerable<FileContainerItem> items = await filters.GetArtifactItems(downloadParameters, buildArtifact);
+                IEnumerable<FileContainerItem> items = await GetArtifactItems(downloadParameters, buildArtifact);
                 IEnumerable<string> fileArtifactPaths = items
                     .Where((item) => item.ItemType == ContainerItemType.File)
                     .Select((fileItem) => Path.Combine(dirPath, fileItem.Path));
@@ -222,6 +220,59 @@ namespace Agent.Plugins
             {
                 CheckDownloads(items, rootPath, containerIdAndRoot.Item2, downloadParameters.IncludeArtifactNameInPath);
             }
+        }
+
+        public async Task<IEnumerable<FileContainerItem>> GetArtifactItems(ArtifactDownloadParameters downloadParameters, BuildArtifact buildArtifact)
+        {
+            FileContainerProvider fileContainerProvider = new FileContainerProvider(connection, tracer);
+            (long, string) containerIdAndRoot = fileContainerProvider.ParseContainerId(buildArtifact.Resource.Data);
+            Guid projectId = downloadParameters.ProjectId;
+            string[] minimatchPatterns = downloadParameters.MinimatchFilters;
+
+            List<FileContainerItem> items = await fileContainerProvider.containerClient.QueryContainerItemsAsync(
+                containerIdAndRoot.Item1,
+                projectId,
+                isShallow: false,
+                includeBlobMetadata: true,
+                containerIdAndRoot.Item2
+            );
+
+            Options customMinimatchOptions;
+            if (downloadParameters.CustomMinimatchOptions != null)
+            {
+                customMinimatchOptions = downloadParameters.CustomMinimatchOptions;
+            }
+            else
+            {
+                customMinimatchOptions = new Options()
+                {
+                    Dot = true,
+                    NoBrace = true,
+                    AllowWindowsPaths = PlatformUtil.RunningOnWindows
+                };
+            }
+
+            List<string> paths = new List<string>();
+            foreach (FileContainerItem item in items)
+            {
+                paths.Add(item.Path);
+            }
+
+            ArtifactItemFilters filters = new ArtifactItemFilters(connection, tracer);
+            Hashtable map = filters.GetMapToFilterItems(paths, minimatchPatterns, customMinimatchOptions);
+
+            // Returns all artifact items. Uses minimatch filters specified in downloadParameters.
+            List<FileContainerItem> resultItems = filters.ApplyPatternsMapToContainerItems(items, map); ;
+
+            tracer.Info($"{resultItems.Count} final results");
+
+            IEnumerable<FileContainerItem> excludedItems = items.Except(resultItems);
+            foreach (FileContainerItem item in excludedItems)
+            {
+                tracer.Info($"Item excluded: {item.Path}");
+            }
+
+            return resultItems;
         }
 
         private void CheckDownloads(IEnumerable<FileContainerItem> items, string rootPath, string artifactName, bool includeArtifactName)

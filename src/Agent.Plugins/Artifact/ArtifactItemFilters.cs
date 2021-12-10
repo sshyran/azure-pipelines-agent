@@ -42,59 +42,6 @@ namespace Agent.Plugins
             this.connection = connection;
         }
 
-        // Returns all artifact items. Uses minimatch filters specified in downloadParameters.
-        public async Task<IEnumerable<FileContainerItem>> GetArtifactItems(ArtifactDownloadParameters downloadParameters, BuildArtifact buildArtifact)
-        {
-            FileContainerProvider fileContainerProvider = new FileContainerProvider(connection, tracer);
-            (long, string) containerIdAndRoot = fileContainerProvider.ParseContainerId(buildArtifact.Resource.Data);
-            Guid projectId = downloadParameters.ProjectId;
-            string[] minimatchPatterns = downloadParameters.MinimatchFilters;
-
-            List<FileContainerItem> items = await fileContainerProvider.containerClient.QueryContainerItemsAsync(
-                containerIdAndRoot.Item1,
-                projectId,
-                isShallow: false,
-                includeBlobMetadata: true,
-                containerIdAndRoot.Item2
-            );
-
-            Options customMinimatchOptions;
-            if (downloadParameters.CustomMinimatchOptions != null)
-            {
-                customMinimatchOptions = downloadParameters.CustomMinimatchOptions;
-            }
-            else
-            {
-                customMinimatchOptions = new Options()
-                {
-                    Dot = true,
-                    NoBrace = true,
-                    AllowWindowsPaths = PlatformUtil.RunningOnWindows
-                };
-            }
-
-            List<string> paths = new List<string>();
-            foreach (FileContainerItem item in items)
-            {
-                paths.Add(item.Path);
-            }
-
-            Hashtable map = GetMapToFilterItems(paths, minimatchPatterns, customMinimatchOptions);
-
-            // return a filtered version of the original list (preserves order and prevents duplication)
-            List<FileContainerItem> resultItems = ApplyPatternsMapToContainerItems(items, map); ;
-
-            tracer.Info($"{resultItems.Count} final results");
-
-            IEnumerable<FileContainerItem> excludedItems = items.Except(resultItems);
-            foreach (FileContainerItem item in excludedItems)
-            {
-                tracer.Info($"Item excluded: {item.Path}");
-            }
-
-            return resultItems;
-        }
-
         public dynamic GetMapToFilterItems(List<string> paths, string[] minimatchPatterns, Options customMinimatchOptions)
         {
             // Hashtable to keep track of matches.
@@ -246,7 +193,7 @@ namespace Agent.Plugins
             }
         }
 
-        private List<FileContainerItem> ApplyPatternsMapToContainerItems(List<FileContainerItem> items, Hashtable map)
+        public List<FileContainerItem> ApplyPatternsMapToContainerItems(List<FileContainerItem> items, Hashtable map)
         {
             List<FileContainerItem> resultItems = new List<FileContainerItem>();
             foreach (FileContainerItem item in items)
