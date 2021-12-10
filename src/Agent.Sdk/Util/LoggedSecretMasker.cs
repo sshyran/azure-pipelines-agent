@@ -49,6 +49,11 @@ namespace Agent.Sdk.Util
             var regex = new Regex(pattern);
             var match = regex.Match("1");
             this.Trace($"Setting up regex for origin: {origin}.");
+            if (pattern == null)
+            {
+                this.Trace($"Pattern is empty.");
+                return;
+            }
             this.Trace($"Length: {pattern.Length}.");
             this.TraceSpecialCharacters(pattern);
 
@@ -73,6 +78,11 @@ namespace Agent.Sdk.Util
         public void AddValue(string value, string origin)
         {
             this.Trace($"Setting up value for origin: {origin}");
+            if (value == null)
+            {
+                this.Trace($"Value is empty.");
+                return;
+            }
             this.Trace($"Length: {value.Length}.");
             this.TraceSpecialCharacters(value);
             this._secretMasker.AddValue(value);
@@ -81,6 +91,11 @@ namespace Agent.Sdk.Util
         {
             this.Trace($"Setting up value for origin: {origin}");
             this.Trace($"Length: {encoder.ToString().Length}.");
+            if (encoder == null)
+            {
+                this.Trace($"Encoder is empty.");
+                return;
+            }
             this.TraceSpecialCharacters(encoder.ToString());
             this._secretMasker.AddValueEncoder(encoder);
         }
