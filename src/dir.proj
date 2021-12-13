@@ -80,7 +80,7 @@
     <Exec Command="dotnet build Test/Test.csproj -c $(BUILDCONFIG) /p:PackageRuntime=$(PackageRuntime)" ConsoleToMSBuild="true" />
     <Exec Command="dotnet --info" />
     <Exec Command="dotnet --version" />
-    <Exec Command="dotnet test Test/Test.csproj --settings $(MSBuildProjectDirectory)/Test/CodeCoverage.runsettings --no-build --logger:trx --collect:&quot;Code Coverage&quot;  --filter &quot;$(TestFilters)&quot; /p:PackageRuntime=$(PackageRuntime)" ConsoleToMSBuild="true" />
+    <Exec Command="dotnet test Test/Test.csproj --settings $(MSBuildProjectDirectory)/Test/CodeCoverage.runsettings --no-build --logger:trx --collect:&quot;Code Coverage&quot; --filter &quot;$(TestFilters)&quot; /p:PackageRuntime=$(PackageRuntime)" ConsoleToMSBuild="true" />
   </Target>
 
   <Target Name="TestL1" DependsOnTargets="GenerateConstant">

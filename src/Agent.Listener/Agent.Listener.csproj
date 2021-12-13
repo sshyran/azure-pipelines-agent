@@ -2,7 +2,9 @@
 
   <Import Project="..\Common.props" />
 
-  <PropertyGroup>
+  <PropertyGroup> 
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <RuntimeIdentifiers>win-x86</RuntimeIdentifiers>
     <OutputType>Exe</OutputType>
   </PropertyGroup>
 
