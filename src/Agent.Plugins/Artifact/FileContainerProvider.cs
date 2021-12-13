@@ -263,7 +263,7 @@ namespace Agent.Plugins
             Hashtable map = filters.GetMapToFilterItems(paths, minimatchPatterns, customMinimatchOptions);
 
             // Returns filtered list of artifact items. Uses minimatch filters specified in downloadParameters.
-            List<FileContainerItem> resultItems = filters.ApplyPatternsMapToContainerItems(items, map); ;
+            List<FileContainerItem> resultItems = filters.ApplyPatternsMapToContainerItems(items, map);
 
             tracer.Info($"{resultItems.Count} final results");
 

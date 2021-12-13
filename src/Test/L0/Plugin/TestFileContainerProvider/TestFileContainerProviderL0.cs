@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
@@ -42,7 +43,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Tests
             new string[] { "ArtifactForTest", "ArtifactForTest/File1.txt", "ArtifactForTest/Folder1", "ArtifactForTest/Folder1/Folder2/File3.txt" })]
         [InlineData(new string[] { "**", "!**/Folder1/**", " ", "!!**/File3.txt" }, 4,
             new string[] { "ArtifactForTest", "ArtifactForTest/File1.txt", "ArtifactForTest/Folder1", "ArtifactForTest/Folder1/Folder2/File3.txt" })]
-        public void TestGettingArtifactItemsWithMinimatchPattern(string[] pttrn, int count, string[] paths)
+        public void TestGettingArtifactItemsWithMinimatchPattern(string[] pttrn, int count, string[] expectedPaths)
         {
             using (TestHostContext hostContext = new TestHostContext(this))
             {
@@ -59,7 +60,13 @@ namespace Microsoft.VisualStudio.Services.Agent.Tests
                     new FileContainerItem() { ItemType = ContainerItemType.Folder, Path = "ArtifactForTest/Folder1/Folder2" },
                     new FileContainerItem() { ItemType = ContainerItemType.File, Path = "ArtifactForTest/Folder1/Folder2/File3.txt" }
                 };
-                
+
+                List<string> paths = new List<string>();
+                foreach (FileContainerItem item in items)
+                {
+                    paths.Add(item.Path);
+                }
+
                 string[] minimatchPatterns = pttrn;
                         
                 Options customMinimatchOptions = new Options()
@@ -69,17 +76,18 @@ namespace Microsoft.VisualStudio.Services.Agent.Tests
                     AllowWindowsPaths = PlatformUtil.RunningOnWindows
                 };
 
-                List<FileContainerItem> resultItems = filters.GetFilteredItems(items, minimatchPatterns, customMinimatchOptions);
+                Hashtable map = filters.GetMapToFilterItems(paths, minimatchPatterns, customMinimatchOptions);
+                List<FileContainerItem> resultItems = filters.ApplyPatternsMapToContainerItems(items, map);
 
                 Assert.Equal(count, resultItems.Count);
 
-                string listPaths = string.Join(", ", paths);
-                List<string> pathsList = new List<string>();
+                string listPaths = string.Join(", ", expectedPaths);
+                List<string> resultPathsList = new List<string>();
                 foreach (FileContainerItem item in resultItems)
                 {
-                    pathsList.Add(item.Path);
+                    resultPathsList.Add(item.Path);
                 }
-                string resultPaths = string.Join(", ", pathsList);
+                string resultPaths = string.Join(", ", resultPathsList);
                 
                 Assert.Equal(listPaths, resultPaths);
             }
