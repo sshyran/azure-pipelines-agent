@@ -1,8 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\Common.props" />
-  <!-- <PropertyGroup> 
-    <TargetFramework>netcoreapp3.1</TargetFramework> 
-  </PropertyGroup> -->
+  <PropertyGroup> 
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <RuntimeIdentifiers>win-x86</RuntimeIdentifiers> 
+  </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Agent.Listener\Agent.Listener.csproj" />
     <ProjectReference Include="..\Microsoft.VisualStudio.Services.Agent\Microsoft.VisualStudio.Services.Agent.csproj" />
