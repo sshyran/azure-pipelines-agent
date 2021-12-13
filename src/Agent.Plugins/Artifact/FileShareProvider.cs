@@ -193,7 +193,7 @@ namespace Agent.Plugins
 
             sourcePath = sourcePath.TrimEnd(trimChars);
 
-            var artifactName =  new DirectoryInfo(destPath).Name;
+            var artifactName =  new DirectoryInfo(sourcePath).Name;
 
             List<FileInfo> files =
                 new DirectoryInfo(sourcePath).EnumerateFiles("*", SearchOption.AllDirectories).ToList<FileInfo>();
@@ -203,7 +203,8 @@ namespace Agent.Plugins
             List<string> paths = new List<string>();
             foreach (FileInfo file in files)
             {
-                paths.Add(file.ToString().Remove(0, sourcePath.Length));
+                string pathInArtifact = file.ToString().Remove(0, sourcePath.Length).TrimStart(trimChars);
+                paths.Add(Path.Combine(artifactName, pathInArtifact));
             }
 
             Options customMinimatchOptions;
@@ -244,7 +245,7 @@ namespace Agent.Plugins
 
             var contentSize = 0;
             var fileCount = 0;
-
+            
             var actionBlock = NonSwallowingActionBlock.Create<FileInfo>(
                action: async file =>
                 {
