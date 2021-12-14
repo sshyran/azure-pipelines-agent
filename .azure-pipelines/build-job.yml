@@ -116,7 +116,7 @@ jobs:
       displayName: Install .NET Core SDK
       inputs:
         packageType: sdk
-        version: '3.1.X'
+        version: '3.1.x'
     - script: ${{ variables.devCommand }} testl0 "" ${{ parameters.os }}-${{ parameters.arch }}
       workingDirectory: src
       displayName: Unit tests
