@@ -156,8 +156,6 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
 
             try
             {
-
-
                 result = UnsafeNativeMethods.WinVerifyTrust(
                 IntPtr.Zero,
                 UnsafeNativeMethods.WINTRUST_ACTION_GENERIC_VERIFY_V2,
