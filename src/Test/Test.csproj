@@ -23,6 +23,7 @@
   </ItemGroup>
 
   <Target Name="CopyFiles">
+    <Copy SourceFiles="D:\Sources\azure-pipelines-agent\_dotnetsdk\3.1.100\host\fxr\3.1.0\hostfxr.dll"  DestinationFolder="$(MSBuildProjectDirectory)\bin\Debug\netcoreapp3.1\win-x86" />
     <Copy
         SourceFiles="$(PkgMicrosoft_TestPlatform_TestHost)\build\netcoreapp2.1\x86\testhost.x86.exe" 
         DestinationFolder="$(MSBuildProjectDirectory)\bin\Debug\netcoreapp3.1\win-x86" 
