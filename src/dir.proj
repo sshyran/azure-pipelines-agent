@@ -77,6 +77,7 @@
   </Target>
 
   <Target Name="TestL0" DependsOnTargets="GenerateConstant">
+    <Exec Command="dotnet --info" />
     <Exec Command="dotnet build Test/Test.csproj -c $(BUILDCONFIG) /p:PackageRuntime=$(PackageRuntime)" ConsoleToMSBuild="true" />
     <Exec Command="dotnet build Test/Test.csproj /t:CopyFiles" />
     <Exec Command="set DOTNET_ROOT=D:\a\1\s\_dotnetsdk\3.1.100\"/>
