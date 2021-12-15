@@ -49,6 +49,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Tests
                             timeout = Process.GetProcessById(sleep.Id);
                         }
 
+                        var value = "";
                         try
                         {
                             trace.Info($"Read env from {timeout.Id}");
@@ -57,7 +58,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Tests
                             {
                                 try
                                 {
-                                    var value = timeout.GetEnvironmentVariable(hc, envName);
+                                    value = timeout.GetEnvironmentVariable(hc, envName);
                                     Assert.True(string.Equals(value, envValue, StringComparison.OrdinalIgnoreCase), "Expected environment '" + envValue + "' did not match actual '" + value + "'");
                                     break;
                                 }
@@ -76,7 +77,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Tests
                         catch (Exception ex)
                         {
                             trace.Error(ex);
-                            Assert.True(false, "Fail to retrive process environment variable due to exception: " + ex.Message + "\n" + ex.StackTrace);
+                            Assert.True(false, "Fail to retrive process environment variable due to exception: " + ex.Message + value + "\n" + ex.StackTrace);
                         }
                     }
                 }
