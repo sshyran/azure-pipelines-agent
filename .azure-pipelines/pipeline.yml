@@ -124,12 +124,12 @@ stages:
       parameters:
         jobName: build_linux_arm
         displayName: Linux (ARM)
-        pool:
-          vmImage: ubuntu-20.04
         # pool:
-        #   name: buildDevs
-        #   demands: 'Agent.OSArchitecture -equals ARM'
-        # container: dotnetcore_arm
+        #   vmImage: ubuntu-20.04
+        pool:
+          name: buildDevs
+          demands: 'Agent.OSArchitecture -equals ARM'
+        container: dotnetcore_arm
         timeoutInMinutes: 75
         os: linux
         arch: arm
@@ -147,11 +147,11 @@ stages:
       parameters:
         jobName: build_linux_arm64
         displayName: Linux (ARM64)
-        pool:
-          vmImage: ubuntu-20.04
         # pool:
-        #   name: buildDevs
-        #   demands: 'Agent.OSArchitecture -equals ARM64'
+        #   vmImage: ubuntu-20.04
+        pool:
+          name: buildDevs
+          demands: 'Agent.OSArchitecture -equals ARM64'
         timeoutInMinutes: 75
         os: linux
         arch: arm64
