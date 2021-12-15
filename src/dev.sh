@@ -15,8 +15,6 @@ DEV_RUNTIME_ID=$3
 DEV_TEST_FILTERS=$4
 DEV_ARGS=("${ALL_ARGS[@]:4}")
 
-echo $DEV_RUNTIME_ID
-
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 source "$SCRIPT_DIR/.helpers.sh"
@@ -140,7 +138,6 @@ function cmd_test_l0 ()
         TestFilters="$TestFilters&$DEV_TEST_FILTERS"
     fi
 
-    dotnet --info
     dotnet msbuild -t:testl0 -p:PackageRuntime="${RUNTIME_ID}" -p:PackageType="${PACKAGE_TYPE}" -p:BUILDCONFIG="${BUILD_CONFIG}" -p:AgentVersion="${AGENT_VERSION}" -p:LayoutRoot="${LAYOUT_DIR}" -p:TestFilters="${TestFilters}" "${DEV_ARGS[@]}" || failed "failed tests"
 }
 
@@ -223,11 +220,6 @@ function cmd_package ()
 
 function cmd_hash ()
 {
-    echo "-----------------------------------------"
-    echo "---- $PACKAGE_DIR ------"
-    echo `ls`
-    echo "-----------------------------------------"
-
     pushd "$PACKAGE_DIR" > /dev/null
 
     files=`ls -1`
@@ -353,7 +345,7 @@ bash ./Misc/externals.sh $RUNTIME_ID "Pre-Cache" || checkRC "externals.sh Pre-Ca
 
 if [[ "$CURRENT_PLATFORM" == 'windows' ]]; then
     vswhere=$(find "$DOWNLOAD_DIR" -name vswhere.exe | head -1)
-    vs_location=$("$vswhere" -prerelease -latest -property installationPath)
+    vs_location=$("$vswhere" -latest -property installationPath)
     msbuild_location="$vs_location""\MSBuild\15.0\Bin\msbuild.exe"
 
     if [[ ! -e "${msbuild_location}" ]]; then

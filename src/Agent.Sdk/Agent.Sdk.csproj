@@ -2,8 +2,6 @@
   <Import Project="..\Common.props" />
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-    <RuntimeIdentifiers>win-x86</RuntimeIdentifiers> 
     <OutputType>Library</OutputType>
   </PropertyGroup>
 
