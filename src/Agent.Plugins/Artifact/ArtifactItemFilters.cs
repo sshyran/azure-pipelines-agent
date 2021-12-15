@@ -196,6 +196,26 @@ namespace Agent.Plugins
             return resultItems;
         }
 
+        // Returns list of FileInfo items required to be downloaded. Used by FileShareProvider.
+        public List<FileInfo> ApplyPatternsMapToFileShareItems(IEnumerable<FileInfo> files, Hashtable map, string sourcePath)
+        {
+            var trimChars = new[] { '\\', '/' };
+
+            List<FileInfo> resultItems = new List<FileInfo>();
+            foreach (FileInfo file in files)
+            {
+                var artifactName = new DirectoryInfo(sourcePath).Name;
+                string pathInArtifact = file.ToString().Remove(0, sourcePath.Length).TrimStart(trimChars);
+
+                if (Convert.ToBoolean(map[Path.Combine(artifactName, pathInArtifact)]))
+                {
+                    resultItems.Add(file);
+                }
+            }
+
+            return resultItems;
+        }
+
         private List<string> FilterItemsByPatterns(List<string> paths, IEnumerable<Func<string, bool>> minimatchFuncs)
         {
             List<string> filteredItems = new List<string>();
