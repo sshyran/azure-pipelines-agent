@@ -122,6 +122,13 @@ jobs:
 
   # Run l1 tests
   - ${{ if parameters.functionalTests }}:
+    - ${{ if and(eq(parameters.os, 'win'), eq(parameters.arch, 'x86')) }}:
+      - task: UseDotNet@2
+        displayName: Install .NET Core 3.1 SDK
+        inputs:
+          version: '3.1.22'
+          packageType: runtime
+          performMultiLevelLookup: true
     - script: ${{ variables.devCommand }} testl1 "" ${{ parameters.os }}-${{ parameters.arch }}
       workingDirectory: src
       displayName: Functional tests
