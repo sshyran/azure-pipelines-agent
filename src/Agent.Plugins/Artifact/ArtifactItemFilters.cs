@@ -144,38 +144,28 @@ namespace Agent.Plugins
 
         private void UpdatePatternsMap(bool isIncludePattern, List<string> paths, IEnumerable<Func<string, bool>> minimatcherFuncs, ref Hashtable map)
         {
-            if (isIncludePattern)
-            {
-                // Apply the pattern.
-                tracer.Info($"Applying include pattern against original list.");
-                List<string> matchResults = this.FilterItemsByPatterns(paths, minimatcherFuncs);
+            string patternType = isIncludePattern ? "include" : "exclude";
+            tracer.Info($"Applying { patternType } pattern against original list.");
 
-                // Union the results.
-                int matchCount = 0;
-                foreach (string matchResult in matchResults)
+            List<string> matchResults = this.FilterItemsByPatterns(paths, minimatcherFuncs);
+            int matchCount = 0;
+
+            foreach (string matchResult in matchResults)
+            {
+                matchCount++;
+                if (isIncludePattern)
                 {
-                    matchCount++;
+                    // Union the results.
                     map[matchResult] = Boolean.TrueString;
                 }
-
-                tracer.Info($"{matchCount} matches");
-            }
-            else
-            {
-                // Apply the pattern.
-                tracer.Info($"Applying exclude pattern against original list.");
-                List<string> matchResults = this.FilterItemsByPatterns(paths, minimatcherFuncs);
-
-                // Subtract the results.
-                int matchCount = 0;
-                foreach (string matchResult in matchResults)
+                else
                 {
-                    matchCount++;
+                    // Subtract the results.
                     map.Remove(matchResult);
                 }
-
-                tracer.Info($"{matchCount} matches");
             }
+
+            tracer.Info($"{matchCount} matches");
         }
 
         // Returns list of FileContainerItem items required to be downloaded. Used by FileContainerProvider.
