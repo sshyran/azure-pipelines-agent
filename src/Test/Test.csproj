@@ -52,4 +52,34 @@
         Retries="3"
         RetryDelayMilliseconds="300"/>
   </Target>
+  <Target Name="CopyFilesL1">
+        <Copy
+        SourceFiles="$(PkgMicrosoft_TestPlatform_TestHost)\build\netcoreapp2.1\x86\testhost.x86.exe" 
+        DestinationFolder="$(MSBuildProjectDirectory)\..\_l1\bin" 
+        SkipUnchangedFiles="true"
+        OverwriteReadOnlyFiles="true" 
+        Retries="3"
+        RetryDelayMilliseconds="300"/>
+    <Copy
+        SourceFiles="$(PkgMicrosoft_TestPlatform_TestHost)\build\netcoreapp2.1\x64\testhost.exe" 
+        DestinationFolder="$(MSBuildProjectDirectory)\..\_l1\bin" 
+        SkipUnchangedFiles="true"
+        OverwriteReadOnlyFiles="true" 
+        Retries="3"
+        RetryDelayMilliseconds="300"/>
+    <Copy
+        SourceFiles="$(PkgMicrosoft_TestPlatform_TestHost)\build\netcoreapp2.1\x64\testhost.dll" 
+        DestinationFolder="$(MSBuildProjectDirectory)\..\_l1\bin" 
+        SkipUnchangedFiles="true"
+        OverwriteReadOnlyFiles="true" 
+        Retries="3"
+        RetryDelayMilliseconds="300"/>
+    <Copy
+        SourceFiles="$(PkgMicrosoft_TestPlatform_TestHost)\build\netcoreapp2.1\x86\testhost.x86.dll" 
+        DestinationFolder="$(MSBuildProjectDirectory)\..\_l1\bin" 
+        SkipUnchangedFiles="true"
+        OverwriteReadOnlyFiles="true" 
+        Retries="3"
+        RetryDelayMilliseconds="300"/>
+  </Target>
 </Project>
