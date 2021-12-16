@@ -63,8 +63,14 @@ namespace Microsoft.VisualStudio.Services.Agent.Tests
                                     Assert.True(string.Equals(value, envValue, StringComparison.OrdinalIgnoreCase), "Expected environment '" + envValue + "' did not match actual '" + value + "'");
                                     break;
                                 }
-                                catch (Exception)
+                                catch (Exception ex)
                                 {
+                                    var message = ex.Message;
+                                    var ie = ex.InnerException;
+                                    var s = ex.StackTrace;
+                                    trace.Info($"----------------------------------------------------------------------------");
+                                    trace.Info($"--------------------- value = { value }\n message = { message }\n ie = { ie }\n s = { s } --------------------------");
+                                    trace.Info($"----------------------------------------------------------------------------");
                                     retries--;
                                     if (retries < 0)
                                     {
