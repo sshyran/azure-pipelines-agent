@@ -22,63 +22,25 @@
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1" />
   </ItemGroup>
 
-  <Target Name="CopyFiles">
+  <ItemGroup>
+      <MySourceFiles Include="$(PkgMicrosoft_TestPlatform_TestHost)\build\netcoreapp2.1\x86\*.dll;$(PkgMicrosoft_TestPlatform_TestHost)\build\netcoreapp2.1\x86\*.exe;$(PkgMicrosoft_TestPlatform_TestHost)\build\netcoreapp2.1\x64\*.dll;$(PkgMicrosoft_TestPlatform_TestHost)\build\netcoreapp2.1\x64\*.exe"/>
+  </ItemGroup>
+
+  <Target Name="CopyFilesL0">
     <Copy
-        SourceFiles="$(PkgMicrosoft_TestPlatform_TestHost)\build\netcoreapp2.1\x86\testhost.x86.exe" 
-        DestinationFolder="$(MSBuildProjectDirectory)\bin\Debug\netcoreapp3.1\win-x86" 
+        SourceFiles="@(MySourceFiles)"
+        DestinationFolder="$(MSBuildProjectDirectory)\bin\Debug\netcoreapp3.1\win-x86"
         SkipUnchangedFiles="true"
-        OverwriteReadOnlyFiles="true" 
-        Retries="3"
-        RetryDelayMilliseconds="300"/>
-    <Copy
-        SourceFiles="$(PkgMicrosoft_TestPlatform_TestHost)\build\netcoreapp2.1\x64\testhost.exe" 
-        DestinationFolder="$(MSBuildProjectDirectory)\bin\Debug\netcoreapp3.1\win-x86" 
-        SkipUnchangedFiles="true"
-        OverwriteReadOnlyFiles="true" 
-        Retries="3"
-        RetryDelayMilliseconds="300"/>
-    <Copy
-        SourceFiles="$(PkgMicrosoft_TestPlatform_TestHost)\build\netcoreapp2.1\x64\testhost.dll" 
-        DestinationFolder="$(MSBuildProjectDirectory)\bin\Debug\netcoreapp3.1\win-x86" 
-        SkipUnchangedFiles="true"
-        OverwriteReadOnlyFiles="true" 
-        Retries="3"
-        RetryDelayMilliseconds="300"/>
-    <Copy
-        SourceFiles="$(PkgMicrosoft_TestPlatform_TestHost)\build\netcoreapp2.1\x86\testhost.x86.dll" 
-        DestinationFolder="$(MSBuildProjectDirectory)\bin\Debug\netcoreapp3.1\win-x86" 
-        SkipUnchangedFiles="true"
-        OverwriteReadOnlyFiles="true" 
+        OverwriteReadOnlyFiles="true"
         Retries="3"
         RetryDelayMilliseconds="300"/>
   </Target>
   <Target Name="CopyFilesL1">
       <Copy
-        SourceFiles="$(PkgMicrosoft_TestPlatform_TestHost)\build\netcoreapp2.1\x86\testhost.x86.exe" 
-        DestinationFolder="D:\a\1\s\_l1\bin" 
+        SourceFiles="@(MySourceFiles)"
+        DestinationFolder="D:\a\1\s\_l1\bin"
         SkipUnchangedFiles="true"
-        OverwriteReadOnlyFiles="true" 
-        Retries="3"
-        RetryDelayMilliseconds="300"/>
-      <Copy
-        SourceFiles="$(PkgMicrosoft_TestPlatform_TestHost)\build\netcoreapp2.1\x86\testhost.x86.dll" 
-        DestinationFolder="D:\a\1\s\_l1\bin" 
-        SkipUnchangedFiles="true"
-        OverwriteReadOnlyFiles="true" 
-        Retries="3"
-        RetryDelayMilliseconds="300"/>
-      <Copy
-        SourceFiles="$(PkgMicrosoft_TestPlatform_TestHost)\build\netcoreapp2.1\x64\testhost.exe" 
-        DestinationFolder="D:\a\1\s\_l1\bin" 
-        SkipUnchangedFiles="true"
-        OverwriteReadOnlyFiles="true" 
-        Retries="3"
-        RetryDelayMilliseconds="300"/>
-      <Copy
-        SourceFiles="$(PkgMicrosoft_TestPlatform_TestHost)\build\netcoreapp2.1\x64\testhost.dll" 
-        DestinationFolder="D:\a\1\s\_l1\bin" 
-        SkipUnchangedFiles="true"
-        OverwriteReadOnlyFiles="true" 
+        OverwriteReadOnlyFiles="true"
         Retries="3"
         RetryDelayMilliseconds="300"/>
   </Target>
