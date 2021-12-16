@@ -14,7 +14,7 @@ parameters:
 # in the ci project, like signing, without actually doing a release
 - name: buildStageOnly
   type: boolean
-  default: true
+  default: false
   displayName: Build Stage Only
 
 variables:
