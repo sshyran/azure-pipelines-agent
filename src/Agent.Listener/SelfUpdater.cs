@@ -412,6 +412,30 @@ You can skip checksum validation for the agent package by setting the environmen
                 }
             }
 
+            if (!String.IsNullOrEmpty(AgentKnobs.DisableAuthenticodeValidation.GetValue(HostContext).AsString()))
+            {
+                Trace.Warning("Authenticode validation skipped for downloaded agent package since it is disabled currently by agent settings.");
+            }
+            else
+            {
+                if (PlatformUtil.RunningOnWindows)
+                {
+                    var isValid = this.VerifyAgentAuthenticode(latestAgentDirectory);
+                    if (!isValid)
+                    {
+                        throw new Exception("Authenticode validation of agent assemblies failed.");
+                    }
+                    else
+                    {
+                        Trace.Info("Authenticode validation of agent assemblies passed successfully.");
+                    }
+                }
+                else
+                {
+                    Trace.Info("Authenticode validation skipped since it's not supported on non-Windows platforms at the moment.");
+                }
+            }
+
             // copy latest agent into agent root folder
             // copy bin from _work/_update -> bin.version under root
             string binVersionDir = Path.Combine(HostContext.GetDirectory(WellKnownDirectory.Root), $"{Constants.Path.BinDirectory}.{_targetPackage.Version}");
@@ -596,6 +620,41 @@ You can skip checksum validation for the agent package by setting the environmen
                 Trace.Error(ex);
                 Trace.Info($"Catch exception during report update state, ignore this error and continue auto-update.");
             }
+        }
+        /// <summary>
+        /// Verifies authenticode sign of agent assemblies
+        /// </summary>
+        /// <param name="agentFolderPath"></param>
+        /// <returns></returns>
+        private bool VerifyAgentAuthenticode(string agentFolderPath)
+        {
+            if (!Directory.Exists(agentFolderPath))
+            {
+                Trace.Error($"Agent folder {agentFolderPath} not found.");
+                return false;
+            }
+
+            var agentDllFiles = Directory.GetFiles(agentFolderPath, "*.dll", SearchOption.AllDirectories);
+            var agentExeFiles = Directory.GetFiles(agentFolderPath, "*.exe", SearchOption.AllDirectories);
+
+            var agentAssemblies = agentDllFiles.Concat(agentExeFiles);
+            Trace.Verbose(String.Format("Found {0} agent assemblies. Performing authenticode validation...", agentAssemblies.Count()));
+
+            foreach (var assemblyFile in agentAssemblies)
+            {
+                FileInfo info = new FileInfo(assemblyFile);
+                try
+                {
+                    InstallerVerifier.VerifyFileSignedByMicrosoft(info.FullName, this.Trace);
+                }
+                catch (Exception e)
+                {
+                    Trace.Error(e);
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 
