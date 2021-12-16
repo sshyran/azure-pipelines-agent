@@ -49,7 +49,6 @@ namespace Microsoft.VisualStudio.Services.Agent.Tests
                             timeout = Process.GetProcessById(sleep.Id);
                         }
 
-                        var value = "";
                         try
                         {
                             trace.Info($"Read env from {timeout.Id}");
@@ -58,19 +57,12 @@ namespace Microsoft.VisualStudio.Services.Agent.Tests
                             {
                                 try
                                 {
-                                    value = timeout.GetEnvironmentVariable(hc, envName);
-                                    trace.Info($"---- We are here, current value is ------- {value}");
+                                    var value = timeout.GetEnvironmentVariable(hc, envName);
                                     Assert.True(string.Equals(value, envValue, StringComparison.OrdinalIgnoreCase), "Expected environment '" + envValue + "' did not match actual '" + value + "'");
                                     break;
                                 }
-                                catch (Exception ex)
+                                catch (Exception)
                                 {
-                                    var message = ex.Message;
-                                    var ie = ex.InnerException;
-                                    var s = ex.StackTrace;
-                                    trace.Info($"----------------------------------------------------------------------------");
-                                    trace.Info($"--------------------- value = { value }\n message = { message }\n ie = { ie }\n s = { s } --------------------------");
-                                    trace.Info($"----------------------------------------------------------------------------");
                                     retries--;
                                     if (retries < 0)
                                     {
@@ -84,7 +76,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Tests
                         catch (Exception ex)
                         {
                             trace.Error(ex);
-                            Assert.True(false, "Fail to retrive process environment variable due to exception: " + ex.Message + value + "\n" + ex.StackTrace);
+                            Assert.True(false, "Fail to retrive process environment variable due to exception: " + ex.Message + "\n" + ex.StackTrace);
                         }
                     }
                 }

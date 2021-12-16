@@ -332,6 +332,7 @@ if [[ (! -d "${DOTNETSDK_INSTALLDIR}") || (! -e "${DOTNETSDK_INSTALLDIR}/.${DOTN
     echo "${DOTNETSDK_VERSION}" > "${DOTNETSDK_INSTALLDIR}/.${DOTNETSDK_VERSION}"
 fi
 
+
 heading ".NET SDK to path"
 
 echo "Adding .NET to PATH (${DOTNETSDK_INSTALLDIR})"

@@ -18,8 +18,8 @@
     <PackageReference Include="System.Reflection.TypeExtensions" Version="4.4.0" />
     <PackageReference Include="System.Threading.ThreadPool" Version="4.3.0" />
     <PackageReference Include="vss-api-netcore" Version="$(VssApiVersion)" />
-    <PackageReference Include="xunit" Version="2.4.1" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1" />
+    <PackageReference Include="xunit" Version="2.2.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0" />
   </ItemGroup>
 
   <ItemGroup>
