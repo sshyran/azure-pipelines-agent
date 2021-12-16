@@ -59,6 +59,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Tests
                                 try
                                 {
                                     value = timeout.GetEnvironmentVariable(hc, envName);
+                                    trace.Info($"---- We are here, current value is ------- {value}");
                                     Assert.True(string.Equals(value, envValue, StringComparison.OrdinalIgnoreCase), "Expected environment '" + envValue + "' did not match actual '" + value + "'");
                                     break;
                                 }
