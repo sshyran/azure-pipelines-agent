@@ -196,7 +196,13 @@ namespace Agent.Plugins
             return resultItems;
         }
 
-        // Returns list of FileInfo items required to be downloaded. Used by FileShareProvider.
+        /// <summary>
+        /// Returns list of FileInfo items required to be downloaded. Used by FileShareProvider.
+        /// </summary>
+        /// <param name="files">List of files detected in artifact</param>
+        /// <param name="map">Map for files in artifact collected in accordance with patterns</param>
+        /// <param name="sourcePath">Full path to artifact placed on file share</param>
+        /// <returns></returns>
         public List<FileInfo> ApplyPatternsMapToFileShareItems(IEnumerable<FileInfo> files, Hashtable map, string sourcePath)
         {
             var trimChars = new[] { '\\', '/' };
