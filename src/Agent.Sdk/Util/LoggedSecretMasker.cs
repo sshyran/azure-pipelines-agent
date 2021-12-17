@@ -18,17 +18,6 @@ namespace Agent.Sdk.Util
                 this._trace.Info($"[DEBUG INFO]{msg}");
             }
         }
-
-        private void TraceSpecialCharacters(string value)
-        {
-            var regex = new Regex("[^A-Za-z0-9]");
-            this.Trace("Looking for special characters");
-            foreach (Match match in regex.Matches(value))
-            {
-                this.Trace(String.Format("Found '{0}' at position {1}", match.Value, match.Index));
-            }
-        }
-
         public LoggedSecretMasker(ISecretMasker secretMasker)
         {
             this._secretMasker = secretMasker;
@@ -55,17 +44,6 @@ namespace Agent.Sdk.Util
                 return;
             }
             this.Trace($"Length: {pattern.Length}.");
-            this.TraceSpecialCharacters(pattern);
-
-            if (match.Success)
-            {
-                this.Trace("Regex matches 1");
-            }
-
-            if (pattern == "1")
-            {
-                this.Trace("Pattern is equal to '1'");
-            }
 
             this._secretMasker.AddRegex(pattern);
         }
@@ -84,7 +62,6 @@ namespace Agent.Sdk.Util
                 return;
             }
             this.Trace($"Length: {value.Length}.");
-            this.TraceSpecialCharacters(value);
             this._secretMasker.AddValue(value);
         }
         public void AddValueEncoder(ValueEncoder encoder, string origin)
@@ -96,7 +73,6 @@ namespace Agent.Sdk.Util
                 this.Trace($"Encoder is empty.");
                 return;
             }
-            this.TraceSpecialCharacters(encoder.ToString());
             this._secretMasker.AddValueEncoder(encoder);
         }
 
