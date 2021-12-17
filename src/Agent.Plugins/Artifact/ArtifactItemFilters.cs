@@ -160,7 +160,7 @@ namespace Agent.Plugins
         /// <param name="isIncludePattern">Defines if specific pattern possitive or negative</param>
         /// <param name="paths">List of relative paths for items detected in artifact. The relative paths start from name of artifact.</param>
         /// <param name="minimatcherFuncs">Functions of MinimatchHelper</param>
-        /// <param name="map">Map for items in artifact collected in accordance with patterns</param>
+        /// <param name="map">Map for items in artifact collected in accordance with patterns. The map is hashtable, key is string path to item in artifact, value is bool true for all items. Item with path from the hashtable is considered as required to be in list after filtering.</param>
         private void UpdatePatternsMap(bool isIncludePattern, List<string> paths, IEnumerable<Func<string, bool>> minimatcherFuncs, ref Hashtable map)
         {
             string patternType = isIncludePattern ? "include" : "exclude";
@@ -191,7 +191,7 @@ namespace Agent.Plugins
         /// Returns list of FileContainerItem items required to be downloaded. Used by FileContainerProvider.
         /// </summary>
         /// <param name="items">List of items detected in artifact</param>
-        /// <param name="map">Map for items in artifact collected in accordance with patterns</param>
+        /// <param name="map">Map for items in artifact collected in accordance with patterns. The map is hashtable, key is string path to item in artifact, value is bool true for all items. Item with path from the hashtable is considered as required to be in list after filtering.</param>
         /// <returns></returns>
         public List<FileContainerItem> ApplyPatternsMapToContainerItems(List<FileContainerItem> items, Hashtable map)
         {
