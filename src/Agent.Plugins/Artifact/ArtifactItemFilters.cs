@@ -26,7 +26,13 @@ namespace Agent.Plugins
             this.connection = connection;
         }
 
-        // Collects hashtable with items in accordance with patterns
+        /// <summary>
+        /// Collects hashtable with items in accordance with patterns
+        /// </summary>
+        /// <param name="paths">List of relative paths for items detected in artifact. The relative paths start from name of artifact.</param>
+        /// <param name="minimatchPatterns">Array of patterns used to filter items in artifact</param>
+        /// <param name="customMinimatchOptions">Download parameters from minimatcherFuncs</param>
+        /// <returns></returns>
         public dynamic GetMapToFilterItems(List<string> paths, string[] minimatchPatterns, Options customMinimatchOptions)
         {
             // Hashtable to keep track of matches.
@@ -133,6 +139,12 @@ namespace Agent.Plugins
             return map;
         }
 
+        /// <summary>
+        /// Expands braces in patterns if they are exist
+        /// </summary>
+        /// <param name="pattern">String of pattern</param>
+        /// <param name="matchOptions">Download parameters from minimatcherFuncs</param>
+        /// <returns></returns>
         private string[] ExpandBraces(string pattern, Options matchOptions)
         {
             // Convert slashes on Windows before calling braceExpand(). Unfortunately this means braces cannot
@@ -142,6 +154,13 @@ namespace Agent.Plugins
             return Minimatcher.BraceExpand(convertedPattern, matchOptions).ToArray();
         }
 
+        /// <summary>
+        /// Adds or removes items from map in accordance with patterns
+        /// </summary>
+        /// <param name="isIncludePattern">Defines if specific pattern possitive or negative</param>
+        /// <param name="paths">List of relative paths for items detected in artifact. The relative paths start from name of artifact.</param>
+        /// <param name="minimatcherFuncs">Functions of MinimatchHelper</param>
+        /// <param name="map">Map for items in artifact collected in accordance with patterns</param>
         private void UpdatePatternsMap(bool isIncludePattern, List<string> paths, IEnumerable<Func<string, bool>> minimatcherFuncs, ref Hashtable map)
         {
             string patternType = isIncludePattern ? "include" : "exclude";
@@ -168,7 +187,12 @@ namespace Agent.Plugins
             tracer.Info($"{matchCount} matches");
         }
 
-        // Returns list of FileContainerItem items required to be downloaded. Used by FileContainerProvider.
+        /// <summary>
+        /// Returns list of FileContainerItem items required to be downloaded. Used by FileContainerProvider.
+        /// </summary>
+        /// <param name="items">List of items detected in artifact</param>
+        /// <param name="map">Map for items in artifact collected in accordance with patterns</param>
+        /// <returns></returns>
         public List<FileContainerItem> ApplyPatternsMapToContainerItems(List<FileContainerItem> items, Hashtable map)
         {
             List<FileContainerItem> resultItems = new List<FileContainerItem>();
@@ -183,6 +207,12 @@ namespace Agent.Plugins
             return resultItems;
         }
 
+        /// <summary>
+        /// Collects list of items filtered by minimather in accordance with pattern
+        /// </summary>
+        /// <param name="paths">List of relative paths for items detected in artifact. The relative paths start from name of artifact.</param>
+        /// <param name="minimatchFuncs">Functions of MinimatchHelper</param>
+        /// <returns></returns>
         private List<string> FilterItemsByPatterns(List<string> paths, IEnumerable<Func<string, bool>> minimatchFuncs)
         {
             List<string> filteredItems = new List<string>();
@@ -198,6 +228,12 @@ namespace Agent.Plugins
         }
 
         // Clones MiniMatch options into separate object
+
+        /// <summary>
+        /// Creates copy of provided minimatcher options
+        /// </summary>
+        /// <param name="currentMiniMatchOptions">Existed minimatcher options for copying</param>
+        /// <returns></returns>
         private Options CloneMiniMatchOptions(Options currentMiniMatchOptions)
         {
             Options clonedMiniMatchOptions = new Options()
