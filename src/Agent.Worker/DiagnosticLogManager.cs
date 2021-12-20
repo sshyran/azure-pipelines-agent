@@ -105,6 +105,18 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
                 File.Copy(agentLogFile, destination);
             }
 
+            // Read and add to logs waagent.conf settings
+            if (PlatformUtil.RunningOnLinux || PlatformUtil.RunningOnMacOS)
+            {
+                executionContext.Debug("Creating waagent file.");
+                string waagentFile = Path.Combine(supportFilesFolder, "capabilities.txt");
+
+                string configFileName = "waagent";
+                string filePath = WhichUtil.Which(configFileName);
+                string waagentContent = !string.IsNullOrEmpty(filePath) ? ParseWaagentContent(filePath) : "waagent.conf file is not found";
+                File.AppendAllText(waagentFile, waagentContent);
+            }
+
             executionContext.Debug("Zipping diagnostic files.");
 
             string buildNumber = executionContext.Variables.Build_Number ?? "UnknownBuildNumber";
@@ -131,6 +143,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             executionContext.Debug("Diagnostic file upload complete.");
         }
 
+
         private string GetCapabilitiesContent(Dictionary<string, string> capabilities)
         {
             var builder = new StringBuilder();
@@ -150,6 +163,34 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
                 builder.AppendLine();
             }
 
+            return builder.ToString();
+        }
+
+        private string ParseWaagentContent(string configPath)
+        {
+            var builder = new StringBuilder();
+
+            builder.AppendLine("waagent.conf settings");
+            builder.AppendLine(string.Empty);
+
+            foreach (string line in File.ReadLines(configPath))
+            {
+                string configLine = line.Trim();
+                if(configLine.StartsWith('#') || string.IsNullOrWhiteSpace(configLine))
+                {
+                    continue;
+                }
+                var confElems = configLine.Split('=');
+                var settingName = confElems[0];
+                var settingValue = confElems[1];
+                builder.Append(settingName);
+                if (!string.IsNullOrWhiteSpace(settingValue))
+                {
+                    builder.Append($" = {settingValue}");
+                }
+
+                builder.AppendLine();
+            }
             return builder.ToString();
         }
 
