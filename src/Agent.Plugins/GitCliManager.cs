@@ -445,10 +445,6 @@ namespace Agent.Plugins.Repository
         /// Verify if git config contains config key with some regex pattern
         /// git config --get-regexp <configKeyPattern>
         /// </summary>
-        /// <param name="context"></param>
-        /// <param name="repositoryPath"></param>
-        /// <param name="configKeyPattern"></param>
-        /// <returns></returns>
         public async Task<bool> GitConfigRegexExist(AgentTaskPluginExecutionContext context, string repositoryPath, string configKeyPattern)
         {
             // git config --get-regexp {configKeyPattern} will return 0 and print the value if the config exist.
