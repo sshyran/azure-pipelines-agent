@@ -191,8 +191,8 @@ You can skip checksum validation for the agent package by setting the environmen
 
             if (!isHostedServer)
             {
-                Trace.Info($"Skipping checksum validation for On-Premises solution");
-                return true;
+                Trace.Info($"Checksum validation for On-Premises solution");
+                // return true;
             }
 
             if (string.IsNullOrEmpty(_targetPackage.HashValue))
@@ -202,7 +202,9 @@ You can skip checksum validation for the agent package by setting the environmen
             }
 
             string expectedHash = _targetPackage.HashValue;
+            Trace.Info($"Expected hash - { expectedHash }");
             string actualHash = IOUtil.GetFileHash(archiveFile);
+            Trace.Info($"Actual hash - { actualHash }");
             bool hashesMatch = StringUtil.AreHashesEqual(actualHash, expectedHash);
 
             if (hashesMatch)
