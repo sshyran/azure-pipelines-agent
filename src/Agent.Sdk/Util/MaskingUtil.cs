@@ -15,24 +15,35 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
         /// <returns>Returns true if key is a secret</returns>
         public static bool IsEndpointAuthorizationParametersSecret(string key)
         {
-            return key != EndpointAuthorizationParameters.IdToken
-                && key != EndpointAuthorizationParameters.Role
-                && key != EndpointAuthorizationParameters.Scope
-                && key != EndpointAuthorizationParameters.TenantId
-                && key != EndpointAuthorizationParameters.IssuedAt
-                && key != EndpointAuthorizationParameters.ExpiresAt
-                && key != EndpointAuthorizationParameters.ExpiresIn
-                && key != EndpointAuthorizationParameters.Audience
-                && key != EndpointAuthorizationParameters.AuthenticationType
-                && key != EndpointAuthorizationParameters.AuthorizationType
-                && key != EndpointAuthorizationParameters.AccessTokenType
-                && key != EndpointAuthorizationParameters.AccessTokenFetchingMethod
-                && key != EndpointAuthorizationParameters.UseWindowsSecurity
-                && key != EndpointAuthorizationParameters.Unsecured
-                && key != EndpointAuthorizationParameters.OAuthAccessTokenIsSupplied
-                && key != EndpointAuthorizationParameters.Audience
-                && key != EndpointAuthorizationParameters.CompleteCallbackPayload
-                && key != EndpointAuthorizationParameters.AcceptUntrustedCertificates;
+            var excludedAuthParams = new string[]{
+                EndpointAuthorizationParameters.IdToken,
+                EndpointAuthorizationParameters.Role,
+                EndpointAuthorizationParameters.Scope,
+                EndpointAuthorizationParameters.TenantId,
+                EndpointAuthorizationParameters.IssuedAt,
+                EndpointAuthorizationParameters.ExpiresAt,
+                EndpointAuthorizationParameters.Audience,
+                EndpointAuthorizationParameters.AuthenticationType,
+                EndpointAuthorizationParameters.AuthorizationType,
+                EndpointAuthorizationParameters.AccessTokenType,
+                EndpointAuthorizationParameters.AccessTokenFetchingMethod,
+                EndpointAuthorizationParameters.UseWindowsSecurity,
+                EndpointAuthorizationParameters.Unsecured,
+                EndpointAuthorizationParameters.OAuthAccessTokenIsSupplied,
+                EndpointAuthorizationParameters.Audience,
+                EndpointAuthorizationParameters.CompleteCallbackPayload,
+                EndpointAuthorizationParameters.AcceptUntrustedCertificates
+            };
+
+            foreach (var authParam in excludedAuthParams)
+            {
+                if (String.Equals(key, authParam, StringComparison.OrdinalIgnoreCase))
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }
