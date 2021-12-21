@@ -1,11 +1,26 @@
 ## Features
-
+ - Better warnings for BlobStore errors (#3591)
+ - Update VssApiVersion to 0.5.172-private (#3608)
+ - Add if condition to lttng-ust installation for yum (#3613)
+ - Improve error messaging for SSL related errors (#3568)
+ - Issue 1836 - Adding of handling for exceptions "An existing connection was forcibly closed by the remote host" (#3616)
+ - Added L0 tests for TrackingManager - MergeTrackingConfigs method (#3675)
 
 ## Bugs
- - Corrected agent's process on updating in a container (#3636)
  - Sync send timeout of dedup client to VssConnection timeout settings (#3642)
+ - Fixed result for MergeTrackingConfigs (#3586)
+ - Rolling back retry handling on GetPipelineCacheArtifactAsync because it is causing real errors to be hidden with unrelated reporting telemetry errors. (#3621)
+ - Turn off Node 6 execution handler deprecation warning for in-the-box tasks (#3633)
+ - Warnings instead of exceptions for ConfigurationManager if deployment type has not been determined (#3614)
+ - Fix bug with AZURE_PIPELINES_DEDUP_PARALLELISM not being enforced (#3618)
+ - Suppressed Node 6 deprecation warnings (#3648)
+ - Corrected agent's process on updating in a container (#3636)
+ - Removed changing source directory if It already exists (#3654)
 
 ## Misc
+ - Added test TranslatePathForStepTarget_should_convert_path_only_for_containers (#3594)
+ - Added timeline to the node6 warning (#3607)
+ - RHEL/CentOS 7 Fix for Lets Encrypt Change (#3601)
  - Remove signing for third party libraries in agent release flow (#3611)
 
 
