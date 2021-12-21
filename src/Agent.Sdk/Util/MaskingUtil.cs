@@ -19,7 +19,6 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
                 && key != EndpointAuthorizationParameters.Role
                 && key != EndpointAuthorizationParameters.Scope
                 && key != EndpointAuthorizationParameters.TenantId
-                && key != EndpointAuthorizationParameters.IdToken
                 && key != EndpointAuthorizationParameters.IssuedAt
                 && key != EndpointAuthorizationParameters.ExpiresAt
                 && key != EndpointAuthorizationParameters.ExpiresIn
