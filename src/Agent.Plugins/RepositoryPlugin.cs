@@ -120,7 +120,8 @@ namespace Agent.Plugins.Repository
 
             executionContext.PublishTelemetry(area: "AzurePipelinesAgent", feature: "Checkout", properties: new Dictionary<string, string>
             {
-                { "RepoType", $"{repo.Type}" }
+                { "RepoType", $"{repo.Type}" },
+                { "HostOS", $"{PlatformUtil.HostOS}" }
             });
 
             MergeCheckoutOptions(executionContext, repo);
