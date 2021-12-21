@@ -109,8 +109,19 @@ jobs:
       env:
         ADO_ENABLE_LOGISSUE: true
 
+  - ${{ if or(eq(parameters.arch, 'arm64'), eq(parameters.arch, 'arm') ) }}:
+    - script: sudo apt-get install qemu binfmt-support qemu-user-static
+    - script: docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+    # - script: docker build -t ${{ parameters.arch }}-tests --file "$(Build.SourcesDirectory)/src/DockerFile-${{ parameters.arch }}" --platform linux/${{ parameters.arch }} . --target test
+    - script: docker buildx create --name testcontainer
+    - script: docker buildx use testcontainer
+    - script: docker buildx inspect --bootstrap
+    - script: docker buildx build --file "$(Build.SourcesDirectory)/src/DockerFile-${{ parameters.arch }}" --platform linux/${{ parameters.arch }} -t test-${{ parameters.arch }} --load .
+    - script: docker images
+    - script: docker run -v/c/tests:/tests test-${{ parameters.arch }}
+
   # Run l0 tests
-  - ${{ if parameters.unitTests }}:
+  - ${{ if and(parameters.unitTests, ne(parameters.arch, 'arm64'), ne(parameters.arch, 'arm')) }}:
     - script: ${{ variables.devCommand }} testl0 Debug ${{ parameters.os }}-${{ parameters.arch }}
       workingDirectory: src
       displayName: Unit tests
@@ -122,16 +133,20 @@ jobs:
 
   # Run l1 tests
   - ${{ if parameters.functionalTests }}:
-    - ${{ if and(eq(parameters.os, 'win'), eq(parameters.arch, 'x86')) }}:
+    - ${{ if and(eq(parameters.os, 'win'), eq(parameters.arch, 'x86'), ne(parameters.arch, 'arm64'), ne(parameters.arch, 'arm')) }}:
       - task: UseDotNet@2
         displayName: Install .NET Core 3.1 SDK
         inputs:
           version: '3.1.22'
           packageType: runtime
           performMultiLevelLookup: true
-    - script: ${{ variables.devCommand }} testl1 Debug ${{ parameters.os }}-${{ parameters.arch }}
-      workingDirectory: src
-      displayName: Functional tests
+    - ${{ if and(ne(parameters.arch, 'arm64'), ne(parameters.arch, 'arm')) }}:
+      - script: ${{ variables.devCommand }} testl1 Debug ${{ parameters.os }}-${{ parameters.arch }}
+        workingDirectory: src
+        displayName: Functional tests
+
+  - ${{ if or(eq(parameters.arch, 'arm64'), eq(parameters.arch, 'arm') ) }}:
+    - script: docker build -t ${{ parameters.arch }}-tests-integration --file "$(Build.SourcesDirectory)/src/DockerFileL1" --platform linux/${{ parameters.arch }} . --target test
 
   - ${{ if or(parameters.unitTests, parameters.functionalTests) }}:
     # Publish test results

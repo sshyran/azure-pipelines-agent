@@ -293,6 +293,7 @@ fi
 
 _VALID_RIDS='linux-x64:linux-arm:linux-arm64:rhel.6-x64:osx-x64:win-x64:win-x86'
 if [[ ":$_VALID_RIDS:" != *:$RUNTIME_ID:* ]]; then
+    echo "------ $RUNTIME_ID -------"
     failed "must specify a valid target runtime ID (one of: $_VALID_RIDS)"
 fi
 
@@ -327,7 +328,7 @@ if [[ (! -d "${DOTNETSDK_INSTALLDIR}") || (! -e "${DOTNETSDK_INSTALLDIR}/.${DOTN
         powershell -NoLogo -Sta -NoProfile -NonInteractive -ExecutionPolicy Unrestricted -Command "& \"./Misc/dotnet-install.ps1\" -Version ${DOTNETSDK_VERSION} -InstallDir \"${sdkinstallwindow_path}\" -Architecture ${architecture}  -NoPath; exit \$LastExitCode;" || checkRC dotnet-install.ps1
     else
         architecture=$( echo $RUNTIME_ID | cut -d "-" -f2)
-        bash ./Misc/dotnet-install.sh --version ${DOTNETSDK_VERSION} --install-dir "${DOTNETSDK_INSTALLDIR}" --architecture ${architecture} --no-path || checkRC dotnet-install.sh
+        bash ./Misc/dotnet-install.sh --version ${DOTNETSDK_VERSION} --install-dir "${DOTNETSDK_INSTALLDIR}" --no-path || checkRC dotnet-install.sh
     fi
 
     echo "${DOTNETSDK_VERSION}" > "${DOTNETSDK_INSTALLDIR}/.${DOTNETSDK_VERSION}"

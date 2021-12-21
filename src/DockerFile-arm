@@ -1,0 +1,8 @@
+FROM mcr.microsoft.com/dotnet/runtime-deps:3.1-focal-arm32v7 AS test
+WORKDIR /app
+EXPOSE 80
+COPY /src /src
+WORKDIR /src
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt update && apt install -y unzip && apt install -y curl && rm -rf /var/lib/apt/lists/*
+ENTRYPOINT ["./dev.sh", "testl0", "Debug", "linux-arm"]
