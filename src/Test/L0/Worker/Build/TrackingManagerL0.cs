@@ -14,6 +14,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using Xunit;
+using Agent.Sdk.Knob;
 
 namespace Microsoft.VisualStudio.Services.Agent.Tests.Worker.Build
 {
@@ -645,6 +646,109 @@ namespace Microsoft.VisualStudio.Services.Agent.Tests.Worker.Build
                 Assert.Equal("SourcesDirectory1", mergedConfig.SourcesDirectory);
                 Assert.Equal("RepositoryType1", mergedConfig.RepositoryType);
                 Assert.Equal("CollectionUrl1", mergedConfig.CollectionUrl);
+                Assert.Equal("ArtifactsDirectory1", mergedConfig.ArtifactsDirectory);
+                Assert.Equal("CollectionId1", mergedConfig.CollectionId);
+                Assert.Equal("FileLocation1", mergedConfig.FileLocation);
+                Assert.Equal("DefinitionId1", mergedConfig.DefinitionId);
+                Assert.Equal("DefinitionName1", mergedConfig.DefinitionName);
+                Assert.Equal("System1", mergedConfig.System);
+                Assert.Equal("TestResultsDirectory1", mergedConfig.TestResultsDirectory);
+            }
+        }
+
+        [Fact]
+        [Trait("Level", "L0")]
+        [Trait("Category", "Worker")]
+        public void MergeTrackingConfig_CheckIfReturnsValidConfigIfBuildOverrideIsFalse()
+        {
+            using (TestHostContext hc = Setup())
+            {
+                var config1 = GetTestConfig(1);
+                var config2 = GetTestConfig(2);
+
+                var mergedConfig = _trackingManager.MergeTrackingConfigs(_ec.Object, config2, config1, false);
+                Assert.Equal("BuildDirectory1", mergedConfig.BuildDirectory);
+                Assert.Equal("SourcesDirectory1", mergedConfig.SourcesDirectory);
+                Assert.Equal("RepositoryType1", mergedConfig.RepositoryType);
+                Assert.Equal("CollectionUrl1", mergedConfig.CollectionUrl);
+                Assert.Equal("ArtifactsDirectory1", mergedConfig.ArtifactsDirectory);
+                Assert.Equal("CollectionId1", mergedConfig.CollectionId);
+                Assert.Equal("FileLocation1", mergedConfig.FileLocation);
+                Assert.Equal("DefinitionId1", mergedConfig.DefinitionId);
+                Assert.Equal("DefinitionName1", mergedConfig.DefinitionName);
+                Assert.Equal("System1", mergedConfig.System);
+                Assert.Equal("TestResultsDirectory1", mergedConfig.TestResultsDirectory);
+            }
+        }
+
+        [Fact]
+        [Trait("Level", "L0")]
+        [Trait("Category", "Worker")]
+        public void MergeTrackingConfig_EmptySourcesDirectoryOfPreviousConfig()
+        {
+            using (TestHostContext hc = Setup())
+            {
+                var config1 = GetTestConfig(1);
+                var config2 = GetTestConfig(2);
+                config1.SourcesDirectory = "";
+
+                var mergedConfig = _trackingManager.MergeTrackingConfigs(_ec.Object, config2, config1, false);
+                Assert.Equal("BuildDirectory1", mergedConfig.BuildDirectory);
+                Assert.Equal("SourcesDirectory2", mergedConfig.SourcesDirectory);
+                Assert.Equal("RepositoryType1", mergedConfig.RepositoryType);
+                Assert.Equal("CollectionUrl1", mergedConfig.CollectionUrl);
+                Assert.Equal("ArtifactsDirectory1", mergedConfig.ArtifactsDirectory);
+                Assert.Equal("CollectionId1", mergedConfig.CollectionId);
+                Assert.Equal("FileLocation1", mergedConfig.FileLocation);
+                Assert.Equal("DefinitionId1", mergedConfig.DefinitionId);
+                Assert.Equal("DefinitionName1", mergedConfig.DefinitionName);
+                Assert.Equal("System1", mergedConfig.System);
+                Assert.Equal("TestResultsDirectory1", mergedConfig.TestResultsDirectory);
+            }
+        }
+
+        [Fact]
+        [Trait("Level", "L0")]
+        [Trait("Category", "Worker")]
+        public void MergeTrackingConfig_EmptyRepositoryTypeOfPreviousConfig()
+        {
+            using (TestHostContext hc = Setup())
+            {
+                var config1 = GetTestConfig(1);
+                var config2 = GetTestConfig(2);
+                config1.RepositoryType = "";
+
+                var mergedConfig = _trackingManager.MergeTrackingConfigs(_ec.Object, config2, config1, false);
+                Assert.Equal("BuildDirectory1", mergedConfig.BuildDirectory);
+                Assert.Equal("SourcesDirectory1", mergedConfig.SourcesDirectory);
+                Assert.Equal("RepositoryType2", mergedConfig.RepositoryType);
+                Assert.Equal("CollectionUrl1", mergedConfig.CollectionUrl);
+                Assert.Equal("ArtifactsDirectory1", mergedConfig.ArtifactsDirectory);
+                Assert.Equal("CollectionId1", mergedConfig.CollectionId);
+                Assert.Equal("FileLocation1", mergedConfig.FileLocation);
+                Assert.Equal("DefinitionId1", mergedConfig.DefinitionId);
+                Assert.Equal("DefinitionName1", mergedConfig.DefinitionName);
+                Assert.Equal("System1", mergedConfig.System);
+                Assert.Equal("TestResultsDirectory1", mergedConfig.TestResultsDirectory);
+            }
+        }
+
+        [Fact]
+        [Trait("Level", "L0")]
+        [Trait("Category", "Worker")]
+        public void MergeTrackingConfig_EmptyCollectionUrlOfPreviousConfig()
+        {
+            using (TestHostContext hc = Setup())
+            {
+                var config1 = GetTestConfig(1);
+                var config2 = GetTestConfig(2);
+                config1.CollectionUrl = "";
+
+                var mergedConfig = _trackingManager.MergeTrackingConfigs(_ec.Object, config2, config1, false);
+                Assert.Equal("BuildDirectory1", mergedConfig.BuildDirectory);
+                Assert.Equal("SourcesDirectory1", mergedConfig.SourcesDirectory);
+                Assert.Equal("RepositoryType1", mergedConfig.RepositoryType);
+                Assert.Equal("CollectionUrl2", mergedConfig.CollectionUrl);
                 Assert.Equal("ArtifactsDirectory1", mergedConfig.ArtifactsDirectory);
                 Assert.Equal("CollectionId1", mergedConfig.CollectionId);
                 Assert.Equal("FileLocation1", mergedConfig.FileLocation);
