@@ -630,6 +630,49 @@ namespace Microsoft.VisualStudio.Services.Agent.Tests.Worker.Build
             }
         }
 
+        [Fact]
+        [Trait("Level", "L0")]
+        [Trait("Category", "Worker")]
+        public void MergeTrackingConfig_CheckIfReturnsValidConfig()
+        {
+            using (TestHostContext hc = Setup())
+            {
+                var config1 = GetTestConfig(1);
+                var config2 = GetTestConfig(2);
+
+                var mergedConfig = _trackingManager.MergeTrackingConfigs(_ec.Object, config2, config1, true);
+                Assert.Equal("BuildDirectory2", mergedConfig.BuildDirectory);
+                Assert.Equal("SourcesDirectory1", mergedConfig.SourcesDirectory);
+                Assert.Equal("RepositoryType1", mergedConfig.RepositoryType);
+                Assert.Equal("CollectionUrl1", mergedConfig.CollectionUrl);
+                Assert.Equal("ArtifactsDirectory1", mergedConfig.ArtifactsDirectory);
+                Assert.Equal("CollectionId1", mergedConfig.CollectionId);
+                Assert.Equal("FileLocation1", mergedConfig.FileLocation);
+                Assert.Equal("DefinitionId1", mergedConfig.DefinitionId);
+                Assert.Equal("DefinitionName1", mergedConfig.DefinitionName);
+                Assert.Equal("System1", mergedConfig.System);
+                Assert.Equal("TestResultsDirectory1", mergedConfig.TestResultsDirectory);
+            }
+        }
+
+        private TrackingConfig GetTestConfig(int index)
+        {
+            TrackingConfig config = new TrackingConfig();
+            config.BuildDirectory = $"BuildDirectory{index}";
+            config.ArtifactsDirectory = $"ArtifactsDirectory{index}";
+            config.CollectionId = $"CollectionId{index}";
+            config.CollectionUrl = $"CollectionUrl{index}";
+            config.FileLocation = $"FileLocation{index}";
+            config.DefinitionId = $"DefinitionId{index}";
+            config.DefinitionName = $"DefinitionName{index}";
+            config.SourcesDirectory = $"SourcesDirectory{index}";
+            config.System = $"System{index}";
+            config.RepositoryType = $"RepositoryType{index}";
+            config.TestResultsDirectory = $"TestResultsDirectory{index}";
+
+            return config;
+        }
+
         private void WriteConfigFile(string contents)
         {
             string filePath = Path.Combine(
