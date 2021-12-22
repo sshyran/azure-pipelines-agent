@@ -139,6 +139,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
                 jobContext.SetVariable(Constants.Variables.Agent.OS, VarUtil.OS);
                 jobContext.SetVariable(Constants.Variables.Agent.OSArchitecture, VarUtil.OSArchitecture);
                 jobContext.SetVariable(Constants.Variables.Agent.RootDirectory, HostContext.GetDirectory(WellKnownDirectory.Work), isFilePath: true);
+                jobContext.SetVariable(Constants.Variables.Agent.Diagnostic, "true");
                 if (PlatformUtil.RunningOnWindows)
                 {
                     jobContext.SetVariable(Constants.Variables.Agent.ServerOMDirectory, HostContext.GetDirectory(WellKnownDirectory.ServerOM), isFilePath: true);
@@ -398,7 +399,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             }
 
             // Clean TEMP after finish process jobserverqueue, since there might be a pending fileupload still use the TEMP dir.
-            _tempDirectoryManager?.CleanupTempDirectory();
+           // _tempDirectoryManager?.CleanupTempDirectory();
 
             if (!jobContext.Features.HasFlag(PlanFeatures.JobCompletedPlanEvent))
             {
