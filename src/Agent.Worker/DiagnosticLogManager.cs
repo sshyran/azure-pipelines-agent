@@ -105,6 +105,15 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
                 File.Copy(agentLogFile, destination);
             }
 
+            // Copy cloud-init log files from linux machines
+            executionContext.Debug("Trying to dump cloud-init logs.");
+            if (PlatformUtil.RunningOnLinux && !string.IsNullOrEmpty(WhichUtil.Which("cloud-init")))
+            {
+                executionContext.Debug("Dumping cloud-init logs.");
+
+                Task<string> cloudInitLogs = DumpCloudInitLogs(jobStartTimeUtc, HostContext.GetDirectory(WellKnownDirectory.Diag));
+            }
+
             executionContext.Debug("Zipping diagnostic files.");
 
             string buildNumber = executionContext.Variables.Build_Number ?? "UnknownBuildNumber";
@@ -129,6 +138,39 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             executionContext.QueueAttachFile(type: CoreAttachmentType.DiagnosticLog, name: diagnosticsZipFileName, filePath: diagnosticsZipFilePath);
 
             executionContext.Debug("Diagnostic file upload complete.");
+        }
+
+        private async Task<string> DumpCloudInitLogs(DateTime jobStartTimeUtc, string diagFolder)
+        {
+            var builder = new StringBuilder();
+
+            string cloudInit = WhichUtil.Which("cloud-init");
+            string arguments = $@"collect-logs -t {diagFolder}\cloudinit-{jobStartTimeUtc.ToString("yyyyMMdd-HHmmss")}-logs.tag.gz";
+
+            using (var processInvoker = HostContext.CreateService<IProcessInvoker>())
+            {
+                processInvoker.OutputDataReceived += (object sender, ProcessDataReceivedEventArgs args) =>
+                {
+                    builder.AppendLine(args.Data);
+                };
+
+                processInvoker.ErrorDataReceived += (object sender, ProcessDataReceivedEventArgs args) =>
+                {
+                    builder.AppendLine(args.Data);
+                };
+
+                await processInvoker.ExecuteAsync(
+                    workingDirectory: HostContext.GetDirectory(WellKnownDirectory.Bin),
+                    fileName: cloudInit,
+                    arguments: arguments,
+                    environment: null,
+                    requireExitCodeZero: false,
+                    outputEncoding: null,
+                    killProcessOnCancel: false,
+                    cancellationToken: default(CancellationToken));
+            }
+
+            return builder.ToString();
         }
 
         private string GetCapabilitiesContent(Dictionary<string, string> capabilities)
