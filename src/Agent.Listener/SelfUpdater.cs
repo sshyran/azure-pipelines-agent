@@ -180,6 +180,8 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
 
             await _serverUtil.DetermineDeploymentType(_serverUrl, _creds, _locationServer);
 
+            // DownloadUrl for offline agent update is started from Url of ADO On-Premises
+            // DownloadUrl for online agent update is started from Url of feed with agent packages
             bool isOfflineUpdate = _targetPackage.DownloadUrl.StartsWith(_serverUrl);
             if (isOfflineUpdate)
             {
@@ -194,9 +196,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
             }
 
             string expectedHash = _targetPackage.HashValue;
-            Trace.Info($"Expected hash - { expectedHash }");
             string actualHash = IOUtil.GetFileHash(archiveFile);
-            Trace.Info($"Actual hash - { actualHash }");
             bool hashesMatch = StringUtil.AreHashesEqual(actualHash, expectedHash);
 
             if (hashesMatch)
