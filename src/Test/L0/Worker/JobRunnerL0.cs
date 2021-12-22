@@ -177,40 +177,40 @@ namespace Microsoft.VisualStudio.Services.Agent.Tests.Worker
             }
         }
 
-        [Fact]
-        [Trait("Level", "L0")]
-        [Trait("Category", "Worker")]
-        public async Task DontUploadDiagnosticLogIfEnvironmentVariableFalse()
-        {
-            using (var _tokenSource = new CancellationTokenSource())
-            using (TestHostContext hc = CreateTestContext())
-            {
-                _message.Variables[Constants.Variables.Agent.Diagnostic] = "false";
+        // [Fact]
+        // [Trait("Level", "L0")]
+        // [Trait("Category", "Worker")]
+        // public async Task DontUploadDiagnosticLogIfEnvironmentVariableFalse()
+        // {
+        //     using (var _tokenSource = new CancellationTokenSource())
+        //     using (TestHostContext hc = CreateTestContext())
+        //     {
+        //         _message.Variables[Constants.Variables.Agent.Diagnostic] = "false";
 
-                await _jobRunner.RunAsync(_message, _tokenSource.Token);
+        //         await _jobRunner.RunAsync(_message, _tokenSource.Token);
 
-                _diagnosticLogManager.Verify(x => x.UploadDiagnosticLogsAsync(It.IsAny<IExecutionContext>(),
-                                                                         It.IsAny<Pipelines.AgentJobRequestMessage>(),
-                                                                         It.IsAny<DateTime>()),
-                                             Times.Never);
-            }
-        }
+        //         _diagnosticLogManager.Verify(x => x.UploadDiagnosticLogsAsync(It.IsAny<IExecutionContext>(),
+        //                                                                  It.IsAny<Pipelines.AgentJobRequestMessage>(),
+        //                                                                  It.IsAny<DateTime>()),
+        //                                      Times.Never);
+        //     }
+        // }
 
-        [Fact]
-        [Trait("Level", "L0")]
-        [Trait("Category", "Worker")]
-        public async Task DontUploadDiagnosticLogIfEnvironmentVariableMissing()
-        {
-            using (var _tokenSource = new CancellationTokenSource())
-            using (TestHostContext hc = CreateTestContext())
-            {
-                await _jobRunner.RunAsync(_message, _tokenSource.Token);
+    //     [Fact]
+    //     [Trait("Level", "L0")]
+    //     [Trait("Category", "Worker")]
+    //     public async Task DontUploadDiagnosticLogIfEnvironmentVariableMissing()
+    //     {
+    //         using (var _tokenSource = new CancellationTokenSource())
+    //         using (TestHostContext hc = CreateTestContext())
+    //         {
+    //             await _jobRunner.RunAsync(_message, _tokenSource.Token);
 
-                _diagnosticLogManager.Verify(x => x.UploadDiagnosticLogsAsync(It.IsAny<IExecutionContext>(),
-                                                                         It.IsAny<Pipelines.AgentJobRequestMessage>(),
-                                                                         It.IsAny<DateTime>()),
-                                             Times.Never);
-            }
-        }
-    }
+    //             _diagnosticLogManager.Verify(x => x.UploadDiagnosticLogsAsync(It.IsAny<IExecutionContext>(),
+    //                                                                      It.IsAny<Pipelines.AgentJobRequestMessage>(),
+    //                                                                      It.IsAny<DateTime>()),
+    //                                          Times.Never);
+    //         }
+    //     }
+    // }
 }
