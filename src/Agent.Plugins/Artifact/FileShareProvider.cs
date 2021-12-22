@@ -198,12 +198,14 @@ namespace Agent.Plugins
             List<FileInfo> files =
                 new DirectoryInfo(sourcePath).EnumerateFiles("*", SearchOption.AllDirectories).ToList<FileInfo>();
 
+            ArtifactItemFilters filters = new ArtifactItemFilters(connection, tracer);
+
             // Getting list of file paths. It is useful to handle list of paths instead of files.
             // Also it allows to use the same methods for FileContainerProvider and FileShareProvider.
             List<string> paths = new List<string>();
             foreach (FileInfo file in files)
             {
-                string pathInArtifact = file.ToString().Remove(0, sourcePath.Length).TrimStart(trimChars);
+                string pathInArtifact = filters.RemoveSourceDirFromPath(file, sourcePath);
                 paths.Add(Path.Combine(artifactName, pathInArtifact));
             }
 
@@ -222,7 +224,6 @@ namespace Agent.Plugins
                 };
             }
 
-            ArtifactItemFilters filters = new ArtifactItemFilters(connection, tracer);
             Hashtable map = filters.GetMapToFilterItems(paths, downloadParameters.MinimatchFilters, customMinimatchOptions);
 
             // Returns filtered list of artifact items. Uses minimatch filters specified in downloadParameters.

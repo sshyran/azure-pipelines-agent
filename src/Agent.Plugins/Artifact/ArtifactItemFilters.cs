@@ -205,13 +205,13 @@ namespace Agent.Plugins
         /// <returns></returns>
         public List<FileInfo> ApplyPatternsMapToFileShareItems(IEnumerable<FileInfo> files, Hashtable map, string sourcePath)
         {
-            var trimChars = new[] { '\\', '/' };
+            char[] trimChars = new[] { '\\', '/' };
 
             List<FileInfo> resultItems = new List<FileInfo>();
             foreach (FileInfo file in files)
             {
                 var artifactName = new DirectoryInfo(sourcePath).Name;
-                string pathInArtifact = file.ToString().Remove(0, sourcePath.Length).TrimStart(trimChars);
+                string pathInArtifact = RemoveSourceDirFromPath(file, sourcePath);
 
                 if (Convert.ToBoolean(map[Path.Combine(artifactName, pathInArtifact)]))
                 {
@@ -234,6 +234,19 @@ namespace Agent.Plugins
             }
 
             return filteredItems;
+        }
+
+        /// <summary>
+        /// Trims source path from full path of file. Result is path to file in artifact.
+        /// E.g. file is \\FileShare\TestArtifact\TestFolder\TestFile.txt, sourcePath is \\FileShare\TestArtifact, result is TestFolder\TestFile.txt.
+        /// </summary>
+        /// <param name="file">FileInfo object with info about file in artifact</param>
+        /// <param name="sourcePath">String path to artifact on file share.</param>
+        /// <returns></returns>
+        public string RemoveSourceDirFromPath(FileInfo file, string sourcePath)
+        {
+            char[] trimChars = new[] { '\\', '/' };
+            return file.ToString().Remove(0, sourcePath.Length).TrimStart(trimChars);
         }
 
         // Clones MiniMatch options into separate object
