@@ -212,5 +212,5 @@ namespace Microsoft.VisualStudio.Services.Agent.Tests.Worker
     //                                          Times.Never);
     //         }
     //     }
-    // }
+    }
 }
