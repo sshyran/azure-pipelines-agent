@@ -106,7 +106,6 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             }
 
             // Copy cloud-init log files from linux machines
-            executionContext.Debug("Trying to dump cloud-init logs.");
             if (PlatformUtil.RunningOnLinux && !string.IsNullOrEmpty(WhichUtil.Which("cloud-init")))
             {
                 executionContext.Debug("Dumping cloud-init logs.");
@@ -145,7 +144,8 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             var builder = new StringBuilder();
 
             string cloudInit = WhichUtil.Which("cloud-init");
-            string arguments = $@"collect-logs -t {diagFolder}\cloudinit-{jobStartTimeUtc.ToString("yyyyMMdd-HHmmss")}-logs.tag.gz";
+            string resultPath = Path.Combine(diagFolder, $"cloudinit-{jobStartTimeUtc.ToString("yyyyMMdd - HHmmss")}-logs.tag.gz");
+            string arguments = $@"collect-logs -t {resultPath}";
 
             using (var processInvoker = HostContext.CreateService<IProcessInvoker>())
             {
