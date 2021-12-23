@@ -427,11 +427,11 @@ namespace Agent.Plugins.Repository
             }
         }
 
-        private void SetPermissions(string filePath, string permissions, bool recursive = false)
+        private void SetPermissions(string path, string permissions, bool recursive = false)
         {
             var chmodProcessInfo = new ProcessStartInfo("chmod")
             {
-                Arguments = $"{permissions} {(recursive ? "-R" : "")}",
+                Arguments = $"{permissions} {(recursive ? "-R" : "")} {path}",
                 UseShellExecute = false,
                 RedirectStandardError = true
             };
@@ -441,7 +441,7 @@ namespace Agent.Plugins.Repository
             string chmodStderr = chmodProcess.StandardError.ReadToEnd();
             if (chmodStderr.Length != 0 || chmodProcess.ExitCode != 0)
             {
-                throw new Exception($"Failed to set {filePath} permissions to {permissions} (recursive: {recursive}). Exit code: {chmodProcess.ExitCode}; stderr: {chmodStderr}");
+                throw new Exception($"Failed to set {path} permissions to {permissions} (recursive: {recursive}). Exit code: {chmodProcess.ExitCode}; stderr: {chmodStderr}");
             }
         }
 
