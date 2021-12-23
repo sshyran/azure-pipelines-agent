@@ -6,4 +6,4 @@ WORKDIR /src
 RUN apt update
 RUN apt install unzip
 RUN ./dev.sh b
-CMD ./dev.sh testl0 Debug linux-arm64
+ENTRYPOINT ["./dev.sh", "testl1", "Debug", "linux-arm64"]
