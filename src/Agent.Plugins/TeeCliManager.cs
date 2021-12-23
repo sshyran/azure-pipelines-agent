@@ -429,19 +429,19 @@ namespace Agent.Plugins.Repository
 
         private void SetPermissions(string filePath, string permissions, bool recursive = false)
         {
-            var extractionProcessInfo = new ProcessStartInfo("chmod")
+            var chmodProcessInfo = new ProcessStartInfo("chmod")
             {
                 Arguments = $"{permissions} {(recursive ? "-R" : "")}",
                 UseShellExecute = false,
                 RedirectStandardError = true
             };
-            Process extractionProcess = Process.Start(extractionProcessInfo);
-            extractionProcess.WaitForExit();
+            Process chmodProcess = Process.Start(chmodProcessInfo);
+            chmodProcess.WaitForExit();
 
-            string extractionStderr = extractionProcess.StandardError.ReadToEnd();
-            if (extractionStderr.Length != 0 || extractionProcess.ExitCode != 0)
+            string chmodStderr = chmodProcess.StandardError.ReadToEnd();
+            if (chmodStderr.Length != 0 || chmodProcess.ExitCode != 0)
             {
-                throw new Exception($"Failed to set {filePath} permissions to {permissions} (recursive: {recursive})");
+                throw new Exception($"Failed to set {filePath} permissions to {permissions} (recursive: {recursive}). Exit code: {chmodProcess.ExitCode}; stderr: {chmodStderr}");
             }
         }
 
