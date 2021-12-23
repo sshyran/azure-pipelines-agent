@@ -350,7 +350,7 @@ namespace Agent.Plugins.Repository
             {
                 DownloadAndExtractTeeWithRetries();
             }
-            catch (Exception ex)
+            catch
             {
                 ExecutionContext.Warning($"Failed to download Resources. Trying to clean up.");
                 CleanupFiles();
