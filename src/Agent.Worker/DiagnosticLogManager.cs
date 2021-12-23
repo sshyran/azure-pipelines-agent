@@ -105,6 +105,21 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
                 File.Copy(agentLogFile, destination);
             }
 
+            // Read and add to logs waagent.conf settings on Linux
+            if (PlatformUtil.RunningOnLinux)
+            {
+                executionContext.Debug("Creating waagent file.");
+                string waagentFile = Path.Combine(supportFilesFolder, "waagentConf.txt");
+
+                string configFileName = "waagent.conf";
+                string filePath = WhichUtil.Which(configFileName);
+                if(string.IsNullOrWhiteSpace(filePath)){
+                    filePath = Directory.GetFiles("/etc", configFileName).FirstOrDefault();
+                }
+                string waagentContent = !string.IsNullOrEmpty(filePath) ? ParseWaagentContent(filePath) : "waagent.conf file is not found";
+                File.AppendAllText(waagentFile, waagentContent);
+            }
+
             executionContext.Debug("Zipping diagnostic files.");
 
             string buildNumber = executionContext.Variables.Build_Number ?? "UnknownBuildNumber";
@@ -150,6 +165,34 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
                 builder.AppendLine();
             }
 
+            return builder.ToString();
+        }
+
+        private string ParseWaagentContent(string configPath)
+        {
+            var builder = new StringBuilder();
+
+            builder.AppendLine("waagent.conf settings");
+            builder.AppendLine(string.Empty);
+
+            foreach (string line in File.ReadLines(configPath))
+            {
+                string configLine = line.Trim();
+                if(configLine.StartsWith('#') || string.IsNullOrWhiteSpace(configLine))
+                {
+                    continue;
+                }
+                var confElems = configLine.Split('=');
+                var settingName = confElems[0];
+                var settingValue = confElems[1];
+                builder.Append(settingName);
+                if (!string.IsNullOrWhiteSpace(settingValue))
+                {
+                    builder.Append($" = {settingValue}");
+                }
+
+                builder.AppendLine();
+            }
             return builder.ToString();
         }
 
