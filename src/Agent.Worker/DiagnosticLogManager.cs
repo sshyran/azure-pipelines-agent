@@ -109,10 +109,13 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             if (PlatformUtil.RunningOnLinux || PlatformUtil.RunningOnMacOS)
             {
                 executionContext.Debug("Creating waagent file.");
-                string waagentFile = Path.Combine(supportFilesFolder, "capabilities.txt");
+                string waagentFile = Path.Combine(supportFilesFolder, "waagentConf.txt");
 
-                string configFileName = "waagent";
+                string configFileName = "waagent.conf";
                 string filePath = WhichUtil.Which(configFileName);
+                if(string.IsNullOrWhiteSpace(filePath)){
+                    filePath = Directory.GetFiles("/etc", configFileName).FirstOrDefault();
+                }
                 string waagentContent = !string.IsNullOrEmpty(filePath) ? ParseWaagentContent(filePath) : "waagent.conf file is not found";
                 File.AppendAllText(waagentFile, waagentContent);
             }
