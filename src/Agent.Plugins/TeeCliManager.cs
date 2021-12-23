@@ -394,12 +394,12 @@ namespace Agent.Plugins.Repository
             IOUtil.DeleteDirectory(tempDirectory, CancellationToken.None);
             Directory.CreateDirectory(tempDirectory);
 
-            string zipPath = Path.Combine(tempDirectory, $"{new Guid().ToString()}.zip");
+            string zipPath = Path.Combine(tempDirectory, $"{Guid.NewGuid().ToString()}.zip");
             DownloadTee(zipPath).GetAwaiter().GetResult();
 
             ExecutionContext.Debug($"Downloaded {zipPath}");
 
-            string extractedTeePath = Path.Combine(tempDirectory, $"{new Guid().ToString()}");
+            string extractedTeePath = Path.Combine(tempDirectory, $"{Guid.NewGuid().ToString()}");
             ZipFile.ExtractToDirectory(zipPath, extractedTeePath);
 
             ExecutionContext.Debug($"Extracted {zipPath} to ${extractedTeePath}");
