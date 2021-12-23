@@ -459,7 +459,7 @@ namespace Agent.Plugins.Repository
                 {
                     tf = new TeeCliManager();
                 }
-                
+
                 tf.CancellationToken = CancellationToken.None;
                 tf.Repository = repository;
                 tf.ExecutionContext = executionContext;

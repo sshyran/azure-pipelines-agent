@@ -345,11 +345,25 @@ namespace Agent.Plugins.Repository
         // Download TEE if absent
         public void DownloadResources()
         {
+            try
+            {
+                DownloadAndExtractTeeWithRetries();
+            }
+            catch (Exception ex)
+            {
+                ExecutionContext.Warning($"Failed to download Resources. Trying to clean up.");
+                CleanupFiles();
+                throw ex;
+            }
+        }
+
+        private void DownloadAndExtractTeeWithRetries()
+        {
             if (Directory.Exists(Path.GetDirectoryName(FilePath)))
             {
                 return;
             }
-            
+
             int providedDownloadRetryCount = AgentKnobs.TeePluginDownloadRetryCount.GetValue(ExecutionContext).AsInt();
             int downloadRetryCount = Math.Max(providedDownloadRetryCount, 3);
 
@@ -415,7 +429,15 @@ namespace Agent.Plugins.Repository
                 return;
             }
 
+            CleanupFiles();
+        }
+
+        private void CleanupFiles()
+        {
             IOUtil.DeleteDirectory(Path.GetDirectoryName(FilePath), CancellationToken.None);
+
+            string tempDirectory = Path.Combine(ExecutionContext.Variables.GetValueOrDefault("Agent.TempDirectory")?.Value, TeeTempDir);
+            IOUtil.DeleteDirectory(tempDirectory, CancellationToken.None);
         }
 
         ////////////////////////////////////////////////////////////////////////////////
