@@ -329,9 +329,6 @@ if [[ (! -d "${DOTNETSDK_INSTALLDIR}") || (! -e "${DOTNETSDK_INSTALLDIR}/.${DOTN
     else
         architecture=$( echo $RUNTIME_ID | cut -d "-" -f2)
         bash ./Misc/dotnet-install.sh --version ${DOTNETSDK_VERSION} --install-dir "${DOTNETSDK_INSTALLDIR}" --no-path || checkRC .sh
-        echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-        ls ${DOTNETSDK_INSTALLDIR} -R
-        echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++"
     fi
 
     echo "${DOTNETSDK_VERSION}" > "${DOTNETSDK_INSTALLDIR}/.${DOTNETSDK_VERSION}"
