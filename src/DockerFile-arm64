@@ -5,4 +5,5 @@ COPY /src /src
 WORKDIR /src
 RUN apt update
 RUN apt install unzip
-ENTRYPOINT ["./dev.sh", "testl0", "Debug", "linux-arm64"]
+RUN ./dev.sh l
+CMD ./dev.sh testl0 Debug linux-arm64
