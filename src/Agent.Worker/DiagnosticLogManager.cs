@@ -144,8 +144,8 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             var builder = new StringBuilder();
 
             string cloudInit = WhichUtil.Which("cloud-init");
-            string resultPath = Path.Combine(diagFolder, $"cloudinit-{jobStartTimeUtc.ToString("yyyyMMdd - HHmmss")}-logs.tag.gz");
-            string arguments = $@"collect-logs -t {resultPath}";
+            string resultName = $"cloudinit-{jobStartTimeUtc.ToString("yyyyMMdd-HHmmss")}-logs.tag.gz";
+            string arguments = $"collect-logs -t \"{diagFolder}/{resultName}\"";
 
             using (var processInvoker = HostContext.CreateService<IProcessInvoker>())
             {
