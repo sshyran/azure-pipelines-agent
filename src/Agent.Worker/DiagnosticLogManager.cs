@@ -110,7 +110,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             {
                 executionContext.Debug("Dumping cloud-init logs.");
 
-                Task<string> cloudInitLogs = DumpCloudInitLogs(jobStartTimeUtc, HostContext.GetDirectory(WellKnownDirectory.Diag));
+                DumpCloudInitLogs(jobStartTimeUtc, HostContext.GetDirectory(WellKnownDirectory.Diag));
             }
 
             executionContext.Debug("Zipping diagnostic files.");
@@ -139,13 +139,17 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             executionContext.Debug("Diagnostic file upload complete.");
         }
 
-        private async Task<string> DumpCloudInitLogs(DateTime jobStartTimeUtc, string diagFolder)
+        private async void DumpCloudInitLogs(DateTime jobStartTimeUtc, string diagFolder)
         {
             var builder = new StringBuilder();
 
             string cloudInit = WhichUtil.Which("cloud-init", trace: Trace);
-            if (string.IsNullOrEmpty(cloudInit)) return "Сloud-init isn't found on current machine.";
-
+            if (string.IsNullOrEmpty(cloudInit))
+            {
+                Trace.Info("Cloud-init ins't found on current machine.");
+                return;
+            }
+            
             string resultName = $"cloudinit-{jobStartTimeUtc.ToString("yyyyMMdd-HHmmss")}-logs.tar.gz";
             string arguments = $"collect-logs -t \"{diagFolder}/{resultName}\"";
 
@@ -172,7 +176,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
                     cancellationToken: default(CancellationToken));
             }
 
-            return builder.ToString();
+            Trace.Info(builder.ToString());
         }
 
         private string GetCapabilitiesContent(Dictionary<string, string> capabilities)
