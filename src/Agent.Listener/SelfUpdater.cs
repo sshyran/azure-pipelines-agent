@@ -42,7 +42,6 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
         private VssCredentials _creds;
         private ILocationServer _locationServer;
         private bool _hashValidationDisabled;
-        private ServerUtil _serverUtil;
 
         public override void Initialize(IHostContext hostContext)
         {
@@ -60,7 +59,6 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
             _creds = credManager.LoadCredentials();
             _locationServer = HostContext.GetService<ILocationServer>();
             _hashValidationDisabled = AgentKnobs.DisableHashValidation.GetValue(_knobContext).AsBoolean();
-            _serverUtil = new ServerUtil(Trace);
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA2000:Dispose objects before losing scope", MessageId = "invokeScript")]
@@ -170,15 +168,13 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
             return false;
         }
 
-        private async Task<bool> HashValidation(string archiveFile)
+        private bool HashValidation(string archiveFile)
         {
             if (_hashValidationDisabled)
             {
                 Trace.Info($"Agent package hash validation disabled, so skipping it");
                 return true;
             }
-
-            await _serverUtil.DetermineDeploymentType(_serverUrl, _creds, _locationServer);
 
             // DownloadUrl for offline agent update is started from Url of ADO On-Premises
             // DownloadUrl for online agent update is started from Url of feed with agent packages
@@ -304,7 +300,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
                             Trace.Info($"Download agent: finished download");
 
                             downloadSucceeded = true;
-                            validationSucceeded = await HashValidation(archiveFile);
+                            validationSucceeded = HashValidation(archiveFile);
                         }
                         catch (OperationCanceledException) when (token.IsCancellationRequested)
                         {
