@@ -141,7 +141,7 @@ jobs:
         displayName: Functional tests
 
   - ${{ if or(eq(parameters.arch, 'arm64'), eq(parameters.arch, 'arm') ) }}:
-    - script: docker build -t ${{ parameters.arch }}-tests-integration --file "$(Build.SourcesDirectory)/src/DockerFileL1" --platform linux/${{ parameters.arch }} . --target test
+    - script: docker run -v $(Build.SourcesDirectory)/src/Test/TestResults:/src/Test/TestResults -v $(Build.SourcesDirectory)/src/Test/TestLogs:/src/Test/TestLogs test-${{ parameters.arch }} ["./dev.sh", "testl1", "Debug", "${{ parameters.os }}-${{ parameters.arch }}"]
 
   - ${{ if or(parameters.unitTests, parameters.functionalTests) }}:
     # Publish test results
