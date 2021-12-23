@@ -38,5 +38,7 @@ namespace Agent.Plugins.Repository
         Task<ITfsVCShelveset> ShelvesetsAsync(string shelveset);
         Task UnshelveAsync(string shelveset, bool failOnNonZeroExitCode);
         void CleanupProxySetting();
+        void DownloadResources();
+        void DeleteResources();
     }
 }

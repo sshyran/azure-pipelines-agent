@@ -67,6 +67,8 @@ namespace Agent.Plugins.Repository
                 tf.Endpoint = endpoint;
             }
 
+            tf.DownloadResources();
+
             // Setup proxy.
             var agentProxy = executionContext.GetProxyConfiguration();
             if (agentProxy != null && !string.IsNullOrEmpty(agentProxy.ProxyAddress) && !agentProxy.WebProxy.IsBypassed(repository.Url))
@@ -433,6 +435,8 @@ namespace Agent.Plugins.Repository
                 tf.CleanupProxySetting();
             }
 
+            tf.DeleteResources();
+
             // Set intra-task variable for post job cleanup
             executionContext.SetTaskVariable("repository", repository.Alias);
         }
@@ -469,6 +473,8 @@ namespace Agent.Plugins.Repository
                     ArgUtil.NotNull(endpoint, nameof(endpoint));
                     tf.Endpoint = endpoint;
                 }
+
+                tf.DownloadResources();
 
                 // Get the definition mappings.
                 var workspaceMappings = repository.Properties.Get<IList<Pipelines.WorkspaceMapping>>(Pipelines.RepositoryPropertyNames.Mappings);
@@ -534,6 +540,8 @@ namespace Agent.Plugins.Repository
                     executionContext.Debug(ex.ToString());
                     executionContext.Warning(ex.Message);
                 }
+
+                tf.DeleteResources();
             }
         }
 
