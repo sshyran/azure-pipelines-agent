@@ -115,9 +115,9 @@ jobs:
     - script: docker buildx create --name testcontainer
     - script: docker buildx use testcontainer
     - script: docker buildx inspect --bootstrap
-    - script: docker buildx build --file "$(Build.SourcesDirectory)/src/DockerFile-${{ parameters.arch }}" --platform linux/arm/v7 -t test-${{ parameters.arch }} --load .
+    - script: docker buildx build --file "$(Build.SourcesDirectory)/src/DockerFile-${{ parameters.arch }}" --platform linux/${{ parameters.os }}-${{ parameters.arch }} -t test-${{ parameters.arch }} --load .
     - script: docker images
-    - script: docker run -v/c/tests:/tests test-${{ parameters.arch }}
+    - script: docker run -v $(Build.SourcesDirectory)/src:/src test-${{ parameters.arch }}
 
   # Run l0 tests
   - ${{ if and(parameters.unitTests, ne(parameters.arch, 'arm64'), ne(parameters.arch, 'arm')) }}:
