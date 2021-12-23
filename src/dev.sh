@@ -293,7 +293,6 @@ fi
 
 _VALID_RIDS='linux-x64:linux-arm:linux-arm64:rhel.6-x64:osx-x64:win-x64:win-x86'
 if [[ ":$_VALID_RIDS:" != *:$RUNTIME_ID:* ]]; then
-    echo "------ $RUNTIME_ID -------"
     failed "must specify a valid target runtime ID (one of: $_VALID_RIDS)"
 fi
 
@@ -348,7 +347,7 @@ bash ./Misc/externals.sh $RUNTIME_ID "Pre-Cache" || checkRC "externals.sh Pre-Ca
 
 if [[ "$CURRENT_PLATFORM" == 'windows' ]]; then
     vswhere=$(find "$DOWNLOAD_DIR" -name vswhere.exe | head -1)
-    vs_location=$("$vswhere" -latest -property installationPath)
+    vs_location=$("$vswhere" -latest -prerelease -property installationPath)
     msbuild_location="$vs_location""\MSBuild\15.0\Bin\msbuild.exe"
 
     if [[ ! -e "${msbuild_location}" ]]; then
