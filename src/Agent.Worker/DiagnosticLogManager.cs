@@ -109,8 +109,8 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             if (PlatformUtil.RunningOnLinux)
             {
                 executionContext.Debug("Dumping cloud-init logs.");
-
-                DumpCloudInitLogs(jobStartTimeUtc, HostContext.GetDirectory(WellKnownDirectory.Diag));
+                await DumpCloudInitLogs(jobStartTimeUtc, HostContext.GetDirectory(WellKnownDirectory.Diag));
+                executionContext.Debug("Dumping cloud-init logs is completed.");
             }
 
             executionContext.Debug("Zipping diagnostic files.");
@@ -139,7 +139,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             executionContext.Debug("Diagnostic file upload complete.");
         }
 
-        private async void DumpCloudInitLogs(DateTime jobStartTimeUtc, string diagFolder)
+        private async Task DumpCloudInitLogs(DateTime jobStartTimeUtc, string diagFolder)
         {
             var builder = new StringBuilder();
 
