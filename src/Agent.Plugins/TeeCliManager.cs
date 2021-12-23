@@ -4,6 +4,7 @@
 using Agent.Sdk;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -403,6 +404,10 @@ namespace Agent.Plugins.Repository
 
             ExecutionContext.Debug($"Extracted {zipPath} to ${extractedTeePath}");
 
+            // We have to set these files as executable because ZipFile.ExtractToDirectory does not set file permissions
+            SetPermissions(Path.Combine(extractedTeePath, "tf"), "a+x");
+            SetPermissions(Path.Combine(extractedTeePath, "native"), "a+x", recursive: true);
+
             string extractedTeeDestinationPath = Path.GetDirectoryName(FilePath);
             Directory.Move(Path.Combine(extractedTeePath, "TEE-CLC-14.135.0"), extractedTeeDestinationPath);
 
@@ -419,6 +424,24 @@ namespace Agent.Plugins.Repository
                 client.DownloadProgressChanged +=
                     (_, progressEvent) => ExecutionContext.Debug($"TEE download progress: {progressEvent.ProgressPercentage}%.");
                 await client.DownloadFileTaskAsync(new Uri(TeeUrl), zipPath);
+            }
+        }
+
+        private void SetPermissions(string filePath, string permissions, bool recursive = false)
+        {
+            var extractionProcessInfo = new ProcessStartInfo("chmod")
+            {
+                Arguments = $"{permissions} {(recursive ? "-R" : "")}",
+                UseShellExecute = false,
+                RedirectStandardError = true
+            };
+            Process extractionProcess = Process.Start(extractionProcessInfo);
+            extractionProcess.WaitForExit();
+
+            string extractionStderr = extractionProcess.StandardError.ReadToEnd();
+            if (extractionStderr.Length != 0 || extractionProcess.ExitCode != 0)
+            {
+                throw new Exception($"Failed to set {filePath} permissions to {permissions} (recursive: {recursive})");
             }
         }
 
