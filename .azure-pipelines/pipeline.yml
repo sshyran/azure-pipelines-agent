@@ -36,10 +36,10 @@ parameters:
   default: false
 - name: linux_arm
   type: boolean
-  default: true
+  default: false
 - name: linux_arm64
   type: boolean
-  default: false
+  default: true
 - name: rhel6_x64
   type: boolean
   default: false
