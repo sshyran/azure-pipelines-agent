@@ -109,7 +109,7 @@ jobs:
       env:
         ADO_ENABLE_LOGISSUE: true
 
-  - ${{ if and(parameters.unitTests, or(eq(parameters.arch, 'arm64'), eq(parameters.arch, 'arm') ) ) }}:
+  - ${{ if and(parameters.unitTests, or(ne(parameters.arch, 'arm64'), ne(parameters.arch, 'arm') ) ) }}:
     - script: sudo apt update && sudo apt install -y qemu qemu-user-static qemu-user binfmt-support && docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
     - script: docker buildx create --name testcontainer && docker buildx use testcontainer
     - script: docker buildx build --file "$(Build.SourcesDirectory)/src/DockerFile-${{ parameters.arch }}" --platform linux/${{ parameters.os }}-${{ parameters.arch }} -t test-${{ parameters.arch }} --load .
