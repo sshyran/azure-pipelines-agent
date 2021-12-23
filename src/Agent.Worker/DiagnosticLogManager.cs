@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft Corporation.
+﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
 using Agent.Sdk;
@@ -106,7 +106,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             }
 
             // Copy cloud-init log files from linux machines
-            if (PlatformUtil.RunningOnLinux && !string.IsNullOrEmpty(WhichUtil.Which("cloud-init", trace: Trace)))
+            if (PlatformUtil.RunningOnLinux)
             {
                 executionContext.Debug("Dumping cloud-init logs.");
 
@@ -143,7 +143,9 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
         {
             var builder = new StringBuilder();
 
-            string cloudInit = WhichUtil.Which("cloud-init");
+            string cloudInit = WhichUtil.Which("cloud-init", trace: Trace);
+            if (string.IsNullOrEmpty(cloudInit)) return "Сloud-init isn't found on current machine.";
+
             string resultName = $"cloudinit-{jobStartTimeUtc.ToString("yyyyMMdd-HHmmss")}-logs.tag.gz";
             string arguments = $"collect-logs -t \"{diagFolder}/{resultName}\"";
 
