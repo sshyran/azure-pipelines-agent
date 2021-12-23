@@ -106,7 +106,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             }
 
             // Copy cloud-init log files from linux machines
-            if (PlatformUtil.RunningOnLinux && !string.IsNullOrEmpty(WhichUtil.Which("cloud-init")))
+            if (PlatformUtil.RunningOnLinux && !string.IsNullOrEmpty(WhichUtil.Which("cloud-init", trace: Trace)))
             {
                 executionContext.Debug("Dumping cloud-init logs.");
 
