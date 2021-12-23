@@ -404,16 +404,16 @@ namespace Agent.Plugins.Repository
 
             ExecutionContext.Debug($"Extracted {zipPath} to ${extractedTeePath}");
 
-            // We have to set these files as executable because ZipFile.ExtractToDirectory does not set file permissions
-            SetPermissions(Path.Combine(extractedTeePath, "tf"), "a+x");
-            SetPermissions(Path.Combine(extractedTeePath, "native"), "a+x", recursive: true);
-
             string extractedTeeDestinationPath = Path.GetDirectoryName(FilePath);
             Directory.Move(Path.Combine(extractedTeePath, "TEE-CLC-14.135.0"), extractedTeeDestinationPath);
 
             ExecutionContext.Debug($"Moved to ${extractedTeeDestinationPath}");
 
             IOUtil.DeleteDirectory(tempDirectory, CancellationToken.None);
+
+            // We have to set these files as executable because ZipFile.ExtractToDirectory does not set file permissions
+            SetPermissions(Path.Combine(extractedTeeDestinationPath, "tf"), "a+x");
+            SetPermissions(Path.Combine(extractedTeeDestinationPath, "native"), "a+x", recursive: true);
         }
 
         private async Task DownloadTee(string zipPath)
