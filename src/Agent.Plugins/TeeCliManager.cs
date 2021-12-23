@@ -354,7 +354,7 @@ namespace Agent.Plugins.Repository
             {
                 ExecutionContext.Warning($"Failed to download Resources. Trying to clean up.");
                 CleanupFiles();
-                throw ex;
+                throw;
             }
         }
 
