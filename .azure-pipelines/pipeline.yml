@@ -27,25 +27,25 @@ parameters:
 # Targets
 - name: win_x64
   type: boolean
-  default: true
+  default: false
 - name: win_x86
   type: boolean
-  default: true
+  default: false
 - name: linux_x64
   type: boolean
-  default: true
+  default: false
 - name: linux_arm
   type: boolean
-  default: true
+  default: false
 - name: linux_arm64
   type: boolean
   default: true
 - name: rhel6_x64
   type: boolean
-  default: true
+  default: false
 - name: macOS_x64
   type: boolean
-  default: true
+  default: false
 
 resources:
   containers:
