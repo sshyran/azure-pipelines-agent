@@ -1,9 +1,0 @@
-FROM arm32v7/ubuntu:latest AS build
-WORKDIR /app
-EXPOSE 80
-COPY /src /src
-WORKDIR /src
-ENV DEBIAN_FRONTEND=noninteractive
-RUN apt update && apt install -y unzip && apt install -y curl && rm -rf /var/lib/apt/lists/*
-RUN uname -a
-ENTRYPOINT ["./dev.sh", "testl0", "Debug", "linux-arm"]

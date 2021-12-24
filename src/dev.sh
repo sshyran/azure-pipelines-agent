@@ -326,7 +326,6 @@ if [[ (! -d "${DOTNETSDK_INSTALLDIR}") || (! -e "${DOTNETSDK_INSTALLDIR}/.${DOTN
         architecture=$( echo $RUNTIME_ID | cut -d "-" -f2)
         powershell -NoLogo -Sta -NoProfile -NonInteractive -ExecutionPolicy Unrestricted -Command "& \"./Misc/dotnet-install.ps1\" -Version ${DOTNETSDK_VERSION} -InstallDir \"${sdkinstallwindow_path}\" -Architecture ${architecture}  -NoPath; exit \$LastExitCode;" || checkRC dotnet-install.ps1
     else
-        architecture=$( echo $RUNTIME_ID | cut -d "-" -f2)
         bash ./Misc/dotnet-install.sh --version ${DOTNETSDK_VERSION} --install-dir "${DOTNETSDK_INSTALLDIR}" --no-path || checkRC .sh
     fi
 
@@ -347,7 +346,7 @@ bash ./Misc/externals.sh $RUNTIME_ID "Pre-Cache" || checkRC "externals.sh Pre-Ca
 
 if [[ "$CURRENT_PLATFORM" == 'windows' ]]; then
     vswhere=$(find "$DOWNLOAD_DIR" -name vswhere.exe | head -1)
-    vs_location=$("$vswhere" -latest -prerelease -property installationPath)
+    vs_location=$("$vswhere" -latest -property installationPath)
     msbuild_location="$vs_location""\MSBuild\15.0\Bin\msbuild.exe"
 
     if [[ ! -e "${msbuild_location}" ]]; then
