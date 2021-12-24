@@ -537,11 +537,6 @@ namespace Agent.Plugins.Repository
                     executionContext.Warning(ex.Message);
                 }
             }
-
-            if (!PlatformUtil.RunningOnWindows)
-            {
-                TeeCliManager.DeleteResources(executionContext);
-            }
         }
 
         private async Task RemoveConflictingWorkspacesAsync(ITfsVCCliManager tf, ITfsVCWorkspace[] tfWorkspaces, string name, string directory)

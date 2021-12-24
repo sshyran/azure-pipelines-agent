@@ -206,6 +206,11 @@ namespace Agent.Plugins.Repository
                 ISourceProvider sourceProvider = SourceProviderFactory.GetSourceProvider(repo.Type);
                 await sourceProvider.PostJobCleanupAsync(executionContext, repo);
             }
+
+            if (!PlatformUtil.RunningOnWindows)
+            {
+                TeeCliManager.DeleteResources(executionContext);
+            }
         }
     }
 
