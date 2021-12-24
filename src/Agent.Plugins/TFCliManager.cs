@@ -323,16 +323,6 @@ namespace Agent.Plugins.Repository
             ArgUtil.NotNull(workspace, nameof(workspace));
             await RunCommandAsync("vc", "workspace", $"/remove:{workspace.Name};{workspace.Owner}");
         }
-
-        public void DownloadResources()
-        {
-            // tf.exe is always present, no need to download it
-        }
-
-        public void DeleteResources()
-        {
-            // tf.exe is always present, no need to delete it
-        }
     }
 
     ////////////////////////////////////////////////////////////////////////////////

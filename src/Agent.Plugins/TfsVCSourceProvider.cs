@@ -51,6 +51,7 @@ namespace Agent.Plugins.Repository
             else
             {
                 tf = new TeeCliManager();
+                TeeCliManager.DownloadResourcesIfAbsent(executionContext, cancellationToken);
             }
 
             tf.CancellationToken = cancellationToken;
@@ -66,8 +67,6 @@ namespace Agent.Plugins.Repository
                 ArgUtil.NotNull(endpoint, nameof(endpoint));
                 tf.Endpoint = endpoint;
             }
-
-            tf.DownloadResources();
 
             // Setup proxy.
             var agentProxy = executionContext.GetProxyConfiguration();
@@ -435,8 +434,6 @@ namespace Agent.Plugins.Repository
                 tf.CleanupProxySetting();
             }
 
-            tf.DeleteResources();
-
             // Set intra-task variable for post job cleanup
             executionContext.SetTaskVariable("repository", repository.Alias);
         }
@@ -458,6 +455,7 @@ namespace Agent.Plugins.Repository
                 else
                 {
                     tf = new TeeCliManager();
+                    TeeCliManager.DownloadResourcesIfAbsent(executionContext, CancellationToken.None);
                 }
 
                 tf.CancellationToken = CancellationToken.None;
@@ -473,8 +471,6 @@ namespace Agent.Plugins.Repository
                     ArgUtil.NotNull(endpoint, nameof(endpoint));
                     tf.Endpoint = endpoint;
                 }
-
-                tf.DownloadResources();
 
                 // Get the definition mappings.
                 var workspaceMappings = repository.Properties.Get<IList<Pipelines.WorkspaceMapping>>(Pipelines.RepositoryPropertyNames.Mappings);
@@ -540,8 +536,11 @@ namespace Agent.Plugins.Repository
                     executionContext.Debug(ex.ToString());
                     executionContext.Warning(ex.Message);
                 }
+            }
 
-                tf.DeleteResources();
+            if (!PlatformUtil.RunningOnWindows)
+            {
+                TeeCliManager.DeleteResources(executionContext);
             }
         }
 
