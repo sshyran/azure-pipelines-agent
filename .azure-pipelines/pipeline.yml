@@ -125,7 +125,9 @@ stages:
         jobName: build_linux_arm
         displayName: Linux (ARM)
         pool:
-          vmImage: ubuntu-20.04
+          name: buildDevs
+          demands: 'Agent.OSArchitecture -equals ARM'
+        container: dotnetcore_arm
         timeoutInMinutes: 75
         os: linux
         arch: arm
