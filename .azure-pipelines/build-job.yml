@@ -110,13 +110,12 @@ jobs:
         ADO_ENABLE_LOGISSUE: true
 
   - ${{ if and(parameters.unitTests, eq(parameters.arch, 'arm64')) }}:
-    # - script: sudo apt update && sudo apt install -y qemu qemu-user-static qemu-user binfmt-support && docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-    #   displayName: Setup emulator
-    # - script: docker buildx create --name testcontainer && docker buildx use testcontainer
-    #   displayName: Create Builder
-    # - script: docker buildx build --file "$(Build.SourcesDirectory)/src/DockerFile-${{ parameters.arch }}" --platform linux/${{ parameters.os }}-${{ parameters.arch }} --load -t test-${{ parameters.arch }} .
-    #   displayName: Create contianer for testing
-    - script: $(Build.SourcesDirectory)/src/setup-arm-env.sh
+    - script: sudo apt update && sudo apt install -y qemu qemu-user-static qemu-user binfmt-support && docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+      displayName: Setup emulator
+    - script: docker buildx create --name testcontainer && docker buildx use testcontainer
+      displayName: Create Builder
+    - script: docker buildx build --file "$(Build.SourcesDirectory)/src/DockerFile-${{ parameters.arch }}" --platform linux/${{ parameters.os }}-${{ parameters.arch }} --load -t test-${{ parameters.arch }} .
+      displayName: Create contianer for testing
 
   # Run l0 tests
   - ${{ if and(parameters.unitTests, ne(parameters.arch, 'arm64')) }}:
