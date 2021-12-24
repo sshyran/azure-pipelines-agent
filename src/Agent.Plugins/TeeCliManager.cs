@@ -450,10 +450,13 @@ namespace Agent.Plugins.Repository
 
         private static void CleanupFiles(AgentTaskPluginExecutionContext context)
         {
-            IOUtil.DeleteDirectory(Path.GetDirectoryName(GetTeeFilePath(context)), CancellationToken.None);
+            string teeDirectory = Path.GetDirectoryName(GetTeeFilePath(context));
+            IOUtil.DeleteDirectory(teeDirectory, CancellationToken.None);
 
             string tempDirectory = Path.Combine(context.Variables.GetValueOrDefault("Agent.TempDirectory")?.Value, TeeTempDir);
             IOUtil.DeleteDirectory(tempDirectory, CancellationToken.None);
+
+            context.Debug($"Cleaned up {teeDirectory} and {tempDirectory}");
         }
 
         ////////////////////////////////////////////////////////////////////////////////
