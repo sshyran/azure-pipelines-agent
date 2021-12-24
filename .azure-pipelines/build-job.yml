@@ -111,13 +111,20 @@ jobs:
 
   - ${{ if and(parameters.unitTests, or(eq(parameters.arch, 'arm64'), eq(parameters.arch, 'arm') ) ) }}:
     - script: sudo apt update && sudo apt install -y qemu qemu-user-static qemu-user binfmt-support && docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+      displayName: Setup emulator
     - script: docker buildx create --name testcontainer && docker buildx use testcontainer
-    - script: docker buildx build --file "$(Build.SourcesDirectory)/src/DockerFile-${{ parameters.arch }}" --platform linux/${{ parameters.os }}-${{ parameters.arch }} -t test-${{ parameters.arch }} --load .
+      displayName: Create Builder
+    - script: docker buildx build --file "$(Build.SourcesDirectory)/src/DockerFile-${{ parameters.arch }}" --platform linux/${{ parameters.os }}-${{ parameters.arch }} --load -t test-${{ parameters.arch }} .
+      displayName: Create contianer for testing
 
   # Run l0 tests
   - ${{ if and(parameters.unitTests, ne(parameters.arch, 'arm64'), ne(parameters.arch, 'arm')) }}:
     - script: ${{ variables.devCommand }} testl0 Debug ${{ parameters.os }}-${{ parameters.arch }}
       workingDirectory: src
+      displayName: Unit tests
+
+  - ${{ if and(parameters.unitTests, or(eq(parameters.arch, 'arm64'), eq(parameters.arch, 'arm') ) ) }}:
+    - script: docker run -v $(Build.SourcesDirectory)/src/Test/TestResults:/src/Test/TestResults -v $(Build.SourcesDirectory)/src/Test/TestLogs:/src/Test/TestLogs test-${{ parameters.arch }} testl0 Debug ${{ parameters.os }}-${{ parameters.arch }}
       displayName: Unit tests
 
   # Install nuget
@@ -140,7 +147,8 @@ jobs:
         displayName: Functional tests
 
   - ${{ if and(parameters.functionalTests, or(eq(parameters.arch, 'arm64'), eq(parameters.arch, 'arm') ) ) }}:
-    - script: docker run -v $(Build.SourcesDirectory)/src/Test/TestResults:/src/Test/TestResults -v $(Build.SourcesDirectory)/src/Test/TestLogs:/src/Test/TestLogs test-${{ parameters.arch }} --entrypoint './dev.sh testl1 Debug ${{ parameters.os }}-${{ parameters.arch }}'
+    - script: docker run -v $(Build.SourcesDirectory)/src/Test/TestResults:/src/Test/TestResults -v $(Build.SourcesDirectory)/src/Test/TestLogs:/src/Test/TestLogs test-${{ parameters.arch }} testl1 Debug ${{ parameters.os }}-${{ parameters.arch }}
+      displayName: Functional tests
 
   - ${{ if or(parameters.unitTests, parameters.functionalTests) }}:
     # Publish test results
