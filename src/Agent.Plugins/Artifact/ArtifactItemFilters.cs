@@ -211,6 +211,31 @@ namespace Agent.Plugins
         }
 
         /// <summary>
+        /// Returns list of FileInfo items required to be downloaded. Used by FileShareProvider.
+        /// </summary>
+        /// <param name="files">List of files detected in artifact</param>
+        /// <param name="map">Map for files in artifact collected in accordance with patterns. The map is hashtable, key is string path to file in artifact, value is bool true for all files. File with path from the hashtable is considered as required to be in list after filtering.</param>
+        /// <param name="sourcePath">Full path to artifact placed on file share</param>
+        /// <returns></returns>
+        public List<FileInfo> ApplyPatternsMapToFileShareItems(IEnumerable<FileInfo> files, Hashtable map, string sourcePath)
+        {
+            char[] trimChars = new[] { '\\', '/' };
+
+            List<FileInfo> resultItems = new List<FileInfo>();
+            foreach (FileInfo file in files)
+            {
+                var artifactName = new DirectoryInfo(sourcePath).Name;
+                string pathInArtifact = RemoveSourceDirFromPath(file, sourcePath);
+
+                if (Convert.ToBoolean(map[Path.Combine(artifactName, pathInArtifact)]))
+                {
+                    resultItems.Add(file);
+                }
+            }
+
+            return resultItems;
+        }
+
         /// Collects list of items filtered by minimather in accordance with pattern
         /// </summary>
         /// <param name="paths">List of relative paths for items detected in artifact. The relative paths start from name of artifact.</param>
@@ -231,6 +256,18 @@ namespace Agent.Plugins
         }
 
         /// <summary>
+        /// Trims source path from full path of file. Result is path to file in artifact.
+        /// E.g. file is \\FileShare\TestArtifact\TestFolder\TestFile.txt, sourcePath is \\FileShare\TestArtifact, result is TestFolder\TestFile.txt.
+        /// </summary>
+        /// <param name="file">FileInfo object with info about file in artifact</param>
+        /// <param name="sourcePath">String path to artifact on file share.</param>
+        /// <returns></returns>
+        public string RemoveSourceDirFromPath(FileInfo file, string sourcePath)
+        {
+            char[] trimChars = new[] { '\\', '/' };
+            return file.ToString().Remove(0, sourcePath.Length).TrimStart(trimChars);
+        }
+
         /// Creates copy of provided minimatcher options
         /// </summary>
         /// <param name="currentMiniMatchOptions">Existed minimatcher options for copying</param>
