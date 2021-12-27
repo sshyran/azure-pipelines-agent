@@ -296,7 +296,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Release
             }
             finally
             {
-                if (isTeeUsed && AgentKnobs.TeePluginDownloadRetryCount.GetValue(executionContext).AsBoolean())
+                if (isTeeUsed && !AgentKnobs.DisableTeePluginRemoval.GetValue(executionContext).AsBoolean())
                 {
                     TeeUtil.DeleteTee(
                         executionContext.GetVariableValueOrDefault("Agent.HomeDirectory"),
