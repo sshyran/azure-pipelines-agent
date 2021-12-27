@@ -14,6 +14,7 @@ using Xunit;
 
 namespace Microsoft.VisualStudio.Services.Agent.Tests.Worker.Build
 {
+    [Collection("Sequential")]
     public sealed class BuildDirectoryManagerL0
     {
         private const string CollectionId = "31ffacb8-b468-4e60-b2f9-c50ce437da92";

@@ -16,6 +16,7 @@ using Microsoft.VisualStudio.Services.Agent.Util;
 
 namespace Microsoft.VisualStudio.Services.Agent.Tests.Worker
 {
+    [Collection("Sequential")]
     public sealed class ExecutionContextL0
     {
         [Fact]

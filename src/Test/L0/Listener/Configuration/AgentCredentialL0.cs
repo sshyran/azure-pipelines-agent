@@ -5,9 +5,11 @@ using Microsoft.VisualStudio.Services.Agent.Listener;
 using Microsoft.VisualStudio.Services.Agent.Listener.Configuration;
 using Microsoft.VisualStudio.Services.Client;
 using Microsoft.VisualStudio.Services.Common;
+using Xunit;
 
 namespace Microsoft.VisualStudio.Services.Agent.Tests.Listener.Configuration
 {
+    [Collection("Sequential")]
     public class TestAgentCredential : CredentialProvider
     {
         public TestAgentCredential(): base("TEST") {}

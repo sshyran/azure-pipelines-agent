@@ -10,6 +10,7 @@ using Xunit;
 
 namespace Microsoft.VisualStudio.Services.Agent.Tests
 {
+    [Collection("Sequential")]
     public sealed class ProxyConfigL0
     {
         private static readonly Regex NewHttpClientHandlerRegex = new Regex("New\\s+HttpClientHandler\\s*\\(", RegexOptions.Compiled | RegexOptions.IgnoreCase);

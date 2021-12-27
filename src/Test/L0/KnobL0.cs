@@ -11,6 +11,7 @@ using Moq;
 
 namespace Microsoft.VisualStudio.Services.Agent.Tests
 {
+    [Collection("Sequential")]
     public sealed class KnobL0
     {
 

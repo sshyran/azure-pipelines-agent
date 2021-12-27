@@ -21,6 +21,7 @@ using Xunit;
 
 namespace Microsoft.VisualStudio.Services.Agent.Tests
 {
+    [Collection("Sequential")]
     public class TestFileShareProviderL0
     {
         private const string TestSourceFolder = "sourceFolder";

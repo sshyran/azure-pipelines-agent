@@ -7,6 +7,7 @@ using Xunit;
 
 namespace Microsoft.VisualStudio.Services.Agent.Tests.Worker.Build
 {
+    [Collection("Sequential")]
     public sealed class TfsVCSourceProviderL0
     {
         [Fact]

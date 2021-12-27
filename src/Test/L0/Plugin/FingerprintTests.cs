@@ -7,6 +7,7 @@ using Xunit;
 
 namespace Microsoft.VisualStudio.Services.Agent.Tests.PipelineCache
 {
+    [Collection("Sequential")]
     public class FingerprintTests
     {
         private static void AssertBothOrders<T>(Action<T, T> assert, T t1, T t2)

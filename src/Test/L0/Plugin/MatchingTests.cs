@@ -12,6 +12,7 @@ using Xunit;
 
 namespace Microsoft.VisualStudio.Services.Agent.Tests.PipelineCache
 {
+    [Collection("Sequential")]
     public class MatchingTests
     {
         private static readonly bool IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);

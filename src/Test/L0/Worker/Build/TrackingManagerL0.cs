@@ -18,6 +18,7 @@ using Agent.Sdk.Knob;
 
 namespace Microsoft.VisualStudio.Services.Agent.Tests.Worker.Build
 {
+    [Collection("Sequential")]
     public sealed class TrackingManagerL0
     {
         private const string CollectionId = "226466ab-342b-4ca4-bbee-0b87154d4936";

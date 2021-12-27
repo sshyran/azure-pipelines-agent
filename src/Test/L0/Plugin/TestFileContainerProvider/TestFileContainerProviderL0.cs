@@ -14,6 +14,7 @@ using Xunit;
 
 namespace Microsoft.VisualStudio.Services.Agent.Tests
 {
+    [Collection("Sequential")]
     public class TestFileContainerProviderL0
     {
         [Theory]

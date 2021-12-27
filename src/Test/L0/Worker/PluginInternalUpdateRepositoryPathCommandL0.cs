@@ -13,6 +13,7 @@ using Xunit;
 
 namespace Test.L0.Worker
 {
+    [Collection("Sequential")]
     public class PluginInternalUpdateRepositoryPathCommandL0
     {
         [Fact]

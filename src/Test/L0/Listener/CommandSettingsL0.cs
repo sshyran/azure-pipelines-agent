@@ -15,6 +15,7 @@ using System.Linq;
 
 namespace Microsoft.VisualStudio.Services.Agent.Tests
 {
+    [Collection("Sequential")]
     public sealed class CommandSettingsL0
     {
         private readonly Mock<IPromptManager> _promptManager = new Mock<IPromptManager>();

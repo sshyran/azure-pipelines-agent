@@ -6,6 +6,7 @@ using Xunit;
 
 namespace Microsoft.VisualStudio.Services.Agent.Tests.Listener.Configuration
 {
+    [Collection("Sequential")]
     public sealed class ArgumentValidatorTestsL0
     {
         [Fact]

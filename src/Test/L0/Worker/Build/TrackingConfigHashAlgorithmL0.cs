@@ -11,6 +11,7 @@ using Xunit;
 
 namespace Microsoft.VisualStudio.Services.Agent.Tests.Worker.Build
 {
+    [Collection("Sequential")]
     public sealed class TrackingConfigHashAlgorithmL0
     {
         // This test is the original test case and is kept to make sure back compat still works.

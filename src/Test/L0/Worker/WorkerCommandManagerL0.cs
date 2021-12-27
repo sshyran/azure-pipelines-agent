@@ -5,6 +5,7 @@ using Xunit;
 
 namespace Microsoft.VisualStudio.Services.Agent.Tests.Worker
 {
+    [Collection("Sequential")]
     public sealed class WorkerCommandManagerL0
     {
 

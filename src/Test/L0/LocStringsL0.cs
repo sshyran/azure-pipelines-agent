@@ -11,6 +11,7 @@ using System;
 
 namespace Microsoft.VisualStudio.Services.Agent.Tests
 {
+    [Collection("Sequential")]
     public sealed class LocStringsL0
     {
         private static readonly Regex ValidKeyRegex = new Regex("^[_a-zA-Z0-9]+$");

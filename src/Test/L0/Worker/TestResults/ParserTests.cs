@@ -16,6 +16,7 @@ using Microsoft.VisualStudio.Services.Agent.Worker.TestResults.Utils;
 
 namespace Microsoft.VisualStudio.Services.Agent.Tests.Worker.TestResults
 {
+    [Collection("Sequential")]
     public class ParserTests
     {
         private Mock<IExecutionContext> _ec;

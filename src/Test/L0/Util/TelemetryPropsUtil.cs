@@ -9,6 +9,7 @@ using Xunit;
 
 namespace Test.L0.Util
 {
+    [Collection("Sequential")]
     class TelemetryPropsUtil
     {
         public static void AssertPipelineData(Dictionary<string, Object> telemetryProps)

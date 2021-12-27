@@ -16,6 +16,7 @@ using Microsoft.VisualStudio.Services.Agent.Util;
 
 namespace Microsoft.VisualStudio.Services.Agent.Tests.Listener
 {
+    [Collection("Sequential")]
     public sealed class AgentL0
     {
         private Mock<IConfigurationManager> _configurationManager;

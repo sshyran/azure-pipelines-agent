@@ -13,6 +13,7 @@ using Xunit;
 
 namespace Microsoft.VisualStudio.Services.Agent.Tests.Listener
 {
+    [Collection("Sequential")]
     public sealed class AgentCapabilitiesProviderTestL0
     {
         [Fact]

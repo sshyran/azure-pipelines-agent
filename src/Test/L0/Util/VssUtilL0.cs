@@ -11,6 +11,7 @@ using System.Text.RegularExpressions;
 
 namespace Microsoft.VisualStudio.Services.Agent.Tests.Util
 {
+    [Collection("Sequential")]
     public sealed class VssUtilL0
     {
         [Fact]

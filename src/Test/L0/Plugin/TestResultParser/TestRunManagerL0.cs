@@ -12,6 +12,7 @@ using ITestRunPublisher = Agent.Plugins.Log.TestResultParser.Contracts.ITestRunP
 
 namespace Test.L0.Plugin.TestResultParser
 {
+    [Collection("Sequential")]
     public class TestRunManagerL0
     {
         [Fact]

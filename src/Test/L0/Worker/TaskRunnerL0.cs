@@ -14,7 +14,7 @@ using Microsoft.TeamFoundation.DistributedTask.WebApi;
 
 namespace Microsoft.VisualStudio.Services.Agent.Tests.Worker
 {
-
+    [Collection("Sequential")]
     public sealed class TaskRunnerL0
     {
 

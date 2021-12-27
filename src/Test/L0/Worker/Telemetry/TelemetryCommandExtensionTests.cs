@@ -14,6 +14,7 @@ using Xunit;
 
 namespace Microsoft.VisualStudio.Services.Agent.Tests.Worker.Telemetry
 {
+    [Collection("Sequential")]
     public class TelemetryCommandExtensionTests
     {
         private Mock<IExecutionContext> _ec;

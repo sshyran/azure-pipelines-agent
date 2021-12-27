@@ -14,6 +14,7 @@ using Pipelines = Microsoft.TeamFoundation.DistributedTask.Pipelines;
 
 namespace Microsoft.VisualStudio.Services.Agent.Tests.Worker
 {
+    [Collection("Sequential")]
     public sealed class WorkerL0
     {
         private Mock<IProcessChannel> _processChannel;

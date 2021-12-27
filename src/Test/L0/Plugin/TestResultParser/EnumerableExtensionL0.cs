@@ -8,6 +8,7 @@ using Xunit;
 
 namespace Test.L0.Plugin.TestResultParser
 {
+    [Collection("Sequential")]
     public class EnumerableExtensionL0
     {
         [Fact]

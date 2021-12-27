@@ -24,6 +24,7 @@ using Microsoft.VisualStudio.Services.Agent.Listener.Diagnostics;
 
 namespace Microsoft.VisualStudio.Services.Agent.Tests
 {
+    [Collection("Sequential")]
     public sealed class ServiceInterfacesL0
     {
         [Fact]

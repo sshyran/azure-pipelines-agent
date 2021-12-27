@@ -8,6 +8,7 @@ using Xunit;
 
 namespace Microsoft.VisualStudio.Services.Agent.Tests.Worker.Container
 {
+    [Collection("Sequential")]
     public sealed class DockerUtilL0
     {
         [Fact]

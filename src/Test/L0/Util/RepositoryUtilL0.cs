@@ -11,6 +11,7 @@ using Xunit;
 
 namespace Microsoft.VisualStudio.Services.Agent.Tests.Util
 {
+    [Collection("Sequential")]
     public sealed class RepositoryUtilL0
     {
         [Fact]
