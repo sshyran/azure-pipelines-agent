@@ -297,6 +297,7 @@ namespace Agent.Sdk.Knob
         public static readonly Knob TeePluginDownloadRetryCount = new Knob(
             nameof(TeePluginDownloadRetryCount),
             "Number of times to retry downloading TEE plugin",
+            new RuntimeKnobSource("DISABLE_TEE_PLUGIN_REMOVAL"),
             new EnvironmentKnobSource("TEE_PLUGIN_DOWNLOAD_RETRY_COUNT"),
             new BuiltInDefaultKnobSource("3"));
     }
