@@ -51,7 +51,6 @@ namespace Agent.Plugins.Repository
             else
             {
                 tf = new TeeCliManager();
-                TeeCliManager.DownloadResourcesIfAbsent(executionContext, cancellationToken);
             }
 
             tf.CancellationToken = cancellationToken;
@@ -455,7 +454,6 @@ namespace Agent.Plugins.Repository
                 else
                 {
                     tf = new TeeCliManager();
-                    TeeCliManager.DownloadResourcesIfAbsent(executionContext, CancellationToken.None);
                 }
 
                 tf.CancellationToken = CancellationToken.None;

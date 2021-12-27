@@ -4,17 +4,13 @@
 using Agent.Sdk;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
-using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using Microsoft.VisualStudio.Services.Agent.Util;
-using Agent.Sdk.Knob;
 
 namespace Agent.Plugins.Repository
 {
@@ -26,11 +22,7 @@ namespace Agent.Plugins.Repository
 
         public static readonly int RetriesOnFailure = 3;
 
-        public string FilePath => GetTeeFilePath(ExecutionContext);
-
-        private static readonly string TeeTempDir = "tee_temp_dir";
-
-        private static readonly string TeeUrl = "https://vstsagenttools.blob.core.windows.net/tools/tee/14_135_0/TEE-CLC-14.135.0.zip";
+        public string FilePath => Path.Combine(ExecutionContext.Variables.GetValueOrDefault("agent.homedirectory")?.Value, "externals", "tee", "tf");
 
         // TODO: Remove AddAsync after last-saved-checkin-metadata problem is fixed properly.
         public async Task AddAsync(string localPath)
@@ -341,122 +333,6 @@ namespace Agent.Plugins.Repository
             }
 
             return output;
-        }
-
-        private static string GetTeeFilePath(AgentTaskPluginExecutionContext context)
-        {
-            return Path.Combine(context.Variables.GetValueOrDefault("agent.homedirectory")?.Value, "externals", "tee", "tf");
-        }
-
-        // Download TEE if absent
-        public static void DownloadResourcesIfAbsent(AgentTaskPluginExecutionContext context, CancellationToken cancellationToken)
-        {
-            string teeFilePath = GetTeeFilePath(context);
-
-            if (Directory.Exists(Path.GetDirectoryName(teeFilePath)))
-            {
-                return;
-            }
-
-            int providedDownloadRetryCount = AgentKnobs.TeePluginDownloadRetryCount.GetValue(context).AsInt();
-            int downloadRetryCount = Math.Max(providedDownloadRetryCount, 3);
-
-            for (int downloadAttempt = 1; downloadAttempt <= downloadRetryCount; downloadAttempt++)
-            {
-                try
-                {
-                    context.Debug($"Trying to download and extract TEE. Attempt: {downloadAttempt}");
-                    DownloadAndExtractTee(context, cancellationToken);
-                    break;
-                }
-                catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
-                {
-                    context.Info("TEE download has been cancelled.");
-                    break;
-                }
-                catch (Exception ex) when (downloadAttempt != downloadRetryCount)
-                {
-                    context.Warning($"Failed to download TEE. Error: {ex.ToString()}");
-                }
-            }
-        }
-
-        private static void DownloadAndExtractTee(AgentTaskPluginExecutionContext context, CancellationToken cancellationToken)
-        {
-            string tempDirectory = Path.Combine(context.Variables.GetValueOrDefault("Agent.TempDirectory")?.Value, TeeTempDir);
-            IOUtil.DeleteDirectory(tempDirectory, CancellationToken.None);
-            Directory.CreateDirectory(tempDirectory);
-
-            string zipPath = Path.Combine(tempDirectory, $"{Guid.NewGuid().ToString()}.zip");
-            DownloadTee(zipPath, context, cancellationToken).GetAwaiter().GetResult();
-
-            context.Debug($"Downloaded {zipPath}");
-
-            string extractedTeePath = Path.Combine(tempDirectory, $"{Guid.NewGuid().ToString()}");
-            ZipFile.ExtractToDirectory(zipPath, extractedTeePath);
-
-            context.Debug($"Extracted {zipPath} to ${extractedTeePath}");
-
-            string extractedTeeDestinationPath = Path.GetDirectoryName(GetTeeFilePath(context));
-            Directory.Move(Path.Combine(extractedTeePath, "TEE-CLC-14.135.0"), extractedTeeDestinationPath);
-
-            context.Debug($"Moved to ${extractedTeeDestinationPath}");
-
-            IOUtil.DeleteDirectory(tempDirectory, CancellationToken.None);
-
-            // We have to set these files as executable because ZipFile.ExtractToDirectory does not set file permissions
-            SetPermissions(Path.Combine(extractedTeeDestinationPath, "tf"), "a+x");
-            SetPermissions(Path.Combine(extractedTeeDestinationPath, "native"), "a+x", recursive: true);
-        }
-
-        private static async Task DownloadTee(string zipPath, AgentTaskPluginExecutionContext context, CancellationToken cancellationToken)
-        {
-            using (var client = new WebClient())
-            using (var registration = cancellationToken.Register(client.CancelAsync))
-            {
-                client.DownloadProgressChanged +=
-                    (_, progressEvent) => context.Debug($"TEE download progress: {progressEvent.ProgressPercentage}%.");
-                await client.DownloadFileTaskAsync(new Uri(TeeUrl), zipPath);
-            }
-        }
-
-        private static void SetPermissions(string path, string permissions, bool recursive = false)
-        {
-            var chmodProcessInfo = new ProcessStartInfo("chmod")
-            {
-                Arguments = $"{permissions} {(recursive ? "-R" : "")} {path}",
-                UseShellExecute = false,
-                RedirectStandardError = true
-            };
-            Process chmodProcess = Process.Start(chmodProcessInfo);
-            chmodProcess.WaitForExit();
-
-            string chmodStderr = chmodProcess.StandardError.ReadToEnd();
-            if (chmodStderr.Length != 0 || chmodProcess.ExitCode != 0)
-            {
-                throw new Exception($"Failed to set {path} permissions to {permissions} (recursive: {recursive}). Exit code: {chmodProcess.ExitCode}; stderr: {chmodStderr}");
-            }
-        }
-
-        public static void DeleteResources(AgentTaskPluginExecutionContext context)
-        {
-            if (AgentKnobs.DisableTeePluginRemoval.GetValue(context).AsBoolean())
-            {
-                return;
-            }
-
-            CleanupFiles(context);
-        }
-
-        private static void CleanupFiles(AgentTaskPluginExecutionContext context)
-        {
-            string teeDirectory = Path.GetDirectoryName(GetTeeFilePath(context));
-            IOUtil.DeleteDirectory(teeDirectory, CancellationToken.None);
-
-            string tempDirectory = Path.Combine(context.Variables.GetValueOrDefault("Agent.TempDirectory")?.Value, TeeTempDir);
-            IOUtil.DeleteDirectory(tempDirectory, CancellationToken.None);
-
-            context.Debug($"Cleaned up {teeDirectory} and {tempDirectory}");
         }
 
         ////////////////////////////////////////////////////////////////////////////////

@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Agent.Sdk;
+using Agent.Sdk.Knob;
 using Microsoft.TeamFoundation.DistributedTask.WebApi;
 using Microsoft.VisualStudio.Services.Agent.Util;
 using Newtonsoft.Json.Linq;
@@ -184,6 +185,17 @@ namespace Agent.Plugins.Repository
                 repo.Properties.Set<string>(Pipelines.RepositoryPropertyNames.Path, expectRepoPath);
             }
 
+            if (!PlatformUtil.RunningOnWindows && string.Equals(repo.Type, Pipelines.RepositoryTypes.Tfvc, StringComparison.OrdinalIgnoreCase))
+            {
+                TeeUtil.DownloadTeeIfAbsent(
+                    executionContext.Variables.GetValueOrDefault("Agent.HomeDirectory")?.Value,
+                    executionContext.Variables.GetValueOrDefault("Agent.TempDirectory")?.Value,
+                    AgentKnobs.TeePluginDownloadRetryCount.GetValue(executionContext).AsInt(),
+                    executionContext.Debug,
+                    token
+                );
+            }
+
             ISourceProvider sourceProvider = SourceProviderFactory.GetSourceProvider(repo.Type);
             await sourceProvider.GetSourceAsync(executionContext, repo, token);
         }
@@ -207,9 +219,13 @@ namespace Agent.Plugins.Repository
                 await sourceProvider.PostJobCleanupAsync(executionContext, repo);
             }
 
-            if (!PlatformUtil.RunningOnWindows)
+            if (!PlatformUtil.RunningOnWindows && !AgentKnobs.DisableTeePluginRemoval.GetValue(executionContext).AsBoolean())
             {
-                TeeCliManager.DeleteResources(executionContext);
+                TeeUtil.DeleteTee(
+                    executionContext.Variables.GetValueOrDefault("Agent.HomeDirectory")?.Value,
+                    executionContext.Variables.GetValueOrDefault("Agent.TempDirectory")?.Value,
+                    executionContext.Debug
+                );
             }
         }
     }
