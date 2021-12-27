@@ -20,7 +20,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
         public static void DownloadTeeIfAbsent(
             string agentHomeDirectory,
             string agentTempDirectory,
-            int downloadRetryCount,
+            int providedDownloadRetryCount,
             Action<string> debug,
             CancellationToken cancellationToken
         ) {
@@ -29,8 +29,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
                 return;
             }
 
-            // int providedDownloadRetryCount = AgentKnobs.TeePluginDownloadRetryCount.GetValue(context).AsInt();
-            // int downloadRetryCount = Math.Max(providedDownloadRetryCount, 3);
+            int downloadRetryCount = Math.Min(Math.Max(providedDownloadRetryCount, 3), 10);
 
             for (int downloadAttempt = 1; downloadAttempt <= downloadRetryCount; downloadAttempt++)
             {
