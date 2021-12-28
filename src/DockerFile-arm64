@@ -8,7 +8,7 @@ COPY /_layout /_layout
 
 WORKDIR /src
 RUN apt update -y
-RUN apt install qemu -y qemu-system-arm
-RUN qemu-system-arm -append 'root=/dev/vda console=ttyS0' -drive file='rootfs.ext2.qcow2,if=virtio,format=qcow2'  -enable-kvm -kernel 'bzImage' -nographic
+# RUN apt install qemu -y qemu-system-arm
+# RUN qemu-system-arm -append 'root=/dev/vda console=ttyS0' -drive file='rootfs.ext2.qcow2,if=virtio,format=qcow2'  -enable-kvm -kernel 'bzImage' -nographic
 RUN apt install unzip
 ENTRYPOINT ["./dev.sh"]
