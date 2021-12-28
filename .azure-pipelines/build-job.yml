@@ -111,9 +111,7 @@ jobs:
 
   - ${{ if and(parameters.unitTests, eq(parameters.arch, 'arm64')) }}:
     - script: sudo apt-get install qemu-system-arm qemu-efi
-    - script: dd if=/dev/zero of=flash0.img bs=1M count=64
-    - script: dd if=/usr/share/qemu-efi/QEMU_EFI.fd of=flash0.img conv=notrunc
-    - script: dd if=/dev/zero of=flash1.img bs=1M count=64
+    - script: dd if=/dev/zero of=flash0.img bs=1M count=64 && dd if=/usr/share/qemu-efi/QEMU_EFI.fd of=flash0.img conv=notrunc && dd if=/dev/zero of=flash1.img bs=1M count=64
     - script: sudo qemu-system-aarch64 -m 1024 -cpu cortex-a57 -M virt -nographic -pflash flash0.img -pflash flash1.img -drive if=none,file=vivid-server-cloudimg-arm64-uefi1.img,id=hd0 -device virtio-blk-device,drive=hd0 -netdev type=tap,id=net0 -device virtio-net-device,netdev=net0,mac=$randmac
     - script: sudo apt update && sudo apt install -y qemu qemu-user-static qemu-user binfmt-support && docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
       displayName: Setup emulator
