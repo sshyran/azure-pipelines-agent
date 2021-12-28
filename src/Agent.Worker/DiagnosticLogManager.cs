@@ -113,7 +113,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
                 string resultLogs = await DumpCloudInitLogs(jobStartTimeUtc, HostContext.GetDirectory(WellKnownDirectory.Diag));
                 executionContext.Debug(resultLogs);
 
-                executionContext.Debug("Dumping cloud-init logs is finished.");
+                executionContext.Debug("Dumping cloud-init logs is ended.");
             }
 
             executionContext.Debug("Zipping diagnostic files.");
