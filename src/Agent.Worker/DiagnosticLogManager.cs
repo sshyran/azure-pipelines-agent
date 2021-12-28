@@ -152,7 +152,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
         {
             var builder = new StringBuilder();
             string cloudInit = WhichUtil.Which("cloud-init", trace: Trace);
-            if (string.IsNullOrEmpty(cloudInit)) return "Cloud-init ins't found on current machine.";
+            if (string.IsNullOrEmpty(cloudInit)) return "Cloud-init isn't found on current machine.";
 
             string resultName = $"cloudinit-{jobStartTimeUtc.ToString("yyyyMMdd-HHmmss")}-logs.tar.gz";
             string arguments = $"collect-logs -t \"{diagFolder}/{resultName}\"";
@@ -169,7 +169,6 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
                     processInvoker.ErrorDataReceived += (object sender, ProcessDataReceivedEventArgs args) =>
                     {
                         builder.AppendLine(args.Data);
-
                     };
 
                     await processInvoker.ExecuteAsync(
