@@ -10,7 +10,6 @@ using Xunit;
 
 namespace Test.L0.Plugin.TestFilePublisher
 {
-    [Collection("Sequential")]
     public class TestFileFinderL0
     {
         [Fact]

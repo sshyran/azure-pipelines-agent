@@ -152,7 +152,6 @@ jobs:
 
   - ${{ if or(parameters.unitTests, parameters.functionalTests) }}:
     # Publish test results
-    - script: grep "Killed process" /var/log/syslog
     - task: PublishTestResults@2
       displayName: Publish Test Results **/*.trx
       inputs:

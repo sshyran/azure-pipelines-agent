@@ -17,7 +17,6 @@ using Test.L0.Util;
 
 namespace Test.L0.Plugin.TestFilePublisher
 {
-    [Collection("Sequential")]
     public class TestFilePublisherLogPluginL0
     {
         [Fact]

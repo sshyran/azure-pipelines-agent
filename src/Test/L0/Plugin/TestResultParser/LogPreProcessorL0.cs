@@ -6,7 +6,6 @@ using Xunit;
 
 namespace Test.L0.Plugin.TestResultParser
 {
-    [Collection("Sequential")]
     public class LogPreProcessorL0
     {
         [Fact]

@@ -19,7 +19,6 @@ using Pipelines = Microsoft.TeamFoundation.DistributedTask.Pipelines;
 
 namespace Microsoft.VisualStudio.Services.Agent.Tests.Plugin
 {
-    [Collection("Sequential")]
     public sealed class RepositoryPluginL0
     {
         private CheckoutTask _checkoutTask;

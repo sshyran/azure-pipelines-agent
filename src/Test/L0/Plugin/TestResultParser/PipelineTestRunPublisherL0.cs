@@ -17,7 +17,6 @@ using TestRun = Agent.Plugins.Log.TestResultParser.Contracts.TestRun;
 
 namespace Test.L0.Plugin.TestResultParser
 {
-    [Collection("Sequential")]
     public class PipelineTestRunPublisherL0
     {
         private PipelineConfig _pipelineConfig;

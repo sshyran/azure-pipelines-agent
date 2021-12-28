@@ -13,7 +13,6 @@ using Xunit;
 
 namespace Microsoft.VisualStudio.Services.Agent.Tests.Worker.Build
 {
-    [Collection("Sequential")]
     public sealed class TfsVCSourceProvider_WorkspaceUtilL0
     {
         private TfsVCSourceProvider.DefinitionWorkspaceMapping[] _definitionMappings;

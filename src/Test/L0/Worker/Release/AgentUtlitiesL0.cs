@@ -10,7 +10,6 @@ using Xunit;
 
 namespace Test.L0.Worker.Release
 {
-    [Collection("Sequential")]
     public sealed class AgentUtlitiesL0
     {
         [Fact]

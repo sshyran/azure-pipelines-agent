@@ -10,7 +10,6 @@ using Moq;
 
 namespace Microsoft.VisualStudio.Services.Agent.Tests
 {
-    [Collection("Sequential")]
     public sealed class HostContextExtensionL0
     {
         [Fact]

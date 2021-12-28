@@ -16,7 +16,6 @@ using System.Collections.Generic;
 
 namespace Microsoft.VisualStudio.Services.Agent.Tests.Listener
 {
-    [Collection("Sequential")]
     public sealed class MessageListenerL0
     {
         private AgentSettings _settings;

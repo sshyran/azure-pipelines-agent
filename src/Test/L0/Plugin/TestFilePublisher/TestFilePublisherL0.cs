@@ -20,7 +20,6 @@ using TestRun = Microsoft.TeamFoundation.TestManagement.WebApi.TestRun;
 
 namespace Test.L0.Plugin.TestFilePublisher
 {
-    [Collection("Sequential")]
     public class TestFilePublisherL0
     {
         [Fact]

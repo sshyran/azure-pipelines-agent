@@ -8,7 +8,6 @@ using System.Diagnostics;
 
 namespace Microsoft.VisualStudio.Services.Agent.Tests.PipelineCaching
 {
-    [Collection("Sequential")]
     public  class TarUtilsL0 {
         [Fact]
         [Trait("Level", "L0")]

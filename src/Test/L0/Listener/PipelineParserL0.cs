@@ -17,7 +17,6 @@ using Yaml = Microsoft.TeamFoundation.DistributedTask.Orchestration.Server.Pipel
 
 namespace Microsoft.VisualStudio.Services.Agent.Tests.Listener
 {
-    [Collection("Sequential")]
     public sealed class PipelineParserL0
     {
         [Fact]

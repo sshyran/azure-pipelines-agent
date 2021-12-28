@@ -17,7 +17,6 @@ using Test.L0.Util;
 
 namespace Test.L0.Plugin.TestResultParser
 {
-    [Collection("Sequential")]
     public class TestResultLogPluginL0
     {
         [Fact]

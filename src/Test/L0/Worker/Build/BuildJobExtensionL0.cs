@@ -17,7 +17,6 @@ using Agent.Sdk;
 
 namespace Microsoft.VisualStudio.Services.Agent.Tests.Worker.Build
 {
-    [Collection("Sequential")]
     public sealed class BuildJobExtensionL0
     {
         private Mock<IExecutionContext> _ec;

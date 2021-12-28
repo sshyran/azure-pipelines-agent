@@ -17,7 +17,6 @@ using Xunit;
 
 namespace Microsoft.VisualStudio.Services.Agent.Tests.Worker.Release
 {
-    [Collection("Sequential")]
     public sealed class TfsGitArtifactL0
     {
         private Mock<IExecutionContext> _ec;

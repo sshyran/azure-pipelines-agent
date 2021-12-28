@@ -15,7 +15,6 @@ using System.Linq;
 
 namespace Microsoft.VisualStudio.Services.Agent.Tests.Worker
 {
-    [Collection("Sequential")]
     public sealed class AgentPluginManagerL0
     {
         private class AgentPluginTaskTest

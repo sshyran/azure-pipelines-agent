@@ -10,7 +10,6 @@ using Xunit;
 
 namespace Test.L0.Worker.Release
 {
-    [Collection("Sequential")]
     public sealed class ReleaseDirectoryManagerL0
     {
         private const string StubCollectionId = "1234-5678";

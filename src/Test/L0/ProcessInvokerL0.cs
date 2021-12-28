@@ -13,7 +13,6 @@ using Microsoft.TeamFoundation.Framework.Common;
 
 namespace Microsoft.VisualStudio.Services.Agent.Tests
 {
-    [Collection("Sequential")]
     public sealed class ProcessInvokerL0
     {
         [Fact]

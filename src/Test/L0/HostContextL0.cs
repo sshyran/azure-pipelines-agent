@@ -9,7 +9,6 @@ using Xunit;
 
 namespace Microsoft.VisualStudio.Services.Agent.Tests
 {
-    [Collection("Sequential")]
     public sealed class HostContextL0
     {
         [Fact]

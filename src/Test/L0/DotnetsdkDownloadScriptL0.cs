@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 
 namespace Microsoft.VisualStudio.Services.Agent.Tests
 {
-    [Collection("Sequential")]
     public sealed class DotnetsdkDownloadScriptL0
     {
         [Fact]

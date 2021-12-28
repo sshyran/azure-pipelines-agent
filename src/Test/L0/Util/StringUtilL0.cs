@@ -7,7 +7,6 @@ using Xunit;
 
 namespace Microsoft.VisualStudio.Services.Agent.Tests.Util
 {
-    [Collection("Sequential")]
     public class StringUtilL0
     {
         [Fact]

@@ -22,7 +22,6 @@ using Xunit;
 
 namespace Microsoft.VisualStudio.Services.Agent.Tests.Worker.Release
 {
-    [Collection("Sequential")]
     public sealed class TfsVCArtifactL0
     {
         private Mock<IExecutionContext> _ec;

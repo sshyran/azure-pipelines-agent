@@ -11,7 +11,6 @@ using Xunit;
 
 namespace Microsoft.VisualStudio.Services.Agent.Tests.Listener
 {
-    [Collection("Sequential")]
     public sealed class UserCapabilitiesProviderTestL0
     {
         [Fact]

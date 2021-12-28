@@ -11,7 +11,6 @@ using Xunit;
 
 namespace Microsoft.VisualStudio.Services.Agent.Tests
 {
-    [Collection("Sequential")]
     public sealed class SecretMaskerL0
     {
         private ISecretMasker initSecretMasker()

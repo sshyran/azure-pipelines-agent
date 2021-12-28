@@ -12,7 +12,6 @@ using Agent.Sdk.Knob;
 
 namespace Microsoft.VisualStudio.Services.Agent.Tests
 {
-    [Collection("Sequential")]
     public sealed class VstsAgentWebProxyL0
     {
         [Fact]

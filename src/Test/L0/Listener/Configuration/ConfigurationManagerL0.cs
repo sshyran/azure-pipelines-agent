@@ -20,7 +20,6 @@ using Microsoft.VisualStudio.Services.Common;
 
 namespace Microsoft.VisualStudio.Services.Agent.Tests.Listener.Configuration
 {
-    [Collection("Sequential")]
     public sealed class ConfigurationManagerL0 : IDisposable
     {
         private Mock<IAgentServer> _agentServer;

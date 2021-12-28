@@ -19,7 +19,6 @@ using Xunit;
 
 namespace Microsoft.VisualStudio.Services.Agent.Tests.Worker.TestResults
 {
-    [Collection("Sequential")]
     public sealed class ResultsCommandTests
     {
         private Mock<IExecutionContext> _ec;

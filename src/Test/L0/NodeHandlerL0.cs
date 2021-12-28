@@ -15,7 +15,6 @@ using Agent.Sdk;
 
 namespace Microsoft.VisualStudio.Services.Agent.Tests
 {
-    [Collection("Sequential")]
     public sealed class NodeHandlerL0
     {
         [Fact]

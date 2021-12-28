@@ -15,7 +15,6 @@ using Xunit;
 
 namespace Microsoft.VisualStudio.Services.Agent.Tests.Worker.CodeCoverage
 {
-    [Collection("Sequential")]
     public class CodeCoverageCommandExtensionTests
     {
         private Mock<IExecutionContext> _ec;

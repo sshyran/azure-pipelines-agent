@@ -10,7 +10,6 @@ using Agent.Sdk;
 
 namespace Microsoft.VisualStudio.Services.Agent.Tests.Worker.Container
 {
-    [Collection("Sequential")]
     public sealed class ContainerInfoL0
     {
         private class MountVolumeTest

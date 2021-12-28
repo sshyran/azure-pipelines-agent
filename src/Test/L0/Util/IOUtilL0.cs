@@ -11,7 +11,6 @@ using Xunit;
 
 namespace Microsoft.VisualStudio.Services.Agent.Tests.Util
 {
-    [Collection("Sequential")]
     public sealed class IOUtilL0
     {
         [Fact]

@@ -12,7 +12,6 @@ using Microsoft.TeamFoundation.DistributedTask.Expressions;
 
 namespace Microsoft.VisualStudio.Services.Agent.Tests.Worker
 {
-    [Collection("Sequential")]
     public sealed class ExpressionManagerL0
     {
         private Mock<IExecutionContext> _ec;
