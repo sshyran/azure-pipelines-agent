@@ -108,8 +108,8 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             // Copy event logs for windows machines
             if (PlatformUtil.RunningOnWindows)
             {
-                executionContext.Debug("Dumping event viewer logs.");
-                await DumpEventLogs(executionContext, HostContext.GetDirectory(WellKnownDirectory.Diag), jobStartTimeUtc);
+                executionContext.Debug("Dumping event viewer logs for current job.");
+                await DumpCurrentJobEventLogs(executionContext, HostContext.GetDirectory(WellKnownDirectory.Diag), jobStartTimeUtc);
             }
 
             executionContext.Debug("Zipping diagnostic files.");
@@ -354,7 +354,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             return builder.ToString();
         }
 
-        private async Task DumpEventLogs(IExecutionContext executionContext, string diagFolder, DateTime jobStartTimeUtc)
+        private async Task DumpCurrentJobEventLogs(IExecutionContext executionContext, string diagFolder, DateTime jobStartTimeUtc)
         {
             try
             {
