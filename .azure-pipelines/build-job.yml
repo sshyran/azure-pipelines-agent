@@ -124,7 +124,7 @@ jobs:
       displayName: Unit tests
 
   - ${{ if and(parameters.unitTests, eq(parameters.arch, 'arm64')) }}:
-    - script: docker run -v /usr/bin/qemu-arm-static:/usr/bin/qemu-arm-static -v /usr/bin/qemu-arm-static:/usr/bin/qemu-arm-static -v $(Build.SourcesDirectory)/src/Test/TestResults:/src/Test/TestResults -v $(Build.SourcesDirectory)/src/Test/TestLogs:/src/Test/TestLogs test-${{ parameters.arch }} testl0 Debug ${{ parameters.os }}-${{ parameters.arch }}
+    - script: docker run -v $(Build.SourcesDirectory)/src/Test/TestResults:/src/Test/TestResults -v $(Build.SourcesDirectory)/src/Test/TestLogs:/src/Test/TestLogs test-${{ parameters.arch }} testl0 Debug ${{ parameters.os }}-${{ parameters.arch }}
       displayName: Unit tests
 
   # Install nuget
