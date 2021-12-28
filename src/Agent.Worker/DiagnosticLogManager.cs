@@ -105,11 +105,11 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
                 File.Copy(agentLogFile, destination);
             }
 
-            // Copy event logs for windows machines            
+            // Copy event logs for windows machines
             if (PlatformUtil.RunningOnWindows)
             {
                 executionContext.Debug("Dumping event viewer logs.");
-                Task<string> eventLogs = DumpEventLogs(jobStartTimeUtc, HostContext.GetDirectory(WellKnownDirectory.Diag));
+                Task<string> eventLogs = DumpEventLogs(HostContext.GetDirectory(WellKnownDirectory.Diag), jobStartTimeUtc);
             }
 
             executionContext.Debug("Zipping diagnostic files.");
@@ -354,11 +354,15 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             return builder.ToString();
         }
 
-        private async Task<string> DumpEventLogs(DateTime jobStartTimeUtc, string diagFolder){
+        private async Task<string> DumpEventLogs(string diagFolder, DateTime jobStartTimeUtc)
+        {
             var builder = new StringBuilder();
 
             string powerShellExe = HostContext.GetService<IPowerShellExeUtil>().GetPath();
-            string arguments = $@"Get-WinEvent -ListLog * | ForEach-Object {{ Get-WinEvent -ErrorAction SilentlyContinue -FilterHashtable @{{ LogName=$_.LogName; StartTime='{ jobStartTimeUtc }'; EndTime='{ DateTime.UtcNow }';}} }} | Format-List > { diagFolder }\EventViewer-{ jobStartTimeUtc.ToString("yyyyMMdd-HHmmss") }.log";
+            string arguments = $@"
+                Get-WinEvent -ListLog * `
+                | ForEach-Object {{ Get-WinEvent -ErrorAction SilentlyContinue -FilterHashtable @{{ LogName=$_.LogName; StartTime='{ jobStartTimeUtc }'; EndTime='{ DateTime.UtcNow }';}} }} `
+                | Format-List > { diagFolder }\EventViewer-{ jobStartTimeUtc.ToString("yyyyMMdd-HHmmss") }.log";
             using (var processInvoker = HostContext.CreateService<IProcessInvoker>())
             {
                 processInvoker.OutputDataReceived += (object sender, ProcessDataReceivedEventArgs args) =>
@@ -384,6 +388,5 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
 
             return builder.ToString();
         }
-
     }
 }
