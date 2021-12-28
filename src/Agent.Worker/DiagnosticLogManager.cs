@@ -361,7 +361,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
                 string powerShellExe = HostContext.GetService<IPowerShellExeUtil>().GetPath();
                 string arguments = $@"
                     Get-WinEvent -ListLog * `
-                    | ForEach-Object {{ Get-WinEvent -ErrorAction SilentlyContinue -FilterHashtable @{{ LogName=$_.LogName; StartTime='{ jobStartTimeUtc }'; EndTime='{ DateTime.UtcNow }';}} }} `
+                    | ForEach-Object {{ Get-WinEvent -ErrorAction SilentlyContinue -FilterHashtable @{{ LogName=$_.LogName; StartTime='{ jobStartTimeUtc.ToLocalTime() }'; EndTime='{ DateTime.Now }';}} }} `
                     | Format-List > { diagFolder }\EventViewer-{ jobStartTimeUtc.ToString("yyyyMMdd-HHmmss") }.log";
                 using (var processInvoker = HostContext.CreateService<IProcessInvoker>())
                 {
