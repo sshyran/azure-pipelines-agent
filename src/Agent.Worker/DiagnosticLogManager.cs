@@ -109,7 +109,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             if (PlatformUtil.RunningOnWindows)
             {
                 executionContext.Debug("Dumping event viewer logs.");
-                Task<string> eventLogs = DumpEventLogs(HostContext.GetDirectory(WellKnownDirectory.Diag), jobStartTimeUtc);
+                await DumpEventLogs(HostContext.GetDirectory(WellKnownDirectory.Diag), jobStartTimeUtc);
             }
 
             executionContext.Debug("Zipping diagnostic files.");
@@ -354,10 +354,8 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             return builder.ToString();
         }
 
-        private async Task<string> DumpEventLogs(string diagFolder, DateTime jobStartTimeUtc)
+        private async Task DumpEventLogs(string diagFolder, DateTime jobStartTimeUtc)
         {
-            var builder = new StringBuilder();
-
             string powerShellExe = HostContext.GetService<IPowerShellExeUtil>().GetPath();
             string arguments = $@"
                 Get-WinEvent -ListLog * `
@@ -365,16 +363,6 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
                 | Format-List > { diagFolder }\EventViewer-{ jobStartTimeUtc.ToString("yyyyMMdd-HHmmss") }.log";
             using (var processInvoker = HostContext.CreateService<IProcessInvoker>())
             {
-                processInvoker.OutputDataReceived += (object sender, ProcessDataReceivedEventArgs args) =>
-                {
-                    builder.AppendLine(args.Data);
-                };
-
-                processInvoker.ErrorDataReceived += (object sender, ProcessDataReceivedEventArgs args) =>
-                {
-                    builder.AppendLine(args.Data);
-                };
-
                 await processInvoker.ExecuteAsync(
                     workingDirectory: HostContext.GetDirectory(WellKnownDirectory.Bin),
                     fileName: powerShellExe,
@@ -385,8 +373,6 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
                     killProcessOnCancel: false,
                     cancellationToken: default(CancellationToken));
             }
-
-            return builder.ToString();
         }
     }
 }
