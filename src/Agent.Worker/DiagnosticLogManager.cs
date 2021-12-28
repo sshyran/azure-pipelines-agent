@@ -109,7 +109,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             if (PlatformUtil.RunningOnLinux)
             {
                 executionContext.Debug("Dumping of waagent.conf file");
-                string waagentFile = Path.Combine(supportFilesFolder, "waagentConf.txt");
+                string waagentDumpFile = Path.Combine(supportFilesFolder, "waagentConf.txt");
 
                 string configFileName = "waagent.conf";
                 try
@@ -117,8 +117,12 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
                     string filePath = Directory.GetFiles("/etc", configFileName).FirstOrDefault();
                     if (!string.IsNullOrWhiteSpace(filePath))
                     {
-                        string waagentContent = ParseWaagentContent(filePath);
-                        File.AppendAllText(waagentFile, waagentContent);
+                        string waagentContent = File.ReadAllText(filePath);
+
+                        File.AppendAllText(waagentDumpFile, "waagent.conf settings");
+                        File.AppendAllText(waagentDumpFile, Environment.NewLine);
+                        File.AppendAllText(waagentDumpFile, waagentContent);
+                        
                         executionContext.Debug("Dumping waagent.conf file is completed.");
                     }
                     else
@@ -177,34 +181,6 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
                 builder.AppendLine();
             }
 
-            return builder.ToString();
-        }
-
-        private string ParseWaagentContent(string configPath)
-        {
-            var builder = new StringBuilder();
-
-            builder.AppendLine("waagent.conf settings");
-            builder.AppendLine(string.Empty);
-
-            foreach (string line in File.ReadLines(configPath))
-            {
-                string configLine = line.Trim();
-                if (configLine.StartsWith('#') || string.IsNullOrWhiteSpace(configLine))
-                {
-                    continue;
-                }
-                var confElems = configLine.Split('=');
-                var settingName = confElems[0];
-                var settingValue = confElems[1];
-                builder.Append(settingName);
-                if (!string.IsNullOrWhiteSpace(settingValue))
-                {
-                    builder.Append($" = {settingValue}");
-                }
-
-                builder.AppendLine();
-            }
             return builder.ToString();
         }
 
