@@ -254,6 +254,12 @@ namespace Agent.Sdk.Knob
             new EnvironmentKnobSource("EnableIncompatibleBuildArtifactsPathResolution"),
             new BuiltInDefaultKnobSource("false"));
 
+        public static readonly Knob DisableAuthenticodeValidation = new Knob(
+               nameof(DisableAuthenticodeValidation),
+               "Disables authenticode validation for agent package during self update. Set this to any non-empty value to disable.",
+               new EnvironmentKnobSource("DISABLE_AUTHENTICODE_VALIDATION"),
+               new BuiltInDefaultKnobSource(string.Empty));
+
         public static readonly Knob DisableHashValidation = new Knob(
             nameof(DisableHashValidation),
             "If true, the agent will skip package hash validation during self-updating.",
