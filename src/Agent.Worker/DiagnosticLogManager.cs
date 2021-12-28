@@ -109,8 +109,11 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             if (PlatformUtil.RunningOnLinux)
             {
                 executionContext.Debug("Dumping cloud-init logs.");
-                await DumpCloudInitLogs(jobStartTimeUtc, HostContext.GetDirectory(WellKnownDirectory.Diag));
-                executionContext.Debug("Dumping cloud-init logs is completed.");
+
+                string resultLogs = await DumpCloudInitLogs(jobStartTimeUtc, HostContext.GetDirectory(WellKnownDirectory.Diag));
+                executionContext.Debug(resultLogs);
+
+                executionContext.Debug("Dumping cloud-init logs is finished.");
             }
 
             executionContext.Debug("Zipping diagnostic files.");
@@ -139,45 +142,54 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             executionContext.Debug("Diagnostic file upload complete.");
         }
 
-        private async Task DumpCloudInitLogs(DateTime jobStartTimeUtc, string diagFolder)
+        /// <summary>
+        /// Dumping cloud-init logs to diag folder of agent if cloud-init is installed on current machine.
+        /// </summary>
+        /// <param name="jobStartTimeUtc">Job start time</param>
+        /// <param name="diagFolder">Path to agent diag folder</param>
+        /// <returns>Returns the method execution logs</returns>
+        private async Task<string> DumpCloudInitLogs(DateTime jobStartTimeUtc, string diagFolder)
         {
             var builder = new StringBuilder();
-
             string cloudInit = WhichUtil.Which("cloud-init", trace: Trace);
-            if (string.IsNullOrEmpty(cloudInit))
-            {
-                Trace.Info("Cloud-init ins't found on current machine.");
-                return;
-            }
-            
+            if (string.IsNullOrEmpty(cloudInit)) return "Cloud-init ins't found on current machine.";
+
             string resultName = $"cloudinit-{jobStartTimeUtc.ToString("yyyyMMdd-HHmmss")}-logs.tar.gz";
             string arguments = $"collect-logs -t \"{diagFolder}/{resultName}\"";
 
-            using (var processInvoker = HostContext.CreateService<IProcessInvoker>())
+            try 
             {
-                processInvoker.OutputDataReceived += (object sender, ProcessDataReceivedEventArgs args) =>
+                using (var processInvoker = HostContext.CreateService<IProcessInvoker>())
                 {
-                    builder.AppendLine(args.Data);
-                };
+                    processInvoker.OutputDataReceived += (object sender, ProcessDataReceivedEventArgs args) =>
+                    {
+                        builder.AppendLine(args.Data);
+                    };
 
-                processInvoker.ErrorDataReceived += (object sender, ProcessDataReceivedEventArgs args) =>
-                {
-                    builder.AppendLine(args.Data);
-                };
+                    processInvoker.ErrorDataReceived += (object sender, ProcessDataReceivedEventArgs args) =>
+                    {
+                        builder.AppendLine(args.Data);
 
-                await processInvoker.ExecuteAsync(
-                    workingDirectory: HostContext.GetDirectory(WellKnownDirectory.Bin),
-                    fileName: cloudInit,
-                    arguments: arguments,
-                    environment: null,
-                    requireExitCodeZero: false,
-                    outputEncoding: null,
-                    killProcessOnCancel: false,
-                    cancellationToken: default(CancellationToken));
+                    };
+
+                    await processInvoker.ExecuteAsync(
+                        workingDirectory: HostContext.GetDirectory(WellKnownDirectory.Bin),
+                        fileName: cloudInit,
+                        arguments: arguments,
+                        environment: null,
+                        requireExitCodeZero: false,
+                        outputEncoding: null,
+                        killProcessOnCancel: false,
+                        cancellationToken: default(CancellationToken));
+                }
             }
-
-            Trace.Info(builder.ToString());
+            catch (Exception ex)
+            {
+                builder.AppendLine(ex.Message);
+            }
+            return builder.ToString();
         }
+
 
         private string GetCapabilitiesContent(Dictionary<string, string> capabilities)
         {
