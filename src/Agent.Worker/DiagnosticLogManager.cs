@@ -108,16 +108,28 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             // Read and add to logs waagent.conf settings on Linux
             if (PlatformUtil.RunningOnLinux)
             {
-                executionContext.Debug("Creating waagent file.");
+                executionContext.Debug("Dumping of waagent.conf file");
                 string waagentFile = Path.Combine(supportFilesFolder, "waagentConf.txt");
 
                 string configFileName = "waagent.conf";
-                string filePath = WhichUtil.Which(configFileName);
-                if(string.IsNullOrWhiteSpace(filePath)){
-                    filePath = Directory.GetFiles("/etc", configFileName).FirstOrDefault();
+                try
+                {
+                    string filePath = Directory.GetFiles("/etc", configFileName).FirstOrDefault();
+                    if (!string.IsNullOrWhiteSpace(filePath))
+                    {
+                        string waagentContent = ParseWaagentContent(filePath);
+                        File.AppendAllText(waagentFile, waagentContent);
+                        executionContext.Debug("Dumping waagent.conf file is completed.");
+                    }
+                    else
+                    {
+                        executionContext.Warning("waagent.conf file wasn,t found. Dumping was not done.");
+                    }
                 }
-                string waagentContent = !string.IsNullOrEmpty(filePath) ? ParseWaagentContent(filePath) : "waagent.conf file is not found";
-                File.AppendAllText(waagentFile, waagentContent);
+                catch
+                {
+                    executionContext.Warning("Dumping of waagent.conf was not completed successfully.");
+                }
             }
 
             executionContext.Debug("Zipping diagnostic files.");
@@ -178,7 +190,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             foreach (string line in File.ReadLines(configPath))
             {
                 string configLine = line.Trim();
-                if(configLine.StartsWith('#') || string.IsNullOrWhiteSpace(configLine))
+                if (configLine.StartsWith('#') || string.IsNullOrWhiteSpace(configLine))
                 {
                     continue;
                 }
