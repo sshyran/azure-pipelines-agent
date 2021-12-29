@@ -381,9 +381,10 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
                         cancellationToken: default(CancellationToken));
                 }
             }
-            catch
+            catch (Exception ex)
             {
                 executionContext.Debug("Failed to dump event viewer logs. Skipping.");
+                executionContext.Debug($"Error message: {ex}");
             }
         }
     }
