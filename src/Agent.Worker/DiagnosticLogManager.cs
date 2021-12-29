@@ -109,7 +109,12 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             if (PlatformUtil.RunningOnWindows)
             {
                 executionContext.Debug("Dumping event viewer logs for current job.");
-                await DumpCurrentJobEventLogs(executionContext, HostContext.GetDirectory(WellKnownDirectory.Diag), jobStartTimeUtc);
+
+                string eventLogsFile = $"{HostContext.GetDirectory(WellKnownDirectory.Diag)}/EventViewer-{ jobStartTimeUtc.ToString("yyyyMMdd-HHmmss") }.log";
+                await DumpCurrentJobEventLogs(executionContext, eventLogsFile, jobStartTimeUtc);
+
+                string destination = Path.Combine(supportFilesFolder, Path.GetFileName(eventLogsFile));
+                File.Copy(eventLogsFile, destination);
             }
 
             executionContext.Debug("Zipping diagnostic files.");
@@ -354,7 +359,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             return builder.ToString();
         }
 
-        private async Task DumpCurrentJobEventLogs(IExecutionContext executionContext, string diagFolder, DateTime jobStartTimeUtc)
+        private async Task DumpCurrentJobEventLogs(IExecutionContext executionContext, string logFile, DateTime jobStartTimeUtc)
         {
             try
             {
@@ -362,7 +367,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
                 string arguments = $@"
                     Get-WinEvent -ListLog * `
                     | ForEach-Object {{ Get-WinEvent -ErrorAction SilentlyContinue -FilterHashtable @{{ LogName=$_.LogName; StartTime='{ jobStartTimeUtc.ToLocalTime() }'; EndTime='{ DateTime.Now }';}} }} `
-                    | Format-List > { diagFolder }\EventViewer-{ jobStartTimeUtc.ToString("yyyyMMdd-HHmmss") }.log";
+                    | Format-List > { logFile }";
                 using (var processInvoker = HostContext.CreateService<IProcessInvoker>())
                 {
                     await processInvoker.ExecuteAsync(
