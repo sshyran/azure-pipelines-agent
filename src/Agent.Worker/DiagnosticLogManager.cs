@@ -123,9 +123,6 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
 
                 string eventLogsFile = $"{HostContext.GetDirectory(WellKnownDirectory.Diag)}/EventViewer-{ jobStartTimeUtc.ToString("yyyyMMdd-HHmmss") }.log";
                 await DumpCurrentJobEventLogs(executionContext, eventLogsFile, jobStartTimeUtc);
-
-                string destination = Path.Combine(supportFilesFolder, Path.GetFileName(eventLogsFile));
-                File.Copy(eventLogsFile, destination);
             }
 
             executionContext.Debug("Zipping diagnostic files.");
