@@ -13,10 +13,7 @@ namespace Agent.Sdk.Util
 
         private void Trace(string msg)
         {
-            if (this._trace != null)
-            {
-                this._trace.Info($"[DEBUG INFO]{msg}");
-            }
+            this._trace?.Info($"[DEBUG INFO]{msg}");
         }
         public LoggedSecretMasker(ISecretMasker secretMasker)
         {
@@ -35,8 +32,6 @@ namespace Agent.Sdk.Util
 
         public void AddRegex(string pattern, string origin)
         {
-            var regex = new Regex(pattern);
-            var match = regex.Match("1");
             this.Trace($"Setting up regex for origin: {origin}.");
             if (pattern == null)
             {

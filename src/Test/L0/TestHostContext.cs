@@ -16,6 +16,7 @@ using System.Net.Http.Headers;
 using Agent.Sdk;
 using Agent.Sdk.Knob;
 using Pipelines = Microsoft.TeamFoundation.DistributedTask.Pipelines;
+using Agent.Sdk.Util;
 
 namespace Microsoft.VisualStudio.Services.Agent.Tests
 {
@@ -25,7 +26,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Tests
         private readonly ConcurrentDictionary<Type, object> _serviceSingletons = new ConcurrentDictionary<Type, object>();
         private readonly ITraceManager _traceManager;
         private readonly Terminal _term;
-        private readonly SecretMasker _secretMasker;
+        private readonly LoggedSecretMasker _secretMasker;
         private CancellationTokenSource _agentShutdownTokenSource = new CancellationTokenSource();
         private string _suiteName;
         private string _testName;
@@ -36,7 +37,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Tests
         public event EventHandler Unloading;
         public CancellationToken AgentShutdownToken => _agentShutdownTokenSource.Token;
         public ShutdownReason AgentShutdownReason { get; private set; }
-        public ISecretMasker SecretMasker => _secretMasker;
+        public LoggedSecretMasker SecretMasker => _secretMasker;
         public TestHostContext(object testClass, [CallerMemberName] string testName = "")
         {
             ArgUtil.NotNull(testClass, nameof(testClass));
@@ -61,10 +62,10 @@ namespace Microsoft.VisualStudio.Services.Agent.Tests
 
             var traceListener = new HostTraceListener(TraceFileName);
             traceListener.DisableConsoleReporting = true;
-            _secretMasker = new SecretMasker();
-            _secretMasker.AddValueEncoder(ValueEncoders.JsonStringEscape);
-            _secretMasker.AddValueEncoder(ValueEncoders.UriDataEscape);
-            _secretMasker.AddValueEncoder(ValueEncoders.BackslashEscape);
+            _secretMasker = new LoggedSecretMasker(new SecretMasker());
+            _secretMasker.AddValueEncoder(ValueEncoders.JsonStringEscape, "TestHostContext");
+            _secretMasker.AddValueEncoder(ValueEncoders.UriDataEscape, "TestHostContext");
+            _secretMasker.AddValueEncoder(ValueEncoders.BackslashEscape, "TestHostContext");
             _traceManager = new TraceManager(traceListener, _secretMasker);
             _trace = GetTrace(nameof(TestHostContext));
 
@@ -432,7 +433,6 @@ namespace Microsoft.VisualStudio.Services.Agent.Tests
                     _loadContext = null;
                 }
                 _traceManager?.Dispose();
-                _secretMasker?.Dispose();
                 _term?.Dispose();
                 _trace?.Dispose();
                 _agentShutdownTokenSource?.Dispose();

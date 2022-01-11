@@ -16,24 +16,24 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
         public static bool IsEndpointAuthorizationParametersSecret(string key)
         {
             var excludedAuthParams = new string[]{
-            EndpointAuthorizationParameters.IdToken,
-            EndpointAuthorizationParameters.Role,
-            EndpointAuthorizationParameters.Scope,
-            EndpointAuthorizationParameters.TenantId,
-            EndpointAuthorizationParameters.IssuedAt,
-            EndpointAuthorizationParameters.ExpiresAt,
-            EndpointAuthorizationParameters.Audience,
-            EndpointAuthorizationParameters.AuthenticationType,
-            EndpointAuthorizationParameters.AuthorizationType,
-            EndpointAuthorizationParameters.AccessTokenType,
-            EndpointAuthorizationParameters.AccessTokenFetchingMethod,
-            EndpointAuthorizationParameters.UseWindowsSecurity,
-            EndpointAuthorizationParameters.Unsecured,
-            EndpointAuthorizationParameters.OAuthAccessTokenIsSupplied,
-            EndpointAuthorizationParameters.Audience,
-            EndpointAuthorizationParameters.CompleteCallbackPayload,
-            EndpointAuthorizationParameters.AcceptUntrustedCertificates
-        };
+                EndpointAuthorizationParameters.IdToken,
+                EndpointAuthorizationParameters.Role,
+                EndpointAuthorizationParameters.Scope,
+                EndpointAuthorizationParameters.TenantId,
+                EndpointAuthorizationParameters.IssuedAt,
+                EndpointAuthorizationParameters.ExpiresAt,
+                EndpointAuthorizationParameters.Audience,
+                EndpointAuthorizationParameters.AuthenticationType,
+                EndpointAuthorizationParameters.AuthorizationType,
+                EndpointAuthorizationParameters.AccessTokenType,
+                EndpointAuthorizationParameters.AccessTokenFetchingMethod,
+                EndpointAuthorizationParameters.UseWindowsSecurity,
+                EndpointAuthorizationParameters.Unsecured,
+                EndpointAuthorizationParameters.OAuthAccessTokenIsSupplied,
+                EndpointAuthorizationParameters.Audience,
+                EndpointAuthorizationParameters.CompleteCallbackPayload,
+                EndpointAuthorizationParameters.AcceptUntrustedCertificates
+            };
 
             foreach (var authParam in excludedAuthParams)
             {
