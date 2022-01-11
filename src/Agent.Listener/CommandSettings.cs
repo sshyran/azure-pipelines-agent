@@ -65,17 +65,17 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
             // Mask secret arguments
             if (Configure != null)
             {
-                context.SecretMasker.AddValue(Configure.Password);
-                context.SecretMasker.AddValue(Configure.ProxyPassword);
-                context.SecretMasker.AddValue(Configure.SslClientCert);
-                context.SecretMasker.AddValue(Configure.Token);
-                context.SecretMasker.AddValue(Configure.WindowsLogonPassword);
+                context.SecretMasker.AddValue(Configure.Password, "Configure.Password");
+                context.SecretMasker.AddValue(Configure.ProxyPassword, "Configure.ProxyPassword");
+                context.SecretMasker.AddValue(Configure.SslClientCert, "Configure.SslClientCert");
+                context.SecretMasker.AddValue(Configure.Token, "Configure.Token");
+                context.SecretMasker.AddValue(Configure.WindowsLogonPassword, "Configure.WindowsLogonPassword");
             }
 
             if (Remove != null)
             {
-                context.SecretMasker.AddValue(Remove.Password);
-                context.SecretMasker.AddValue(Remove.Token);
+                context.SecretMasker.AddValue(Remove.Password, "Remove.Password");
+                context.SecretMasker.AddValue(Remove.Token, "Remove.Token");
             }
 
             PrintArguments();
@@ -100,7 +100,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
                         bool secret = Constants.Agent.CommandLine.Args.Secrets.Any(x => string.Equals(x, name, StringComparison.OrdinalIgnoreCase));
                         if (secret)
                         {
-                            context.SecretMasker.AddValue(val);
+                            context.SecretMasker.AddValue(val, fullKey);
                         }
 
                         // Store the value.

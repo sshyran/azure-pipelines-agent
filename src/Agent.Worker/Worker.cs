@@ -123,7 +123,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
         private void AddUserSuppliedSecret(String secret)
         {
             ArgUtil.NotNull(secret, nameof(secret));
-            HostContext.SecretMasker.AddValue(secret);
+            HostContext.SecretMasker.AddValue(secret, "UserSuppliedSecret");
             // for variables, it is possible that they are used inside a shell which would strip off surrounding quotes
             // so, if the value is surrounded by quotes, add a quote-timmed version of the secret to our masker as well
             // This addresses issue #2525
@@ -131,7 +131,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             {
                 if (secret.StartsWith(quoteChar) && secret.EndsWith(quoteChar))
                 {
-                    HostContext.SecretMasker.AddValue(secret.Trim(quoteChar));
+                    HostContext.SecretMasker.AddValue(secret.Trim(quoteChar), "UserSuppliedSecret");
                 }
             }
         }
@@ -171,7 +171,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
 
                     // We need this because the worker will print out the job message JSON to diag log
                     // and SecretMasker has JsonEscapeEncoder hook up
-                    HostContext.SecretMasker.AddValue(maskHint.Value);
+                    HostContext.SecretMasker.AddValue(maskHint.Value, "AddingMaskHint");
                 }
                 else
                 {
@@ -185,11 +185,11 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             // Add masks for service endpoints
             foreach (ServiceEndpoint endpoint in message.Resources.Endpoints ?? new List<ServiceEndpoint>())
             {
-                foreach (var keyValuePair in endpoint.Authorization?.Parameters ?? new Dictionary<string, string>())
+                foreach (var keyValuePair in endpoint.Authorization?.Parameters)
                 {
                     if (!string.IsNullOrEmpty(keyValuePair.Value) && MaskingUtil.IsEndpointAuthorizationParametersSecret(keyValuePair.Key))
                     {
-                        HostContext.SecretMasker.AddValue(keyValuePair.Value);
+                        HostContext.SecretMasker.AddValue(keyValuePair.Value, keyValuePair.Key);
                     }
                 }
             }
@@ -199,7 +199,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             {
                 if (!string.IsNullOrEmpty(file.Ticket))
                 {
-                    HostContext.SecretMasker.AddValue(file.Ticket);
+                    HostContext.SecretMasker.AddValue(file.Ticket, "SecureFileTicket");
                 }
             }
         }
