@@ -153,11 +153,19 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             {
                 executionContext.Debug("Dumping event viewer logs for current job.");
 
-                string eventLogsFile = $"{HostContext.GetDirectory(WellKnownDirectory.Diag)}/EventViewer-{ jobStartTimeUtc.ToString("yyyyMMdd-HHmmss") }.log";
-                await DumpCurrentJobEventLogs(executionContext, eventLogsFile, jobStartTimeUtc);
+                try
+                {
+                    string eventLogsFile = $"{HostContext.GetDirectory(WellKnownDirectory.Diag)}/EventViewer-{ jobStartTimeUtc.ToString("yyyyMMdd-HHmmss") }.log";
+                    await DumpCurrentJobEventLogs(executionContext, eventLogsFile, jobStartTimeUtc);
 
-                string destination = Path.Combine(supportFilesFolder, Path.GetFileName(eventLogsFile));
-                File.Copy(eventLogsFile, destination);
+                    string destination = Path.Combine(supportFilesFolder, Path.GetFileName(eventLogsFile));
+                    File.Copy(eventLogsFile, destination);
+                }
+                catch (Exception ex)
+                {
+                    executionContext.Debug("Failed to dump event viewer logs. Skipping.");
+                    executionContext.Debug($"Error message: {ex}");
+                }
             }
 
             executionContext.Debug("Zipping diagnostic files.");
@@ -456,30 +464,22 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
         // Dumps the gathered info into a separate file since the logs are long.
         private async Task DumpCurrentJobEventLogs(IExecutionContext executionContext, string logFile, DateTime jobStartTimeUtc)
         {
-            try
+            string powerShellExe = HostContext.GetService<IPowerShellExeUtil>().GetPath();
+            string arguments = $@"
+                Get-WinEvent -ListLog * `
+                | ForEach-Object {{ Get-WinEvent -ErrorAction SilentlyContinue -FilterHashtable @{{ LogName=$_.LogName; StartTime='{ jobStartTimeUtc.ToLocalTime() }'; EndTime='{ DateTime.Now }';}} }} `
+                | Format-List > { logFile }";
+            using (var processInvoker = HostContext.CreateService<IProcessInvoker>())
             {
-                string powerShellExe = HostContext.GetService<IPowerShellExeUtil>().GetPath();
-                string arguments = $@"
-                    Get-WinEvent -ListLog * `
-                    | ForEach-Object {{ Get-WinEvent -ErrorAction SilentlyContinue -FilterHashtable @{{ LogName=$_.LogName; StartTime='{ jobStartTimeUtc.ToLocalTime() }'; EndTime='{ DateTime.Now }';}} }} `
-                    | Format-List > { logFile }";
-                using (var processInvoker = HostContext.CreateService<IProcessInvoker>())
-                {
-                    await processInvoker.ExecuteAsync(
-                        workingDirectory: HostContext.GetDirectory(WellKnownDirectory.Bin),
-                        fileName: powerShellExe,
-                        arguments: arguments,
-                        environment: null,
-                        requireExitCodeZero: false,
-                        outputEncoding: null,
-                        killProcessOnCancel: false,
-                        cancellationToken: default(CancellationToken));
-                }
-            }
-            catch (Exception ex)
-            {
-                executionContext.Debug("Failed to dump event viewer logs. Skipping.");
-                executionContext.Debug($"Error message: {ex}");
+                await processInvoker.ExecuteAsync(
+                    workingDirectory: HostContext.GetDirectory(WellKnownDirectory.Bin),
+                    fileName: powerShellExe,
+                    arguments: arguments,
+                    environment: null,
+                    requireExitCodeZero: false,
+                    outputEncoding: null,
+                    killProcessOnCancel: false,
+                    cancellationToken: default(CancellationToken));
             }
         }
     }
