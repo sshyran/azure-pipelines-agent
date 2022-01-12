@@ -452,6 +452,8 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             return builder.ToString();
         }
 
+        // Collects Windows event logs that appeared during the job execution.
+        // Dumps the gathered info into a separate file since the logs are long.
         private async Task DumpCurrentJobEventLogs(IExecutionContext executionContext, string logFile, DateTime jobStartTimeUtc)
         {
             try
