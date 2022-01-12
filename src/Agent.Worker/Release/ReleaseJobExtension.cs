@@ -218,7 +218,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Release
             if (isTeeUsed)
             {
                 int providedDownloadRetryCount = AgentKnobs.TeePluginDownloadRetryCount.GetValue(executionContext).AsInt();
-                TeeUtil.DownloadTeeIfAbsent(
+                await TeeUtil.DownloadTeeIfAbsent(
                     executionContext.GetVariableValueOrDefault("Agent.HomeDirectory"),
                     executionContext.GetVariableValueOrDefault("Agent.TempDirectory"),
                     AgentKnobs.TeePluginDownloadRetryCount.GetValue(executionContext).AsInt(),

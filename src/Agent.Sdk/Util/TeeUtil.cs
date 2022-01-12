@@ -15,9 +15,12 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
     {
         private static readonly string TeeTempDir = "tee_temp_dir";
 
-        private static readonly string TeeUrl = "https://vstsagenttools.blob.core.windows.net/tools/tee/14_135_0/TEE-CLC-14.135.0.zip";
+        private static readonly string TeePluginName = "TEE-CLC-14.135.0";
 
-        public static void DownloadTeeIfAbsent(
+        private static readonly string TeeUrl = $"https://vstsagenttools.blob.core.windows.net/tools/tee/14_135_0/{TeePluginName}.zip";
+
+        // If TEE is not found in the working directory (externals/tee), tries to download and extract it with retries.
+        public static async Task DownloadTeeIfAbsent(
             string agentHomeDirectory,
             string agentTempDirectory,
             int providedDownloadRetryCount,
@@ -36,7 +39,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
                 try
                 {
                     debug($"Trying to download and extract TEE. Attempt: {downloadAttempt}");
-                    DownloadAndExtractTee(agentHomeDirectory, agentTempDirectory, debug, cancellationToken);
+                    await DownloadAndExtractTee(agentHomeDirectory, agentTempDirectory, debug, cancellationToken);
                     break;
                 }
                 catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
@@ -51,7 +54,10 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
             }
         }
 
-        private static void DownloadAndExtractTee(
+        // Downloads TEE archive to the TEE temp directory.
+        // Once downloaded, archive is extracted to the working TEE directory (externals/tee)
+        // Sets required permissions for extracted files.
+        private static async Task DownloadAndExtractTee(
             string agentHomeDirectory,
             string agentTempDirectory,
             Action<string> debug,
@@ -62,7 +68,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
             Directory.CreateDirectory(tempDirectory);
 
             string zipPath = Path.Combine(tempDirectory, $"{Guid.NewGuid().ToString()}.zip");
-            DownloadTee(zipPath, debug, cancellationToken).GetAwaiter().GetResult();
+            await DownloadTee(zipPath, debug, cancellationToken);
 
             debug($"Downloaded {zipPath}");
 
@@ -83,6 +89,8 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
             SetPermissions(Path.Combine(extractedTeeDestinationPath, "native"), "a+x", recursive: true);
         }
 
+        // Downloads TEE zip archive from the vsts blob store.
+        // Logs download progress.
         private static async Task DownloadTee(string zipPath, Action<string> debug, CancellationToken cancellationToken)
         {
             using (var client = new WebClient())
@@ -94,6 +102,10 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
             }
         }
 
+        // Sets file permissions of a file or a folder.
+        // Uses the following commands:
+        // For non-recursive: chmod <permissions> <path>
+        // For recursive: chmod -R <permissions> <path>
         private static void SetPermissions(string path, string permissions, bool recursive = false)
         {
             var chmodProcessInfo = new ProcessStartInfo("chmod")
@@ -112,6 +124,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
             }
         }
 
+        // Cleanup function that removes everything from working and temporary TEE directories
         public static void DeleteTee(string agentHomeDirectory, string agentTempDirectory, Action<string> debug)
         {
             string teeDirectory = GetTeePath(agentHomeDirectory);
@@ -123,6 +136,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
             debug($"Cleaned up {teeDirectory} and {tempDirectory}");
         }
 
+        // Returns tee location: <agent home>/externals/tee
         private static string GetTeePath(string agentHomeDirectory)
         {
             return Path.Combine(agentHomeDirectory, "externals", "tee");

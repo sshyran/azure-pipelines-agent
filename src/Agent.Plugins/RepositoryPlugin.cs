@@ -193,7 +193,7 @@ namespace Agent.Plugins.Repository
 
             if (!PlatformUtil.RunningOnWindows && string.Equals(repo.Type, Pipelines.RepositoryTypes.Tfvc, StringComparison.OrdinalIgnoreCase))
             {
-                TeeUtil.DownloadTeeIfAbsent(
+                await TeeUtil.DownloadTeeIfAbsent(
                     executionContext.Variables.GetValueOrDefault("Agent.HomeDirectory")?.Value,
                     executionContext.Variables.GetValueOrDefault("Agent.TempDirectory")?.Value,
                     AgentKnobs.TeePluginDownloadRetryCount.GetValue(executionContext).AsInt(),
