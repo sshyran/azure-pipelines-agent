@@ -78,7 +78,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
             debug($"Extracted {zipPath} to ${extractedTeePath}");
 
             string extractedTeeDestinationPath = GetTeePath(agentHomeDirectory);
-            Directory.Move(Path.Combine(extractedTeePath, "TEE-CLC-14.135.0"), extractedTeeDestinationPath);
+            Directory.Move(Path.Combine(extractedTeePath, TeePluginName), extractedTeeDestinationPath);
 
             debug($"Moved to ${extractedTeeDestinationPath}");
 
