@@ -91,6 +91,8 @@ namespace Agent.Plugins.Repository
         {
             return executionContext != null && RepositoryUtil.HasMultipleCheckouts(executionContext.JobSettings);
         }
+
+        protected TeeUtil teeUtil = new TeeUtil();
     }
 
     public class CheckoutTask : RepositoryTask
@@ -193,7 +195,7 @@ namespace Agent.Plugins.Repository
 
             if (!PlatformUtil.RunningOnWindows && string.Equals(repo.Type, Pipelines.RepositoryTypes.Tfvc, StringComparison.OrdinalIgnoreCase))
             {
-                await TeeUtil.DownloadTeeIfAbsent(
+                await teeUtil.DownloadTeeIfAbsent(
                     executionContext.Variables.GetValueOrDefault("Agent.HomeDirectory")?.Value,
                     executionContext.Variables.GetValueOrDefault("Agent.TempDirectory")?.Value,
                     AgentKnobs.TeePluginDownloadRetryCount.GetValue(executionContext).AsInt(),
@@ -227,7 +229,7 @@ namespace Agent.Plugins.Repository
 
             if (!PlatformUtil.RunningOnWindows && !AgentKnobs.DisableTeePluginRemoval.GetValue(executionContext).AsBoolean())
             {
-                TeeUtil.DeleteTee(
+                teeUtil.DeleteTee(
                     executionContext.Variables.GetValueOrDefault("Agent.HomeDirectory")?.Value,
                     executionContext.Variables.GetValueOrDefault("Agent.TempDirectory")?.Value,
                     executionContext.Debug

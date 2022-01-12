@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Microsoft.VisualStudio.Services.Agent.Util
 {
-    public static class TeeUtil
+    public class TeeUtil
     {
         private static readonly string TeeTempDir = "tee_temp_dir";
 
@@ -20,7 +20,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
         private static readonly string TeeUrl = $"https://vstsagenttools.blob.core.windows.net/tools/tee/14_135_0/{TeePluginName}.zip";
 
         // If TEE is not found in the working directory (externals/tee), tries to download and extract it with retries.
-        public static async Task DownloadTeeIfAbsent(
+        public async Task DownloadTeeIfAbsent(
             string agentHomeDirectory,
             string agentTempDirectory,
             int providedDownloadRetryCount,
@@ -57,7 +57,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
         // Downloads TEE archive to the TEE temp directory.
         // Once downloaded, archive is extracted to the working TEE directory (externals/tee)
         // Sets required permissions for extracted files.
-        private static async Task DownloadAndExtractTee(
+        private async Task DownloadAndExtractTee(
             string agentHomeDirectory,
             string agentTempDirectory,
             Action<string> debug,
@@ -91,7 +91,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
 
         // Downloads TEE zip archive from the vsts blob store.
         // Logs download progress.
-        private static async Task DownloadTee(string zipPath, Action<string> debug, CancellationToken cancellationToken)
+        private async Task DownloadTee(string zipPath, Action<string> debug, CancellationToken cancellationToken)
         {
             using (var client = new WebClient())
             using (var registration = cancellationToken.Register(client.CancelAsync))
@@ -106,7 +106,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
         // Uses the following commands:
         // For non-recursive: chmod <permissions> <path>
         // For recursive: chmod -R <permissions> <path>
-        private static void SetPermissions(string path, string permissions, bool recursive = false)
+        private void SetPermissions(string path, string permissions, bool recursive = false)
         {
             var chmodProcessInfo = new ProcessStartInfo("chmod")
             {
@@ -125,7 +125,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
         }
 
         // Cleanup function that removes everything from working and temporary TEE directories
-        public static void DeleteTee(string agentHomeDirectory, string agentTempDirectory, Action<string> debug)
+        public void DeleteTee(string agentHomeDirectory, string agentTempDirectory, Action<string> debug)
         {
             string teeDirectory = GetTeePath(agentHomeDirectory);
             IOUtil.DeleteDirectory(teeDirectory, CancellationToken.None);
@@ -137,7 +137,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
         }
 
         // Returns tee location: <agent home>/externals/tee
-        private static string GetTeePath(string agentHomeDirectory)
+        private string GetTeePath(string agentHomeDirectory)
         {
             return Path.Combine(agentHomeDirectory, "externals", "tee");
         }
