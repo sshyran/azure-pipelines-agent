@@ -92,7 +92,16 @@ namespace Agent.Plugins.Repository
             return executionContext != null && RepositoryUtil.HasMultipleCheckouts(executionContext.JobSettings);
         }
 
-        protected TeeUtil teeUtil = new TeeUtil();
+        protected TeeUtil teeUtil;
+        protected void initializeTeeUtil(AgentTaskPluginExecutionContext executionContext, CancellationToken cancellationToken) {
+            teeUtil = new TeeUtil(
+                executionContext.Variables.GetValueOrDefault("Agent.HomeDirectory")?.Value,
+                executionContext.Variables.GetValueOrDefault("Agent.TempDirectory")?.Value,
+                AgentKnobs.TeePluginDownloadRetryCount.GetValue(executionContext).AsInt(),
+                executionContext.Debug,
+                cancellationToken
+            );
+        }
     }
 
     public class CheckoutTask : RepositoryTask
@@ -195,13 +204,8 @@ namespace Agent.Plugins.Repository
 
             if (!PlatformUtil.RunningOnWindows && string.Equals(repo.Type, Pipelines.RepositoryTypes.Tfvc, StringComparison.OrdinalIgnoreCase))
             {
-                await teeUtil.DownloadTeeIfAbsent(
-                    executionContext.Variables.GetValueOrDefault("Agent.HomeDirectory")?.Value,
-                    executionContext.Variables.GetValueOrDefault("Agent.TempDirectory")?.Value,
-                    AgentKnobs.TeePluginDownloadRetryCount.GetValue(executionContext).AsInt(),
-                    executionContext.Debug,
-                    token
-                );
+                initializeTeeUtil(executionContext, token);
+                await teeUtil.DownloadTeeIfAbsent();
             }
 
             ISourceProvider sourceProvider = SourceProviderFactory.GetSourceProvider(repo.Type);
@@ -229,11 +233,8 @@ namespace Agent.Plugins.Repository
 
             if (!PlatformUtil.RunningOnWindows && !AgentKnobs.DisableTeePluginRemoval.GetValue(executionContext).AsBoolean())
             {
-                teeUtil.DeleteTee(
-                    executionContext.Variables.GetValueOrDefault("Agent.HomeDirectory")?.Value,
-                    executionContext.Variables.GetValueOrDefault("Agent.TempDirectory")?.Value,
-                    executionContext.Debug
-                );
+                initializeTeeUtil(executionContext, token);
+                teeUtil.DeleteTee();
             }
         }
     }

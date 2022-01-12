@@ -19,27 +19,39 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
 
         private static readonly string TeeUrl = $"https://vstsagenttools.blob.core.windows.net/tools/tee/14_135_0/{TeePluginName}.zip";
 
-        // If TEE is not found in the working directory (externals/tee), tries to download and extract it with retries.
-        public async Task DownloadTeeIfAbsent(
+        private string agentHomeDirectory;
+        private string agentTempDirectory;
+        private int downloadRetryCount;
+        private Action<string> debug;
+        private CancellationToken cancellationToken;
+
+        public TeeUtil(
             string agentHomeDirectory,
             string agentTempDirectory,
             int providedDownloadRetryCount,
             Action<string> debug,
             CancellationToken cancellationToken
         ) {
-            if (Directory.Exists(GetTeePath(agentHomeDirectory)))
+            this.agentHomeDirectory = agentHomeDirectory;
+            this.agentTempDirectory = agentTempDirectory;
+            this.downloadRetryCount = Math.Min(Math.Max(providedDownloadRetryCount, 3), 10);
+            this.debug = debug;
+            this.cancellationToken = cancellationToken;
+        }
+
+        // If TEE is not found in the working directory (externals/tee), tries to download and extract it with retries.
+        public async Task DownloadTeeIfAbsent() {
+            if (Directory.Exists(GetTeePath()))
             {
                 return;
             }
-
-            int downloadRetryCount = Math.Min(Math.Max(providedDownloadRetryCount, 3), 10);
 
             for (int downloadAttempt = 1; downloadAttempt <= downloadRetryCount; downloadAttempt++)
             {
                 try
                 {
                     debug($"Trying to download and extract TEE. Attempt: {downloadAttempt}");
-                    await DownloadAndExtractTee(agentHomeDirectory, agentTempDirectory, debug, cancellationToken);
+                    await DownloadAndExtractTee();
                     break;
                 }
                 catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
@@ -57,18 +69,13 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
         // Downloads TEE archive to the TEE temp directory.
         // Once downloaded, archive is extracted to the working TEE directory (externals/tee)
         // Sets required permissions for extracted files.
-        private async Task DownloadAndExtractTee(
-            string agentHomeDirectory,
-            string agentTempDirectory,
-            Action<string> debug,
-            CancellationToken cancellationToken
-        ) {
+        private async Task DownloadAndExtractTee() {
             string tempDirectory = Path.Combine(agentTempDirectory, TeeTempDir);
             IOUtil.DeleteDirectory(tempDirectory, CancellationToken.None);
             Directory.CreateDirectory(tempDirectory);
 
             string zipPath = Path.Combine(tempDirectory, $"{Guid.NewGuid().ToString()}.zip");
-            await DownloadTee(zipPath, debug, cancellationToken);
+            await DownloadTee(zipPath);
 
             debug($"Downloaded {zipPath}");
 
@@ -77,7 +84,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
 
             debug($"Extracted {zipPath} to ${extractedTeePath}");
 
-            string extractedTeeDestinationPath = GetTeePath(agentHomeDirectory);
+            string extractedTeeDestinationPath = GetTeePath();
             Directory.Move(Path.Combine(extractedTeePath, TeePluginName), extractedTeeDestinationPath);
 
             debug($"Moved to ${extractedTeeDestinationPath}");
@@ -91,7 +98,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
 
         // Downloads TEE zip archive from the vsts blob store.
         // Logs download progress.
-        private async Task DownloadTee(string zipPath, Action<string> debug, CancellationToken cancellationToken)
+        private async Task DownloadTee(string zipPath)
         {
             using (var client = new WebClient())
             using (var registration = cancellationToken.Register(client.CancelAsync))
@@ -125,9 +132,9 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
         }
 
         // Cleanup function that removes everything from working and temporary TEE directories
-        public void DeleteTee(string agentHomeDirectory, string agentTempDirectory, Action<string> debug)
+        public void DeleteTee()
         {
-            string teeDirectory = GetTeePath(agentHomeDirectory);
+            string teeDirectory = GetTeePath();
             IOUtil.DeleteDirectory(teeDirectory, CancellationToken.None);
 
             string tempDirectory = Path.Combine(agentTempDirectory, TeeTempDir);
@@ -137,7 +144,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
         }
 
         // Returns tee location: <agent home>/externals/tee
-        private string GetTeePath(string agentHomeDirectory)
+        private string GetTeePath()
         {
             return Path.Combine(agentHomeDirectory, "externals", "tee");
         }

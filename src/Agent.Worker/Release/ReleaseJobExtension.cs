@@ -41,7 +41,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Release
         public override Type ExtensionType => typeof(IJobExtension);
         public override HostTypes HostType => HostTypes.Release;
 
-        private TeeUtil teeUtil = new TeeUtil();
+        private TeeUtil teeUtil;
 
         public override IStep GetExtensionPreJobStep(IExecutionContext jobContext)
         {
@@ -219,14 +219,14 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Release
                 x.ArtifactType == AgentArtifactType.Tfvc);
             if (isTeeUsed)
             {
-                int providedDownloadRetryCount = AgentKnobs.TeePluginDownloadRetryCount.GetValue(executionContext).AsInt();
-                await teeUtil.DownloadTeeIfAbsent(
+                teeUtil = new TeeUtil(
                     executionContext.GetVariableValueOrDefault("Agent.HomeDirectory"),
                     executionContext.GetVariableValueOrDefault("Agent.TempDirectory"),
                     AgentKnobs.TeePluginDownloadRetryCount.GetValue(executionContext).AsInt(),
                     executionContext.Debug,
                     executionContext.CancellationToken
                 );
+                await teeUtil.DownloadTeeIfAbsent();
             }
 
             try
@@ -300,11 +300,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Release
             {
                 if (isTeeUsed && !AgentKnobs.DisableTeePluginRemoval.GetValue(executionContext).AsBoolean())
                 {
-                    teeUtil.DeleteTee(
-                        executionContext.GetVariableValueOrDefault("Agent.HomeDirectory"),
-                        executionContext.GetVariableValueOrDefault("Agent.TempDirectory"),
-                        executionContext.Debug
-                    );
+                    teeUtil.DeleteTee();
                 }
             }
         }
