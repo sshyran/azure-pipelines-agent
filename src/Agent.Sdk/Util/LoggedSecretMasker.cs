@@ -58,14 +58,12 @@ namespace Agent.Sdk.Util
                 this.Trace($"Value is empty.");
                 return;
             }
-            this.Trace($"Length: {value.Length}.");
             this._secretMasker.AddValue(value);
         }
 
         public void AddValueEncoder(ValueEncoder encoder, string origin)
         {
             this.Trace($"Setting up value for origin: {origin}");
-            this.Trace($"Length: {encoder.ToString().Length}.");
             if (encoder == null)
             {
                 this.Trace($"Encoder is empty.");
