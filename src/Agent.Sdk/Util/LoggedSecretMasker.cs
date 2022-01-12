@@ -15,14 +15,17 @@ namespace Agent.Sdk.Util
         {
             this._trace?.Info($"[DEBUG INFO]{msg}");
         }
+
         public LoggedSecretMasker(ISecretMasker secretMasker)
         {
+
             this._secretMasker = secretMasker;
         }
 
         public void setTrace(ITraceWriter trace)
         {
             this._trace = trace;
+            this._trace?.Info($"========================[DEBUG INFO]========================");
         }
 
         public void AddRegex(string pattern)
@@ -38,7 +41,6 @@ namespace Agent.Sdk.Util
                 this.Trace($"Pattern is empty.");
                 return;
             }
-            this.Trace($"Length: {pattern.Length}.");
 
             this._secretMasker.AddRegex(pattern);
         }
