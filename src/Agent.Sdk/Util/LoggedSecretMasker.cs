@@ -6,6 +6,9 @@ using System.Text.RegularExpressions;
 
 namespace Agent.Sdk.Util
 {
+    /// <summary>
+    /// Extended secret masker service, that allows to log origins of secrets
+    /// </summary>
     public class LoggedSecretMasker : ISecretMasker
     {
         private ISecretMasker _secretMasker;
@@ -32,6 +35,11 @@ namespace Agent.Sdk.Util
             this.AddValue(value, "Unknown");
         }
 
+        /// <summary>
+        /// Overloading of AddValue method with additional logic for logging origin of provided secret
+        /// </summary>
+        /// <param name="value">Secret to be added</param>
+        /// <param name="origin">Origin of the secret</param>
         public void AddValue(string value, string origin)
         {
             this.Trace($"Setting up value for origin: {origin}");

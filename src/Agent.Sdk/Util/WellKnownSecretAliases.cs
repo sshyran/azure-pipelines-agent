@@ -5,14 +5,16 @@ namespace Agent.Sdk.Util
 {
     public static class WellKnownSecretAliases
     {
+        // Known configuration secrets
         public static readonly string ConfigurePassword = "Configure.Password";
         public static readonly string ConfigureProxyPassword = "Configure.ProxyPassword";
         public static readonly string ConfigureSslClientCert = "Configure.SslClientCert";
         public static readonly string ConfigureToken = "Configure.Token";
         public static readonly string ConfigureWindowsLogonPassword = "Configure.WindowsLogonPassword";
-
         public static readonly string RemovePassword = "Remove.Password";
         public static readonly string RemoveToken = "Remove.Token";
+
+        // Other known origins for secrets
         public static readonly string GitSourceProviderAuthHeader = "GitSourceProvider.AuthHeader";
         public static readonly string TaskSetSecretCommand = "TaskSetSecretCommand";
         public static readonly string TaskSetVariableCommand = "TaskSetVariableCommand";
