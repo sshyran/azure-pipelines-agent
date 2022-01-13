@@ -25,24 +25,6 @@ namespace Agent.Sdk.Util
         public void setTrace(ITraceWriter trace)
         {
             this._trace = trace;
-            this._trace?.Info($"========================[DEBUG INFO]========================");
-        }
-
-        public void AddRegex(string pattern)
-        {
-            this.AddRegex(pattern, "Unknown");
-        }
-
-        public void AddRegex(string pattern, string origin)
-        {
-            this.Trace($"Setting up regex for origin: {origin}.");
-            if (pattern == null)
-            {
-                this.Trace($"Pattern is empty.");
-                return;
-            }
-
-            this._secretMasker.AddRegex(pattern);
         }
 
         public void AddValue(string value)
@@ -61,20 +43,14 @@ namespace Agent.Sdk.Util
             this._secretMasker.AddValue(value);
         }
 
-        public void AddValueEncoder(ValueEncoder encoder, string origin)
+        public void AddRegex(string pattern)
         {
-            this.Trace($"Setting up value for origin: {origin}");
-            if (encoder == null)
-            {
-                this.Trace($"Encoder is empty.");
-                return;
-            }
-            this._secretMasker.AddValueEncoder(encoder);
+            this._secretMasker.AddRegex(pattern);
         }
 
         public void AddValueEncoder(ValueEncoder encoder)
         {
-            this.AddValueEncoder(encoder, "Unknown");
+            this._secretMasker.AddValueEncoder(encoder);
         }
 
         public ISecretMasker Clone()

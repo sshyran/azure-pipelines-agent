@@ -3,7 +3,7 @@
 
 using System;
 using System.Collections.Generic;
-using Agent.Sdk.Util.WellKnownSecretAliases;
+using Agent.Sdk.Util;
 
 namespace Microsoft.VisualStudio.Services.Agent
 {

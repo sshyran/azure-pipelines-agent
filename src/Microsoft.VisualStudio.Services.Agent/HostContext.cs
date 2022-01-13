@@ -86,15 +86,15 @@ namespace Microsoft.VisualStudio.Services.Agent
             _loadContext = AssemblyLoadContext.GetLoadContext(typeof(HostContext).GetTypeInfo().Assembly);
             _loadContext.Unloading += LoadContext_Unloading;
 
-            this.SecretMasker.AddValueEncoder(ValueEncoders.JsonStringEscape, "JsonStringEscape");
-            this.SecretMasker.AddValueEncoder(ValueEncoders.UriDataEscape, "UriDataEscape");
-            this.SecretMasker.AddValueEncoder(ValueEncoders.BackslashEscape, "BackslashEscape");
-            this.SecretMasker.AddRegex(AdditionalMaskingRegexes.UrlSecretPattern, "UrlSecretPattern");
+            this.SecretMasker.AddValueEncoder(ValueEncoders.JsonStringEscape);
+            this.SecretMasker.AddValueEncoder(ValueEncoders.UriDataEscape);
+            this.SecretMasker.AddValueEncoder(ValueEncoders.BackslashEscape);
+            this.SecretMasker.AddRegex(AdditionalMaskingRegexes.UrlSecretPattern);
             if (AgentKnobs.MaskUsingCredScanRegexes.GetValue(this).AsBoolean())
             {
                 foreach (var pattern in AdditionalMaskingRegexes.CredScanPatterns)
                 {
-                    this.SecretMasker.AddRegex(pattern, "CredScanPatterns");
+                    this.SecretMasker.AddRegex(pattern);
                 }
             }
 

@@ -63,9 +63,9 @@ namespace Microsoft.VisualStudio.Services.Agent.Tests
             var traceListener = new HostTraceListener(TraceFileName);
             traceListener.DisableConsoleReporting = true;
             _secretMasker = new LoggedSecretMasker(new SecretMasker());
-            _secretMasker.AddValueEncoder(ValueEncoders.JsonStringEscape, "TestHostContext");
-            _secretMasker.AddValueEncoder(ValueEncoders.UriDataEscape, "TestHostContext");
-            _secretMasker.AddValueEncoder(ValueEncoders.BackslashEscape, "TestHostContext");
+            _secretMasker.AddValueEncoder(ValueEncoders.JsonStringEscape);
+            _secretMasker.AddValueEncoder(ValueEncoders.UriDataEscape);
+            _secretMasker.AddValueEncoder(ValueEncoders.BackslashEscape);
             _traceManager = new TraceManager(traceListener, _secretMasker);
             _trace = GetTrace(nameof(TestHostContext));
 

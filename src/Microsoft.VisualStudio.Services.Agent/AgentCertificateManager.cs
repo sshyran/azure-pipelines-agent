@@ -9,7 +9,7 @@ using Microsoft.VisualStudio.Services.Common;
 using System.Net.Http;
 using Microsoft.VisualStudio.Services.WebApi;
 using Agent.Sdk;
-using Agent.Sdk.Util.WellKnownSecretAliases;
+using Agent.Sdk.Util;
 
 namespace Microsoft.VisualStudio.Services.Agent
 {

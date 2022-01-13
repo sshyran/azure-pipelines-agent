@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Agent.Listener.CommandLine;
 using Agent.Sdk;
+using Agent.Sdk.Util;
 using CommandLine;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json;
@@ -65,17 +66,17 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
             // Mask secret arguments
             if (Configure != null)
             {
-                context.SecretMasker.AddValue(Configure.Password, "Configure.Password");
-                context.SecretMasker.AddValue(Configure.ProxyPassword, "Configure.ProxyPassword");
-                context.SecretMasker.AddValue(Configure.SslClientCert, "Configure.SslClientCert");
-                context.SecretMasker.AddValue(Configure.Token, "Configure.Token");
-                context.SecretMasker.AddValue(Configure.WindowsLogonPassword, "Configure.WindowsLogonPassword");
+                context.SecretMasker.AddValue(Configure.Password, WellKnownSecretAliases.ConfigurePassword);
+                context.SecretMasker.AddValue(Configure.ProxyPassword, WellKnownSecretAliases.ConfigureProxyPassword);
+                context.SecretMasker.AddValue(Configure.SslClientCert, WellKnownSecretAliases.ConfigureSslClientCert);
+                context.SecretMasker.AddValue(Configure.Token, WellKnownSecretAliases.ConfigureToken);
+                context.SecretMasker.AddValue(Configure.WindowsLogonPassword, WellKnownSecretAliases.ConfigureWindowsLogonPassword);
             }
 
             if (Remove != null)
             {
-                context.SecretMasker.AddValue(Remove.Password, "Remove.Password");
-                context.SecretMasker.AddValue(Remove.Token, "Remove.Token");
+                context.SecretMasker.AddValue(Remove.Password, WellKnownSecretAliases.RemovePassword);
+                context.SecretMasker.AddValue(Remove.Token, WellKnownSecretAliases.RemoveToken);
             }
 
             PrintArguments();

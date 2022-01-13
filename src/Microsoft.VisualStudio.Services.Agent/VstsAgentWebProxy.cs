@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Agent.Sdk;
 using Agent.Sdk.Knob;
-using Agent.Sdk.Util.WellKnownSecretAliases;
+using Agent.Sdk.Util;
 
 namespace Microsoft.VisualStudio.Services.Agent
 {

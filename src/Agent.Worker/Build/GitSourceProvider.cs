@@ -14,7 +14,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Text;
 using System.Diagnostics;
-using Agent.Sdk.Util.WellKnownSecretAliases;
+using Agent.Sdk.Util;
 
 namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
 {

@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-namespace Agent.Sdk.Util.WellKnownSecretAliases
+namespace Agent.Sdk.Util
 {
     public static class WellKnownSecretAliases
     {
