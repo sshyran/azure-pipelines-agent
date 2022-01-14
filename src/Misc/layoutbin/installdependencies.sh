@@ -57,8 +57,8 @@ then
         echo "--------Debian Version--------"
         cat /etc/debian_version
         echo "------------------------------"
-
-        # prefer apt over apt-get
+        
+        # prefer apt over apt-get        
         command -v apt
         if [ $? -eq 0 ]
         then
@@ -177,7 +177,7 @@ then
                         print_errormessage
                         exit 1
                     fi
-                fi
+                fi       
 
                 dnf install -y lttng-ust krb5-libs zlib libicu
                 if [ $? -ne 0 ]
@@ -197,7 +197,7 @@ then
             then
                 yum install -y openssl-libs krb5-libs zlib libicu
                 if [ $? -ne 0 ]
-                then 
+                then                    
                     echo "'yum' failed with exit code '$?'"
                     print_errormessage
                     exit 1
@@ -257,7 +257,6 @@ then
                 exit 1
             fi
         elif [ -e /etc/mariner-release ]
-        # RHEL6 doesn't have an os-release file defined, read redhat-release instead
         then
             echo "The current OS is Mariner based"
             echo "--------Mariner Version--------"
