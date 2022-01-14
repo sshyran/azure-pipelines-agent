@@ -296,6 +296,29 @@ then
         print_errormessage
         exit 1
     fi
+elif [ -e /etc/mariner-release ]
+# RHEL6 doesn't have an os-release file defined, read redhat-release instead
+then
+    echo "The current OS is Mariner based"
+    echo "--------Mariner Version--------"
+    cat /etc/mariner-release
+    echo "------------------------------"
+
+    command -v yum
+    if [ $? -eq 0 ]
+        then
+        yum install -y icu
+        if [ $? -ne 0 ]
+        then                    
+            echo "'yum' failed with exit code '$?'"
+            print_errormessage
+            exit 1
+        fi
+    else
+        echo "Can not find 'yum'"
+        print_errormessage
+        exit 1
+    fi
 else
     echo "Unknown OS version"
     print_errormessage
