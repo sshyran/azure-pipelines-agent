@@ -201,8 +201,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
         /// <summary>
         /// Dumping cloud-init logs to diag folder of agent if cloud-init is installed on current machine.
         /// </summary>
-        /// <param name="jobStartTimeUtc">Job start time</param>
-        /// <param name="diagFolder">Path to agent diag folder</param>
+        /// <param name="logsFile">Path to collect cloud-init logs</param>
         /// <returns>Returns the method execution logs</returns>
         private async Task<string> DumpCloudInitLogs(string logsFile)
         {
