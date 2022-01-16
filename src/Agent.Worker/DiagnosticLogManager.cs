@@ -142,8 +142,12 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             {
                 executionContext.Debug("Dumping cloud-init logs.");
 
-                string resultLogs = await DumpCloudInitLogs(jobStartTimeUtc, HostContext.GetDirectory(WellKnownDirectory.Diag));
+                string logsFilePath = $"{HostContext.GetDirectory(WellKnownDirectory.Diag)}/cloudinit-{jobStartTimeUtc.ToString("yyyyMMdd-HHmmss")}-logs.tar.gz";
+                string resultLogs = await DumpCloudInitLogs(logsFilePath);
                 executionContext.Debug(resultLogs);
+
+                string destination = Path.Combine(supportFilesFolder, Path.GetFileName(logsFilePath));
+                File.Copy(logsFilePath, destination);
 
                 executionContext.Debug("Dumping cloud-init logs is ended.");
             }
@@ -200,7 +204,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
         /// <param name="jobStartTimeUtc">Job start time</param>
         /// <param name="diagFolder">Path to agent diag folder</param>
         /// <returns>Returns the method execution logs</returns>
-        private async Task<string> DumpCloudInitLogs(DateTime jobStartTimeUtc, string diagFolder)
+        private async Task<string> DumpCloudInitLogs(string logsFile)
         {
             var builder = new StringBuilder();
             string cloudInit = WhichUtil.Which("cloud-init", trace: Trace);
@@ -209,8 +213,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
                 return "Cloud-init isn't found on current machine.";
             }
 
-            string resultName = $"cloudinit-{jobStartTimeUtc.ToString("yyyyMMdd-HHmmss")}-logs.tar.gz";
-            string arguments = $"collect-logs -t \"{diagFolder}/{resultName}\"";
+            string arguments = $"collect-logs -t \"{logsFile}\"";
 
             try
             {
