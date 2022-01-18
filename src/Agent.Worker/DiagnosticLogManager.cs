@@ -172,7 +172,15 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
                 }
             }
 
-            DumpAgentExtensionLogs(executionContext, supportFilesFolder);
+            try
+            {
+                DumpAgentExtensionLogs(executionContext, supportFilesFolder, jobStartTimeUtc);
+            }
+            catch (Exception ex)
+            {
+                executionContext.Debug("Failed to dump Agent Azure VM extension logs. Skipping.");
+                executionContext.Debug($"Error message: {ex}");
+            }
 
             executionContext.Debug("Zipping diagnostic files.");
 
@@ -200,13 +208,14 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             executionContext.Debug("Diagnostic file upload complete.");
         }
 
-        // Dumping TeamServicesAgent extension logs to the support files folder.
-        private void DumpAgentExtensionLogs(IExecutionContext executionContext, string supportFilesFolder)
+        // Dumping Agent Azure VM extension logs to the support files folder.
+        private void DumpAgentExtensionLogs(IExecutionContext executionContext, string supportFilesFolder, DateTime jobStartTimeUtc)
         {
             executionContext.Debug("Starting dumping agent extension logs.");
 
             string pathToLogs = null;
             string archiveName = null;
+            string timestamp = jobStartTimeUtc.ToString("yyyyMMdd-HHmmss");
 
             if (PlatformUtil.RunningOnWindows)
             {
@@ -218,28 +227,33 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
                     Version maxVersion = versions.Max();
                     pathToLogs = Path.Combine(pathToVersions, maxVersion.ToString());
                 }
-                archiveName = "AgentWindowsExtensionLogs.zip";
+                archiveName = $"AgentWindowsExtensionLogs-{timestamp}-utc.zip";
             }
 
             if (PlatformUtil.RunningOnLinux)
             {
                 pathToLogs = "/var/log/azure/Microsoft.VisualStudio.Services.TeamServicesAgentLinux";
-                archiveName = "AgentLinuxExtensionLogs.zip";
+                archiveName = $"AgentLinuxExtensionLogs-{timestamp}-utc.zip";
             }
 
             if (Directory.Exists(pathToLogs))
             {
                 executionContext.Debug($"Path to agent extension logs: {pathToLogs}");
-                string destination = Path.Combine(supportFilesFolder, archiveName);
-                executionContext.Debug($"Agent extension logs destination: {destination}");
-                ZipFile.CreateFromDirectory(pathToLogs, destination);
+
+                string archivePath = Path.Combine(HostContext.GetDirectory(WellKnownDirectory.Diag), archiveName);
+                executionContext.Debug($"Archiving agent extension logs to: {archivePath}");
+                ZipFile.CreateFromDirectory(pathToLogs, archivePath);
+
+                string copyPath = Path.Combine(supportFilesFolder, archiveName);
+                executionContext.Debug($"Copying archived agent extension logs to: {copyPath}");
+                File.Copy(archivePath, copyPath);
+
+                executionContext.Debug("Finishing dumping agent extension logs.");
             }
             else
             {
                 executionContext.Debug("Agent extension logs not found. Skipping.");
             }
-
-            executionContext.Debug("Finishing dumping agent extension logs.");
         }
 
         /// <summary>
