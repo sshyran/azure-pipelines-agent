@@ -117,7 +117,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
         {
             var chmodProcessInfo = new ProcessStartInfo("chmod")
             {
-                Arguments = $"{permissions} {(recursive ? "-R" : "")} {path}",
+                Arguments = $"{(recursive ? "-R" : "")} {permissions} {path}",
                 UseShellExecute = false,
                 RedirectStandardError = true
             };
