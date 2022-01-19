@@ -85,6 +85,12 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
             debug($"Extracted {zipPath} to ${extractedTeePath}");
 
             string extractedTeeDestinationPath = GetTeePath();
+            
+            if (Directory.Exists(extractedTeeDestinationPath)) 
+            {
+                DeleteTee();
+            }
+
             Directory.Move(Path.Combine(extractedTeePath, TeePluginName), extractedTeeDestinationPath);
 
             debug($"Moved to ${extractedTeeDestinationPath}");
@@ -117,7 +123,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
         {
             var chmodProcessInfo = new ProcessStartInfo("chmod")
             {
-                Arguments = $"{permissions} {(recursive ? "-R" : "")} {path}",
+                Arguments = $"{(recursive ? "-R" : "")} {permissions} {path}",
                 UseShellExecute = false,
                 RedirectStandardError = true
             };
