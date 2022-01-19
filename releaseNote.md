@@ -1,7 +1,25 @@
+## Features
+ - [macOS] Return the correct minor version on 11 and later OS. (#3605)
+ - Add Event Log dumping (#3653)
+ - Add passive validation - list local group memberships (#3673)
+ - Added RepoType telemetry for checkout task (#3677)
+ - Enabling validation of checksum for online agent update for ADO OnPrem (#3679)
+ - Add function to read waagent.conf settings and condition to run it only on Linux (#3680)
+ - Add passive validation - dumping cloud-init logs (#3681)
+ - Added masking for environment variables containing credentials in diagnostic logs (#3682)
+ - Download TEE plugin conditionally during checkout (#3684)
+ - Added information about user groups into environment file (Linux, MacOS) (#3690)
+ - Add cloud-init logs to diagnostics archive (#3700)
+
 ## Bugs
+ - Porting logic of handling negative patterns for DownloadBuildArtifacts task (#3664)
+ - Added tests for ported logic of handling negative patterns for DownloadBuildArtifacts task (#3665)
+ - Adding support of negative patterns for DownloadBuildArtifacts task in scenarios with using file share (#3666)
  - Fix permissions setting on MacOS while downloading TEE (#3704)
 
 ## Misc
+ - Add info about labels Latest and Pre-release (#3695)
+ - Switched macos pool to 10.15 (#3697)
  - Update dumping waagent.conf file logic not to write warning on missed "waagent.conf" (#3706)
 
 
