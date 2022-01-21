@@ -172,6 +172,29 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
                 }
             }
 
+            if (PlatformUtil.RunningOnLinux && !PlatformUtil.RunningOnRHEL6) {
+                executionContext.Debug("Dumping info about invalid MD5 sums of installed packages.");
+
+                try
+                {
+                    string packageVerificationResults = await GetPackageVerificationResult(executionContext);
+                    IEnumerable<string> brokenPackagesInfo = packageVerificationResults
+                        .Split("\n")
+                        .Where((line) => !line.EndsWith("OK"));
+
+                    string brokenPackagesLogsPath = $"{HostContext.GetDirectory(WellKnownDirectory.Diag)}/BrokenPackages-{ jobStartTimeUtc.ToString("yyyyMMdd-HHmmss") }.log";
+                    File.AppendAllLines(brokenPackagesLogsPath, brokenPackagesInfo);
+
+                    string destination = Path.Combine(supportFilesFolder, Path.GetFileName(brokenPackagesLogsPath));
+                    File.Copy(brokenPackagesLogsPath, destination);
+                }
+                catch (Exception ex)
+                {
+                    executionContext.Debug("Failed to dump broken packages logs. Skipping.");
+                    executionContext.Debug($"Error message: {ex}");
+                }
+            }
+
             executionContext.Debug("Zipping diagnostic files.");
 
             string buildNumber = executionContext.Variables.Build_Number ?? "UnknownBuildNumber";
@@ -574,6 +597,36 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
                     killProcessOnCancel: false,
                     cancellationToken: default(CancellationToken));
             }
+        }
+
+        private async Task<string> GetPackageVerificationResult(IExecutionContext executionContext)
+        {
+            var debsums = WhichUtil.Which("debsums");
+            var stringBuilder = new StringBuilder();
+            using (var processInvoker = HostContext.CreateService<IProcessInvoker>())
+            {
+                processInvoker.OutputDataReceived += (object sender, ProcessDataReceivedEventArgs mes) =>
+                {
+                    stringBuilder.AppendLine(mes.Data);
+                };
+                processInvoker.ErrorDataReceived += (object sender, ProcessDataReceivedEventArgs mes) =>
+                {
+                    stringBuilder.AppendLine(mes.Data);
+                };
+
+                await processInvoker.ExecuteAsync(
+                    workingDirectory: HostContext.GetDirectory(WellKnownDirectory.Bin),
+                    fileName: debsums,
+                    arguments: string.Empty,
+                    environment: null,
+                    requireExitCodeZero: false,
+                    outputEncoding: null,
+                    killProcessOnCancel: false,
+                    cancellationToken: default(CancellationToken)
+                );
+            }
+
+            return stringBuilder.ToString();
         }
     }
 }

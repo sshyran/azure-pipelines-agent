@@ -120,6 +120,14 @@ then
                     print_errormessage
                     exit 1
                 fi
+
+                # Try to install debsums package for logs gathering diagnostic info about broken packages
+                apt-get install debsums
+                if [ $? -ne 0 ]
+                then
+                    # Since this is only for diagnostics, we don't have to fail the entire script if this installation fails
+                    echo "Failed to install debsum package for diagnostics."
+                fi
             else
                 echo "Can not find 'apt' or 'apt-get'"
                 print_errormessage
