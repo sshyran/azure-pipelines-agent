@@ -11,6 +11,7 @@ fi
 # Debian based OS (Debian, Ubuntu, Linux Mint) has /etc/debian_version
 # Fedora based OS (Fedora, Redhat, Centos, Oracle Linux 7) has /etc/redhat-release
 # SUSE based OS (OpenSUSE, SUSE Enterprise) has ID_LIKE=suse in /etc/os-release
+# Mariner based OS (CBL-Mariner) has /etc/mariner-release
 
 function print_repositories_and_deps_warning()
 {
