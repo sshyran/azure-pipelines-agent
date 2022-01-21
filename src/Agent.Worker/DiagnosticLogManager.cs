@@ -150,6 +150,11 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
                 {
                     string destination = Path.Combine(supportFilesFolder, Path.GetFileName(logsFilePath));
                     File.Copy(logsFilePath, destination);
+                    executionContext.Debug("Cloud-init logs added to the diagnostics archive.");
+                }
+                else
+                {
+                    executionContext.Debug("Cloud-init logs were not found.");
                 }
 
                 executionContext.Debug("Dumping cloud-init logs is ended.");
