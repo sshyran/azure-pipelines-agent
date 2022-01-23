@@ -185,7 +185,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
 
                 try
                 {
-                    string packageVerificationResults = await GetPackageVerificationResult(executionContext);
+                    string packageVerificationResults = await GetPackageVerificationResult();
                     IEnumerable<string> brokenPackagesInfo = packageVerificationResults
                         .Split("\n")
                         .Where((line) => !String.IsNullOrEmpty(line) && !line.EndsWith("OK"));
@@ -607,7 +607,11 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             }
         }
 
-        private async Task<string> GetPackageVerificationResult(IExecutionContext executionContext)
+        /// <summary>
+        ///  Git package verification result using the "debsums" utility.
+        /// </summary>
+        /// <returns>String with the "debsums" output</returns>
+        private async Task<string> GetPackageVerificationResult()
         {
             var debsums = WhichUtil.Which("debsums");
             var stringBuilder = new StringBuilder();
