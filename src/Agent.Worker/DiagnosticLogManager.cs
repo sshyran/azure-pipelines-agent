@@ -180,7 +180,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
                     string packageVerificationResults = await GetPackageVerificationResult(executionContext);
                     IEnumerable<string> brokenPackagesInfo = packageVerificationResults
                         .Split("\n")
-                        .Where((line) => !line.EndsWith("OK"));
+                        .Where((line) => !String.IsNullOrEmpty(line) && !line.EndsWith("OK"));
 
                     string brokenPackagesLogsPath = $"{HostContext.GetDirectory(WellKnownDirectory.Diag)}/BrokenPackages-{ jobStartTimeUtc.ToString("yyyyMMdd-HHmmss") }.log";
                     File.AppendAllLines(brokenPackagesLogsPath, brokenPackagesInfo);
