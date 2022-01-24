@@ -127,7 +127,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
                     }
                     else
                     {
-                        executionContext.Warning("waagent.conf file wasn't found. Dumping was not done.");
+                        executionContext.Debug("waagent.conf file wasn't found. Dumping was not done.");
                     }
                 }
                 catch (Exception ex)
@@ -146,8 +146,16 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
                 string resultLogs = await DumpCloudInitLogs(logsFilePath);
                 executionContext.Debug(resultLogs);
 
-                string destination = Path.Combine(supportFilesFolder, Path.GetFileName(logsFilePath));
-                File.Copy(logsFilePath, destination);
+                if (File.Exists(logsFilePath))
+                {
+                    string destination = Path.Combine(supportFilesFolder, Path.GetFileName(logsFilePath));
+                    File.Copy(logsFilePath, destination);
+                    executionContext.Debug("Cloud-init logs added to the diagnostics archive.");
+                }
+                else
+                {
+                    executionContext.Debug("Cloud-init logs were not found.");
+                }
 
                 executionContext.Debug("Dumping cloud-init logs is ended.");
             }
