@@ -244,11 +244,15 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
                 string pathToExtensionVersions = ExtensionPaths.WindowsPathToExtensionVersions;
                 if (!Directory.Exists(pathToExtensionVersions))
                 {
+                    executionContext.Debug("Path to subfolders with Agent Azure VM Windows extension logs (of its different versions) does not exist.");
+                    executionContext.Debug($"(directory \"{pathToExtensionVersions}\" not found)");
                     return false;
                 }
                 string[] subDirs = Directory.GetDirectories(pathToExtensionVersions).Select(dir => Path.GetFileName(dir)).ToArray();
                 if (subDirs.Length == 0)
                 {
+                    executionContext.Debug("Path to Agent Azure VM Windows extension logs (of its different versions) does not contain subfolders.");
+                    executionContext.Debug($"(directory \"{pathToExtensionVersions}\" does not contain subdirectories with logs)");
                     return false;
                 }
                 Version[] versions = subDirs.Select(dir => new Version(dir)).ToArray();
@@ -262,6 +266,8 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
                 pathToLogs = ExtensionPaths.LinuxPathToExtensionLogs;
                 if (!Directory.Exists(pathToLogs))
                 {
+                    executionContext.Debug("Path to Agent Azure VM Linux extension logs does not exist.");
+                    executionContext.Debug($"(directory \"{pathToLogs}\" not found)");
                     return false;
                 }
                 archiveName = $"AgentLinuxExtensionLogs-{timestamp}-utc.zip";
