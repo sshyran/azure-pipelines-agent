@@ -174,7 +174,16 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
 
             try
             {
-                DumpAgentExtensionLogs(executionContext, supportFilesFolder, jobStartTimeUtc);
+                executionContext.Debug("Starting dumping Agent Azure VM extension logs.");
+                bool logsSuccessfullyDumped = DumpAgentExtensionLogs(executionContext, supportFilesFolder, jobStartTimeUtc);
+                if (logsSuccessfullyDumped)
+                {
+                    executionContext.Debug("Agent Azure VM extension logs successfully dumped.");
+                }
+                else
+                {
+                    executionContext.Debug("Agent Azure VM extension logs not found. Skipping.");
+                }
             }
             catch (Exception ex)
             {
@@ -208,52 +217,64 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             executionContext.Debug("Diagnostic file upload complete.");
         }
 
-        // Dumping Agent Azure VM extension logs to the support files folder.
-        private void DumpAgentExtensionLogs(IExecutionContext executionContext, string supportFilesFolder, DateTime jobStartTimeUtc)
+        /// <summary>
+        /// Dumping Agent Azure VM extension logs to the support files folder.
+        /// </summary>
+        /// <param name="executionContext">Execution context to write debug messages.</param>
+        /// <param name="supportFilesFolder">Destination folder for files to be dumped.</param>
+        /// <param name="jobStartTimeUtc">Date and time to create timestamp.</param>
+        /// <returns>true, if logs have been dumped successfully; otherwise returns false.</returns>
+        private bool DumpAgentExtensionLogs(IExecutionContext executionContext, string supportFilesFolder, DateTime jobStartTimeUtc)
         {
-            executionContext.Debug("Starting dumping agent extension logs.");
-
-            string pathToLogs = null;
-            string archiveName = null;
+            string pathToLogs = String.Empty;
+            string archiveName = String.Empty;
             string timestamp = jobStartTimeUtc.ToString("yyyyMMdd-HHmmss");
 
             if (PlatformUtil.RunningOnWindows)
             {
-                string pathToVersions = "C:\\WindowsAzure\\Logs\\Plugins\\Microsoft.VisualStudio.Services.TeamServicesAgent";
-                if (Directory.Exists(pathToVersions))
+                // the extension creates a subfolder with a version number on Windows, and we're taking the latest one
+                string pathToExtensionVersions = ExtensionPaths.WindowsPathToExtensionVersions;
+                if (!Directory.Exists(pathToExtensionVersions))
                 {
-                    string[] subDirs = Directory.GetDirectories(pathToVersions).Select(dir => dir.Split("\\").Last()).ToArray();
-                    Version[] versions = subDirs.Select(dir => new Version(dir)).ToArray();
-                    Version maxVersion = versions.Max();
-                    pathToLogs = Path.Combine(pathToVersions, maxVersion.ToString());
+                    return false;
                 }
+                string[] subDirs = Directory.GetDirectories(pathToExtensionVersions).Select(dir => Path.GetFileName(dir)).ToArray();
+                if (subDirs.Length == 0)
+                {
+                    return false;
+                }
+                Version[] versions = subDirs.Select(dir => new Version(dir)).ToArray();
+                Version maxVersion = versions.Max();
+                pathToLogs = Path.Combine(pathToExtensionVersions, maxVersion.ToString());
                 archiveName = $"AgentWindowsExtensionLogs-{timestamp}-utc.zip";
             }
-
-            if (PlatformUtil.RunningOnLinux)
+            else if (PlatformUtil.RunningOnLinux)
             {
-                pathToLogs = "/var/log/azure/Microsoft.VisualStudio.Services.TeamServicesAgentLinux";
+                // the extension does not create a subfolder with a version number on Linux, and we're just taking this folder
+                pathToLogs = ExtensionPaths.LinuxPathToExtensionLogs;
+                if (!Directory.Exists(pathToLogs))
+                {
+                    return false;
+                }
                 archiveName = $"AgentLinuxExtensionLogs-{timestamp}-utc.zip";
-            }
-
-            if (Directory.Exists(pathToLogs))
-            {
-                executionContext.Debug($"Path to agent extension logs: {pathToLogs}");
-
-                string archivePath = Path.Combine(HostContext.GetDirectory(WellKnownDirectory.Diag), archiveName);
-                executionContext.Debug($"Archiving agent extension logs to: {archivePath}");
-                ZipFile.CreateFromDirectory(pathToLogs, archivePath);
-
-                string copyPath = Path.Combine(supportFilesFolder, archiveName);
-                executionContext.Debug($"Copying archived agent extension logs to: {copyPath}");
-                File.Copy(archivePath, copyPath);
-
-                executionContext.Debug("Finishing dumping agent extension logs.");
             }
             else
             {
-                executionContext.Debug("Agent extension logs not found. Skipping.");
+                executionContext.Debug("Dumping Agent Azure VM extension logs implemented for Windows and Linux only.");
+                return false;
             }
+
+            executionContext.Debug($"Path to agent extension logs: {pathToLogs}");
+
+            string archivePath = Path.Combine(HostContext.GetDirectory(WellKnownDirectory.Diag), archiveName);
+            executionContext.Debug($"Archiving agent extension logs to: {archivePath}");
+            ZipFile.CreateFromDirectory(pathToLogs, archivePath);
+
+            string copyPath = Path.Combine(supportFilesFolder, archiveName);
+            executionContext.Debug($"Copying archived agent extension logs to: {copyPath}");
+            File.Copy(archivePath, copyPath);
+
+            return true;
         }
 
         /// <summary>
@@ -633,5 +654,11 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
                     cancellationToken: default(CancellationToken));
             }
         }
+    }
+
+    internal static class ExtensionPaths
+    {
+        public static readonly String WindowsPathToExtensionVersions = "C:\\WindowsAzure\\Logs\\Plugins\\Microsoft.VisualStudio.Services.TeamServicesAgent";
+        public static readonly String LinuxPathToExtensionLogs = "/var/log/azure/Microsoft.VisualStudio.Services.TeamServicesAgentLinux";
     }
 }
