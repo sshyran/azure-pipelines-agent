@@ -25,5 +25,14 @@ namespace Agent.Sdk.Util
         public static readonly string TerminalReadSecret = "Terminal.ReadSecret";
         public static readonly string ProxyPassword = "ProxyPassword";
         public static readonly string ClientCertificatePassword = "ClientCertificatePassword";
+
+        // Secret regex aliases
+        public static readonly string UrlSecretPattern = "RegexUrlSecretPattern";
+        public static readonly string CredScanPatterns = "RegexCredScanPatterns";
+
+        // Value encoder aliases
+        public static readonly string JsonStringEscape = "ValueEncoderJsonStringEscape";
+        public static readonly string UriDataEscape = "ValueEncoderUriDataEscape";
+        public static readonly string BackslashEscape = "ValueEncoderBackslashEscape";
     }
 }

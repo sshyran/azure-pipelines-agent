@@ -9,30 +9,29 @@ namespace Agent.Sdk.Util
     /// <summary>
     /// Extended secret masker service, that allows to log origins of secrets
     /// </summary>
-    public class LoggedSecretMasker : ISecretMasker
+    public class LoggedSecretMasker : ILoggedSecretMasker
     {
         private ISecretMasker _secretMasker;
         private ITraceWriter _trace;
 
         private void Trace(string msg)
         {
-            this._trace?.Info($"[DEBUG INFO]{msg}");
+            this._trace?.Info(msg);
         }
 
         public LoggedSecretMasker(ISecretMasker secretMasker)
         {
-
             this._secretMasker = secretMasker;
         }
 
-        public void setTrace(ITraceWriter trace)
+        public void SetTrace(ITraceWriter trace)
         {
             this._trace = trace;
         }
 
-        public void AddValue(string value)
+        public void AddValue(string pattern)
         {
-            this.AddValue(value, "Unknown");
+            this._secretMasker.AddValue(pattern);
         }
 
         /// <summary>
@@ -56,14 +55,48 @@ namespace Agent.Sdk.Util
             this._secretMasker.AddRegex(pattern);
         }
 
+        /// <summary>
+        /// Overloading of AddRegex method with additional logic for logging origin of provided secret
+        /// </summary>
+        /// <param name="pattern"></param>
+        /// <param name="origin"></param>
+        public void AddRegex(string pattern, string origin)
+        {
+            this.Trace($"Setting up regex for origin: {origin}.");
+            if (pattern == null)
+            {
+                this.Trace($"Pattern is empty.");
+                return;
+            }
+
+            this._secretMasker.AddRegex(pattern);
+        }
+
         public void AddValueEncoder(ValueEncoder encoder)
         {
             this._secretMasker.AddValueEncoder(encoder);
         }
 
+        /// <summary>
+        /// Overloading of AddValueEncoder method with additional logic for logging origin of provided secret
+        /// </summary>
+        /// <param name="encoder"></param>
+        /// <param name="origin"></param>
+        public void AddValueEncoder(ValueEncoder encoder, string origin)
+        {
+            this.Trace($"Setting up value for origin: {origin}");
+            this.Trace($"Length: {encoder.ToString().Length}.");
+            if (encoder == null)
+            {
+                this.Trace($"Encoder is empty.");
+                return;
+            }
+            this._secretMasker.AddValueEncoder(encoder);
+        }
+
         public ISecretMasker Clone()
         {
-            return this._secretMasker.Clone();
+            return new LoggedSecretMasker(this._secretMasker.Clone());
         }
 
         public string MaskSecrets(string input)

@@ -101,7 +101,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
                         bool secret = Constants.Agent.CommandLine.Args.Secrets.Any(x => string.Equals(x, name, StringComparison.OrdinalIgnoreCase));
                         if (secret)
                         {
-                            context.SecretMasker.AddValue(val, fullKey);
+                            context.SecretMasker.AddValue(val, $"CommandSettings_{fullKey}");
                         }
 
                         // Store the value.

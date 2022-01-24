@@ -26,7 +26,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Tests
         private readonly ConcurrentDictionary<Type, object> _serviceSingletons = new ConcurrentDictionary<Type, object>();
         private readonly ITraceManager _traceManager;
         private readonly Terminal _term;
-        private readonly LoggedSecretMasker _secretMasker;
+        private readonly ILoggedSecretMasker _secretMasker;
         private CancellationTokenSource _agentShutdownTokenSource = new CancellationTokenSource();
         private string _suiteName;
         private string _testName;
@@ -37,7 +37,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Tests
         public event EventHandler Unloading;
         public CancellationToken AgentShutdownToken => _agentShutdownTokenSource.Token;
         public ShutdownReason AgentShutdownReason { get; private set; }
-        public LoggedSecretMasker SecretMasker => _secretMasker;
+        public ILoggedSecretMasker SecretMasker => _secretMasker;
         public TestHostContext(object testClass, [CallerMemberName] string testName = "")
         {
             ArgUtil.NotNull(testClass, nameof(testClass));

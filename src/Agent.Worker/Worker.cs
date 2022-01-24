@@ -168,7 +168,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             {
                 if (maskHint.Type == MaskType.Regex)
                 {
-                    HostContext.SecretMasker.AddRegex(maskHint.Value);
+                    HostContext.SecretMasker.AddRegex(maskHint.Value, $"Worker_{WellKnownSecretAliases.AddingMaskHint}");
 
                     // We need this because the worker will print out the job message JSON to diag log
                     // and SecretMasker has JsonEscapeEncoder hook up
@@ -190,7 +190,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
                 {
                     if (!string.IsNullOrEmpty(keyValuePair.Value) && MaskingUtil.IsEndpointAuthorizationParametersSecret(keyValuePair.Key))
                     {
-                        HostContext.SecretMasker.AddValue(keyValuePair.Value, keyValuePair.Key);
+                        HostContext.SecretMasker.AddValue(keyValuePair.Value, $"Worker_EndpointAuthorizationParameters_{keyValuePair.Key}");
                     }
                 }
             }
