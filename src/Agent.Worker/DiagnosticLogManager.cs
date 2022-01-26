@@ -201,6 +201,8 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
                     executionContext.Debug("Failed to dump broken packages logs. Skipping.");
                     executionContext.Debug($"Error message: {ex}");
                 }
+            } else {
+                executionContext.Debug("The platform is not Linux or RHEL6 - skipping debsums check.");
             }
 
             try
