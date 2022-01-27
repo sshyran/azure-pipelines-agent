@@ -69,7 +69,7 @@ stages:
         jobName: build_windows_x64
         displayName: Windows (x64)
         pool:
-          vmImage: windows-latest
+          vmImage: windows-2019
         os: win
         arch: x64
         branch: ${{ parameters.branch }}
