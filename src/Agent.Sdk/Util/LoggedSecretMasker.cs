@@ -47,7 +47,8 @@ namespace Agent.Sdk.Util
                 this.Trace($"Value is empty.");
                 return;
             }
-            this._secretMasker.AddValue(value);
+
+            AddValue(value);
         }
 
         public void AddRegex(string pattern)
@@ -69,7 +70,7 @@ namespace Agent.Sdk.Util
                 return;
             }
 
-            this._secretMasker.AddRegex(pattern);
+            AddRegex(pattern);
         }
 
         public void AddValueEncoder(ValueEncoder encoder)
@@ -91,7 +92,8 @@ namespace Agent.Sdk.Util
                 this.Trace($"Encoder is empty.");
                 return;
             }
-            this._secretMasker.AddValueEncoder(encoder);
+
+            AddValueEncoder(encoder);
         }
 
         public ISecretMasker Clone()
