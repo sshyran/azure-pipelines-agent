@@ -202,7 +202,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
                     executionContext.Debug($"Error message: {ex}");
                 }
             } else {
-                executionContext.Debug("The platform is not Linux or RHEL6 - skipping debsums check.");
+                executionContext.Debug("The platform is not based on Debian - skipping debsums check.");
             }
 
             try
