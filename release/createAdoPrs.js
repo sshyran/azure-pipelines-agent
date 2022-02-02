@@ -88,7 +88,7 @@ async function createAdoPR(directory, release)
     {
         fs.copyFileSync(file, target);
     }
-    var newBranch = `users/${process.env.USERNAME}/agent-${release}`;
+    var newBranch = `users/${'DaniilShmelev'}/agent-${release}`;
     util.execInForeground(`${GIT} add ${targetDirectory}`, directory, opt.dryrun);
     commitAndPush(directory, release, newBranch);
 
@@ -99,7 +99,7 @@ async function createAdoPR(directory, release)
         sourceRefName: `refs/heads/${newBranch}`,
         targetRefName: 'refs/heads/master',
         title: 'Update agent',
-        description: `Update agent to version ${release}`
+        description: `[TEST; DO NOT MERGE] Update agent to version ${release}`
     }, 'AzureDevOps', 'AzureDevOps');
 }
 
@@ -128,7 +128,7 @@ async function createConfigChangePR(repoPath, agentVersion) {
         fs.copyFileSync(file, publishScriptPathInSystem);
     }
 
-    const newBranch = `users/${process.env.USERNAME}/agent-${agentVersion}`;
+    const newBranch = `users/${'DaniilShmelev'}/agent-${agentVersion}`;
     util.execInForeground(`${GIT} add ${publishScriptPathInRepo}`, repoPath, opt.dryrun);
     commitAndPush(repoPath, agentVersion, newBranch);
 
@@ -168,8 +168,8 @@ async function main()
         util.verifyMinimumNodeVersion();
         util.verifyMinimumGitVersion();
         createIntegrationFiles(newRelease);
-        util.execInForeground(`${GIT} config --global user.email "${process.env.USEREMAIL}"`, null, opt.dryrun);
-        util.execInForeground(`${GIT} config --global user.name "${process.env.USERNAME}"`, null, opt.dryrun);
+        util.execInForeground(`${GIT} config --global user.email "${'v-dshmelev@microsoft.com'}"`, null, opt.dryrun);
+        util.execInForeground(`${GIT} config --global user.name "${'DaniilShmelev'}"`, null, opt.dryrun);
 
         var pathToAdo = path.join(INTEGRATION_DIR, 'AzureDevOps');
         await createAdoPR(pathToAdo, newRelease);
