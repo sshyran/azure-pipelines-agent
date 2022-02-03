@@ -17,6 +17,7 @@
  - Adding support of negative patterns for DownloadBuildArtifacts task in scenarios with using file share (#3666)
  - Fix permissions setting on MacOS while downloading TEE (#3704)
  - Fix adding cloud-init logs to diagnostics archive (#3710)
+ - Added correction of empty Matching pattern field to default value (#3730)
 
 ## Misc
  - Add info about labels Latest and Pre-release (#3695)
