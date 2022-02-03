@@ -115,7 +115,7 @@ namespace Agent.Plugins.BuildArtifacts
             targetPath = Path.IsPathFullyQualified(targetPath) ? targetPath : Path.GetFullPath(Path.Combine(defaultWorkingDirectory, targetPath));
 
             // Empty input field "Matching pattern" must be recognised as default value '**'
-            itemPattern = itemPattern.Length == 0 ? "**" : itemPattern;
+            itemPattern = string.IsNullOrEmpty(itemPattern) ? "**" : itemPattern;
 
             string[] minimatchPatterns = itemPattern.Split(
                 new[] { "\n" },
