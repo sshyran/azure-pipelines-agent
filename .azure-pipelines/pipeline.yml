@@ -125,8 +125,7 @@ stages:
         jobName: build_linux_arm
         displayName: Linux (ARM)
         pool:
-          name: buildDevs
-          demands: 'Agent.OSArchitecture -equals ARM'
+          name: 1ES_ARM_Agent_Pool
         container: dotnetcore_arm
         timeoutInMinutes: 75
         os: linux
@@ -146,8 +145,7 @@ stages:
         jobName: build_linux_arm64
         displayName: Linux (ARM64)
         pool:
-          name: buildDevs
-          demands: 'Agent.OSArchitecture -equals ARM64'
+          name: 1ES_ARM_Agent_Pool
         timeoutInMinutes: 75
         os: linux
         arch: arm64
