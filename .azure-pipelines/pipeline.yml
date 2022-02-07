@@ -126,6 +126,7 @@ stages:
         displayName: Linux (ARM)
         pool:
           name: 1ES_ARM_Agent_Pool
+          vmImage: Ubuntu_2004_ARM64
         container: dotnetcore_arm
         timeoutInMinutes: 75
         os: linux
@@ -146,6 +147,7 @@ stages:
         displayName: Linux (ARM64)
         pool:
           name: 1ES_ARM_Agent_Pool
+          vmImage: Ubuntu_2004_ARM64
         timeoutInMinutes: 75
         os: linux
         arch: arm64
