@@ -101,7 +101,7 @@ jobs:
       parameters:
         branch: ${{ parameters.branch }}
 
-  - ${{ if eq(parameters.arch, 'arm64') }}:
+  - ${{ if or(eq(parameters.arch, 'arm64'), eq(parameters.arch, 'arm')) }}:
     - script: sudo apt-get update && sudo apt-get -y install unzip
 
   # Build agent layout

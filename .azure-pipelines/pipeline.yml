@@ -27,25 +27,25 @@ parameters:
 # Targets
 - name: win_x64
   type: boolean
-  default: true
+  default: false
 - name: win_x86
   type: boolean
-  default: true
+  default: false
 - name: linux_x64
   type: boolean
-  default: true
+  default: false
 - name: linux_arm
   type: boolean
   default: true
 - name: linux_arm64
   type: boolean
-  default: true
+  default: false
 - name: rhel6_x64
   type: boolean
-  default: true
+  default: false
 - name: macOS_x64
   type: boolean
-  default: true
+  default: false
 
 resources:
   containers:
@@ -127,7 +127,7 @@ stages:
         pool:
           name: 1ES_ARM_Agent_Pool
           vmImage: Ubuntu_2004_ARM64
-        container: dotnetcore_arm
+        # container: dotnetcore_arm
         timeoutInMinutes: 75
         os: linux
         arch: arm
