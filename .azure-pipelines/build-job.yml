@@ -102,7 +102,7 @@ jobs:
         branch: ${{ parameters.branch }}
 
   - ${{ if or(eq(parameters.arch, 'arm64'), eq(parameters.arch, 'arm')) }}:
-    - script: sudo apt-get update && sudo apt-get -y install unzip
+    - script: sudo dpkg --add-architecture armhf && sudo apt-get update && sudo apt-get -y install unzip libc6:armhf libstdc++6:armhf binfmt-support qemu qemu-user-static
 
   # Build agent layout
   - script: ${{ variables.devCommand }} layout Release ${{ parameters.os }}-${{ parameters.arch }}
