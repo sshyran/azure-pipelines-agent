@@ -101,6 +101,9 @@ jobs:
       parameters:
         branch: ${{ parameters.branch }}
 
+  - ${{ if eq(parameters.arch, 'arm64') }}:
+    - script: sudo apt-get update && sudo apt-get -y install unzip
+
   # Build agent layout
   - script: ${{ variables.devCommand }} layout Release ${{ parameters.os }}-${{ parameters.arch }}
     workingDirectory: src
