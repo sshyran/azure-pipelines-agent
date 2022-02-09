@@ -22,7 +22,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
         private static UtilKnobValueContext _knobContext = UtilKnobValueContext.Instance();
 
         private const string _testUri = "https://microsoft.com/";
-        private static bool _IsCustomServerCertificateValidationSupported;
+        private static bool? _IsCustomServerCertificateValidationSupported;
 
         public static bool IsCustomServerCertificateValidationSupported
         {
@@ -32,7 +32,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
                 {
                     _IsCustomServerCertificateValidationSupported = CheckSupportOfCustomServerCertificateValidation();
                 }
-                return _IsCustomServerCertificateValidationSupported;
+                return (bool)_IsCustomServerCertificateValidationSupported;
             }
         }
 
