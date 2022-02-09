@@ -21,6 +21,26 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
     {
         private static UtilKnobValueContext _knobContext = UtilKnobValueContext.Instance();
 
+        public static bool IsCustomServerCertificateValidationSupported
+        {
+            get
+            {
+                HttpClientHandler handler = new HttpClientHandler();
+                handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; };
+                HttpClient client = new HttpClient(handler);
+
+                try
+                {
+                    client.GetAsync("https://microsoft.com/").GetAwaiter();
+                }
+                catch (Exception)
+                {
+                    return false;
+                }
+                return true;
+            }
+        }
+
         public static void InitializeVssClientSettings(ProductInfoHeaderValue additionalUserAgent, IWebProxy proxy, IVssClientCertificateManager clientCert)
         {
             var headerValues = new List<ProductInfoHeaderValue>();
@@ -75,7 +95,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
             settings.AcceptLanguages.Remove(CultureInfo.InvariantCulture);
 
             // Setting `ServerCertificateCustomValidation` to able to capture SSL data for diagnostic
-            if (trace != null)
+            if (trace != null && !PlatformUtil.RunningOnMacOS && IsCustomServerCertificateValidationSupported)
             {
                 SslUtil sslUtil = new SslUtil(trace);
                 settings.ServerCertificateValidationCallback = sslUtil.RequestStatusCustomValidation;
