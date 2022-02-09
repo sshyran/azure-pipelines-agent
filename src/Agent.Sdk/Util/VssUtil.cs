@@ -21,27 +21,18 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
     {
         private static UtilKnobValueContext _knobContext = UtilKnobValueContext.Instance();
 
+        private const string _testUri = "https://microsoft.com/";
+        private static bool _IsCustomServerCertificateValidationSupported;
+
         public static bool IsCustomServerCertificateValidationSupported
         {
             get
             {
-                using (var handler = new HttpClientHandler())
+                if (_IsCustomServerCertificateValidationSupported == null)
                 {
-                    handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; };
-
-                    using (var client = new HttpClient(handler))
-                    {
-                        try
-                        {
-                            client.GetAsync("https://microsoft.com/").GetAwaiter();
-                        }
-                        catch (Exception)
-                        {
-                            return false;
-                        }
-                        return true;
-                    }
+                    _IsCustomServerCertificateValidationSupported = CheckSupportOfCustomServerCertificateValidation();
                 }
+                return _IsCustomServerCertificateValidationSupported;
             }
         }
 
@@ -99,7 +90,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
             settings.AcceptLanguages.Remove(CultureInfo.InvariantCulture);
 
             // Setting `ServerCertificateCustomValidation` to able to capture SSL data for diagnostic
-            if (trace != null && !PlatformUtil.RunningOnMacOS && IsCustomServerCertificateValidationSupported)
+            if (trace != null && IsCustomServerCertificateValidationSupported)
             {
                 SslUtil sslUtil = new SslUtil(trace);
                 settings.ServerCertificateValidationCallback = sslUtil.RequestStatusCustomValidation;
@@ -129,6 +120,27 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
             }
 
             return credentials;
+        }
+
+        private static bool CheckSupportOfCustomServerCertificateValidation()
+        {
+            using (var handler = new HttpClientHandler())
+            {
+                handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; };
+
+                using (var client = new HttpClient(handler))
+                {
+                    try
+                    {
+                        client.GetAsync(_testUri).GetAwaiter().GetResult();
+                    }
+                    catch (Exception)
+                    {
+                        return false;
+                    }
+                    return true;
+                }
+            }
         }
     }
 }
