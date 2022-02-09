@@ -25,19 +25,23 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
         {
             get
             {
-                HttpClientHandler handler = new HttpClientHandler();
-                handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; };
-                HttpClient client = new HttpClient(handler);
+                using (var handler = new HttpClientHandler())
+                {
+                    handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; };
 
-                try
-                {
-                    client.GetAsync("https://microsoft.com/").GetAwaiter();
+                    using (var client = new HttpClient(handler))
+                    {
+                        try
+                        {
+                            client.GetAsync("https://microsoft.com/").GetAwaiter();
+                        }
+                        catch (Exception)
+                        {
+                            return false;
+                        }
+                        return true;
+                    }
                 }
-                catch (Exception)
-                {
-                    return false;
-                }
-                return true;
             }
         }
 
