@@ -137,9 +137,10 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
                     {
                         client.GetAsync(_testUri).GetAwaiter().GetResult();
                     }
-                    catch (Exception)
+                    catch (Exception e)
                     {
-                        trace.Verbose("The current system doesn't support custom server certificate validation.");
+                        trace.Verbose("No more detailed SSL data will be captured.");
+                        trace.Verbose(e.Message);
                         return false;
                     }
                     return true;
