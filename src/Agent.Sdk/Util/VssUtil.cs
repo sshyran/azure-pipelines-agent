@@ -28,11 +28,15 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
         {
             get
             {
-                if (_IsCustomServerCertificateValidationSupported == null)
+                if (!PlatformUtil.RunningOnWindows && PlatformUtil.UseLegacyHttpHandler)
                 {
-                    _IsCustomServerCertificateValidationSupported = CheckSupportOfCustomServerCertificateValidation();
+                    if (_IsCustomServerCertificateValidationSupported == null)
+                    {
+                        _IsCustomServerCertificateValidationSupported = CheckSupportOfCustomServerCertificateValidation();
+                    }
+                    return (bool)_IsCustomServerCertificateValidationSupported;
                 }
-                return (bool)_IsCustomServerCertificateValidationSupported;
+                return true;
             }
         }
 
