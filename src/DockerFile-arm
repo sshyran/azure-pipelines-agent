@@ -1,0 +1,9 @@
+FROM azpagentinfra/arm:latest AS test
+WORKDIR /app
+EXPOSE 80
+COPY /src /src
+COPY /_downloads /_downloads
+COPY /_layout /_layout
+
+WORKDIR /src
+ENTRYPOINT ["./dev.sh"]
