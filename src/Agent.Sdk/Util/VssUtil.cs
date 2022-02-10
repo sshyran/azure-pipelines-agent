@@ -22,23 +22,9 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
         private static UtilKnobValueContext _knobContext = UtilKnobValueContext.Instance();
 
         private const string _testUri = "https://microsoft.com/";
-        private static bool? _IsCustomServerCertificateValidationSupported;
+        private static bool? _isCustomServerCertificateValidationSupported;
 
-        public static bool IsCustomServerCertificateValidationSupported
-        {
-            get
-            {
-                if (!PlatformUtil.RunningOnWindows && PlatformUtil.UseLegacyHttpHandler)
-                {
-                    if (_IsCustomServerCertificateValidationSupported == null)
-                    {
-                        _IsCustomServerCertificateValidationSupported = CheckSupportOfCustomServerCertificateValidation();
-                    }
-                    return (bool)_IsCustomServerCertificateValidationSupported;
-                }
-                return true;
-            }
-        }
+        
 
         public static void InitializeVssClientSettings(ProductInfoHeaderValue additionalUserAgent, IWebProxy proxy, IVssClientCertificateManager clientCert)
         {
@@ -94,7 +80,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
             settings.AcceptLanguages.Remove(CultureInfo.InvariantCulture);
 
             // Setting `ServerCertificateCustomValidation` to able to capture SSL data for diagnostic
-            if (trace != null && IsCustomServerCertificateValidationSupported)
+            if (trace != null && IsCustomServerCertificateValidationSupported(trace))
             {
                 SslUtil sslUtil = new SslUtil(trace);
                 settings.ServerCertificateValidationCallback = sslUtil.RequestStatusCustomValidation;
@@ -126,7 +112,20 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
             return credentials;
         }
 
-        private static bool CheckSupportOfCustomServerCertificateValidation()
+        public static bool IsCustomServerCertificateValidationSupported(ITraceWriter trace)
+        {
+            if (!PlatformUtil.RunningOnWindows && PlatformUtil.UseLegacyHttpHandler)
+            {
+                if (_isCustomServerCertificateValidationSupported == null)
+                {
+                    _isCustomServerCertificateValidationSupported = CheckSupportOfCustomServerCertificateValidation(trace);
+                }
+                return (bool)_isCustomServerCertificateValidationSupported;
+            }
+            return true;
+        }
+
+        private static bool CheckSupportOfCustomServerCertificateValidation(ITraceWriter trace)
         {
             using (var handler = new HttpClientHandler())
             {
@@ -140,6 +139,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
                     }
                     catch (Exception)
                     {
+                        trace.Verbose("The current system doesn't support custom server certificate validation.");
                         return false;
                     }
                     return true;
