@@ -139,8 +139,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
                     }
                     catch (Exception e)
                     {
-                        trace.Verbose("No more detailed SSL data will be captured.");
-                        trace.Verbose(e.Message);
+                        trace.Verbose($"SSL diagnostic data collection is disabled, due to issue:\n{e.Message}");
                         return false;
                     }
                     return true;
