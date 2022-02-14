@@ -108,6 +108,7 @@ stages:
       condition: and(succeeded(), eq(variables['SHOULDCREATEPR'], 'True'), eq(variables['build.reason'], 'Schedule'))
 
     - powershell: |
+        $buildUrl = "$(System.TeamFoundationCollectionUri)$(System.TeamProject)/_build/results?buildId=$(Build.BuildId)&_a=summary"
         $titleText = "Azure Pipelines Agent Localization build failed - ID $($(Build.BuildId))"
         $messageText = "Failed to create agent Localization update PR. Please review the results of failed build [ID $($(Build.BuildId))]($($buildUrl)). Related article in [Wiki](https://mseng.visualstudio.com/AzureDevOps/_wiki/wikis/AzureDevOps.wiki/16150/Localization-update)."
         $body = [PSCustomObject]@{
