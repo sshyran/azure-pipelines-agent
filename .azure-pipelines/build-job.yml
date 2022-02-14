@@ -101,25 +101,9 @@ jobs:
       parameters:
         branch: ${{ parameters.branch }}
 
-  - ${{ if or(eq(parameters.arch, 'arm64'), eq(parameters.arch, 'arm')) }}:
+  - ${{ if eq(parameters.arch, 'arm64') }}:
     - script: sudo apt-get update && sudo apt-get -y install unzip
-
-  - ${{ if eq(parameters.arch, 'arm') }}:
-    - script: |
-        sudo dpkg --add-architecture armhf
-        sudo apt-get -y install apt-transport-https ca-certificates curl software-properties-common
-        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-        sudo add-apt-repository "deb [arch=arm64] https://download.docker.com/linux/ubuntu bionic stable"
-        sudo apt-get update
-        apt-cache policy docker-ce
-        sudo apt-get -y install docker-ce
-        sleep 20
-        sudo systemctl status docker
-        sudo docker run --rm --privileged aptman/qus -s -- -p arm
-        sudo systemctl restart docker
-      displayName: Setup docker
-    - script: docker buildx create --name testcontainer && docker buildx use testcontainer
-      displayName: Create Builder
+      displayName: Install unzip
 
   # Build agent layout
   - script: ${{ variables.devCommand }} layout Release ${{ parameters.os }}-${{ parameters.arch }}
@@ -130,16 +114,9 @@ jobs:
         ADO_ENABLE_LOGISSUE: true
 
   # Run l0 tests
-  - ${{ if and(parameters.unitTests, ne(parameters.arch, 'arm')) }}:
+  - ${{ if parameters.unitTests }}:
     - script: ${{ variables.devCommand }} testl0 Debug ${{ parameters.os }}-${{ parameters.arch }}
       workingDirectory: src
-      displayName: Unit tests
-
-  - ${{ if and(parameters.unitTests, eq(parameters.arch, 'arm')) }}:
-    - script: sudo docker buildx build --file "$(Build.SourcesDirectory)/src/DockerFile-${{ parameters.arch }}" --platform linux/${{ parameters.arch }} -t "test-${{ parameters.arch }}:latest" --output=type=docker .
-      displayName: Create contianer for testing
-    - script: sudo docker images
-    - script: sudo docker run --platform linux/${{ parameters.arch }} -v $(Build.SourcesDirectory)/src/Test/TestResults:/src/Test/TestResults -v $(Build.SourcesDirectory)/src/Test/TestLogs:/src/Test/TestLogs test-arm testl0 Debug ${{ parameters.os }}-${{ parameters.arch }}
       displayName: Unit tests
 
   # Install nuget

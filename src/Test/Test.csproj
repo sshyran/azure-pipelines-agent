@@ -44,13 +44,4 @@
         Retries="3"
         RetryDelayMilliseconds="300"/>
   </Target>
-  <Target Name="CopyFilesL0ARM">
-    <Copy
-        SourceFiles="@(MySourceFiles)"
-        DestinationFolder="$(MSBuildProjectDirectory)\bin\Debug\netcoreapp3.1\linux-arm"
-        SkipUnchangedFiles="true"
-        OverwriteReadOnlyFiles="true"
-        Retries="3"
-        RetryDelayMilliseconds="300"/>
-  </Target>
 </Project>
