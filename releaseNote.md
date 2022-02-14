@@ -1,3 +1,12 @@
+## Features
+ - Update error message on PR changes #3738 (#3741)
+
+## Bugs
+ - Add check the support of custom server certificate validation  (#3738)
+
+## Misc
+
+
 
 ## Agent Downloads
 
