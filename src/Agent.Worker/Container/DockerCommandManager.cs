@@ -245,7 +245,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Container
                 }
                 else
                 {
-                    Trace.Warning("Specified driver not found!");
+                    Trace.Warning($"Specified '{driver}' driver not found!");
                 }
             }
             else if (usingWindowsContainers && networkDrivers.Contains("nat"))
