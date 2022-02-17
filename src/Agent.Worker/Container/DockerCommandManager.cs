@@ -239,7 +239,14 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Container
 
             if (!String.IsNullOrEmpty(driver))
             {
-                options += $" --driver {driver}";
+                if (networkDrivers.Contains(driver))
+                {
+                    options += $" --driver {driver}";
+                }
+                else
+                {
+                    Trace.Warning("Specified driver not found!");
+                }
             }
             else if (usingWindowsContainers && networkDrivers.Contains("nat"))
             {
