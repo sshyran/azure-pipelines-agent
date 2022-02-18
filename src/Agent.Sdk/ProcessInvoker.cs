@@ -11,6 +11,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Agent.Sdk;
+using Agent.Sdk.Knob;
 using Microsoft.TeamFoundation.Framework.Common;
 
 namespace Microsoft.VisualStudio.Services.Agent.Util
@@ -25,41 +26,62 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
         private Stopwatch _stopWatch;
         private int _asyncStreamReaderCount = 0;
         private bool _waitingOnStreams = false;
-        private readonly AsyncManualResetEvent _outputProcessEvent = new AsyncManualResetEvent();
+        private readonly AsyncManualResetEvent _outputProcessEvent;
         private readonly TaskCompletionSource<bool> _processExitedCompletionSource = new TaskCompletionSource<bool>();
         private readonly ConcurrentQueue<string> _errorData = new ConcurrentQueue<string>();
         private readonly ConcurrentQueue<string> _outputData = new ConcurrentQueue<string>();
         private readonly TimeSpan _sigintTimeout = TimeSpan.FromMilliseconds(7500);
         private readonly TimeSpan _sigtermTimeout = TimeSpan.FromMilliseconds(2500);
-        private ITraceWriter Trace { get; set; }
+        public ITraceWriter Trace { get; set; }
 
         private class AsyncManualResetEvent
         {
             private volatile TaskCompletionSource<bool> m_tcs = new TaskCompletionSource<bool>();
+            private readonly ITraceWriter Trace;
 
+            public AsyncManualResetEvent(ITraceWriter trace)
+            {
+                Trace = trace;
+            }
             public Task WaitAsync() { return m_tcs.Task; }
 
-            public void Set()
+            public void Set(string sourceCall)
             {
+                WriteAdditionalTracing($"Set AsyncManualResetEvent for event from {sourceCall}");
                 var tcs = m_tcs;
                 Task.Factory.StartNew(s => ((TaskCompletionSource<bool>)s).TrySetResult(true),
                     tcs, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default);
                 tcs.Task.Wait();
+                WriteAdditionalTracing($"{sourceCall}: Stop Task.Wait()");
             }
 
             public void Reset()
             {
+                WriteAdditionalTracing("Reset AsyncManualResetEvent");
                 while (true)
                 {
+                    WriteAdditionalTracing("Reseting AsyncManualResetEvent...");
                     var tcs = m_tcs;
                     if (!tcs.Task.IsCompleted ||
                         Interlocked.CompareExchange(ref m_tcs, new TaskCompletionSource<bool>(), tcs) == tcs)
+                    {
+                        WriteAdditionalTracing($"Finish reseting AsyncManualResetEvent");
                         return;
+                    }
+                }
+            }
+
+            private void WriteAdditionalTracing(string message)
+            {
+                var writeAdditionalTraces = System.Environment.GetEnvironmentVariable("VSTS_AGENT_TRACE_PROCESSINVOKER");
+                if (writeAdditionalTraces == "true")
+                {
+                    Trace.Info(message);
                 }
             }
         }
 
-        public bool DisableWorkerCommands {get; set; }
+        public bool DisableWorkerCommands { get; set; }
 
         public event EventHandler<ProcessDataReceivedEventArgs> OutputDataReceived;
         public event EventHandler<ProcessDataReceivedEventArgs> ErrorDataReceived;
@@ -68,6 +90,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
         {
             this.Trace = trace;
             this.DisableWorkerCommands = disableWorkerCommands;
+            _outputProcessEvent = new AsyncManualResetEvent(this.Trace);
         }
 
         public Task<int> ExecuteAsync(
@@ -293,13 +316,15 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
             // Start the standard error notifications, if appropriate.
             if (_proc.StartInfo.RedirectStandardError)
             {
-                StartReadStream(_proc.StandardError, _errorData);
+                WriteAdditionalTracing("Start task for STDERR stream read.");
+                StartReadStream(_proc.StandardError, _errorData, "STDERR");
             }
 
             // Start the standard output notifications, if appropriate.
             if (_proc.StartInfo.RedirectStandardOutput)
             {
-                StartReadStream(_proc.StandardOutput, _outputData);
+                WriteAdditionalTracing("Start task for STDOUT stream read.");
+                StartReadStream(_proc.StandardOutput, _outputData, "STDOUT");
             }
 
             if (_proc.StartInfo.RedirectStandardInput)
@@ -322,7 +347,10 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
                 {
                     Task outputSignal = _outputProcessEvent.WaitAsync();
                     var signaled = await Task.WhenAny(outputSignal, _processExitedCompletionSource.Task);
-
+                    if (_proc.HasExited)
+                    {
+                        WriteAdditionalTracing($"Child process {_proc.Id} has exited with exit code {_proc.ExitCode}");
+                    }
                     if (signaled == outputSignal)
                     {
                         ProcessOutput();
@@ -376,17 +404,22 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
             List<string> outputData = new List<string>();
 
             string errorLine;
+            WriteAdditionalTracing("STDERR lines");
             while (_errorData.TryDequeue(out errorLine))
             {
                 errorData.Add(errorLine);
             }
+            WriteAdditionalTracing($"Proccessed error lines {errorData.Count}");
 
             string outputLine;
+            WriteAdditionalTracing("STDOUT lines");
             while (_outputData.TryDequeue(out outputLine))
             {
                 outputData.Add(outputLine);
             }
+            WriteAdditionalTracing($"Proccessed output lines {outputData.Count}");
 
+            WriteAdditionalTracing("Call reset event _outputProcessEvent.Reset()");
             _outputProcessEvent.Reset();
 
             // Write the error lines.
@@ -480,13 +513,16 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
             }
         }
 
-        private void StartReadStream(StreamReader reader, ConcurrentQueue<string> dataBuffer)
+        private void StartReadStream(StreamReader reader, ConcurrentQueue<string> dataBuffer, string bufferName)
         {
             Task.Run(() =>
             {
+                WriteAdditionalTracing($"{bufferName}: Task with stream reading was called");
                 while (!reader.EndOfStream)
                 {
+                    WriteAdditionalTracing("Reading line");
                     string line = reader.ReadLine();
+                    WriteAdditionalTracing("Reading completed");
                     if (line != null)
                     {
                         if (DisableWorkerCommands)
@@ -494,17 +530,32 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
                             line = Regex.Replace(line, "##vso", "**vso", RegexOptions.IgnoreCase);
                         }
                         dataBuffer.Enqueue(line);
-                        _outputProcessEvent.Set();
+                        WriteAdditionalTracing($"{bufferName} Read line: {line}");
+                        WriteAdditionalTracing($"Call setting event for {bufferName}");
+                        _outputProcessEvent.Set(bufferName);
+                    }
+                    else
+                    {
+                        WriteAdditionalTracing($"{bufferName} : line is null");
                     }
                 }
 
-                Trace.Info("STDOUT/STDERR stream read finished.");
+                Trace.Info($"{bufferName} stream read finished.");
 
                 if (Interlocked.Decrement(ref _asyncStreamReaderCount) == 0 && _waitingOnStreams)
                 {
                     _processExitedCompletionSource.TrySetResult(true);
                 }
             });
+        }
+
+        private void WriteAdditionalTracing(string message)
+        {
+            var writeAdditionalTraces = System.Environment.GetEnvironmentVariable("VSTS_AGENT_TRACE_PROCESSINVOKER");
+            if (writeAdditionalTraces == "true")
+            {
+                Trace.Info(message);
+            }
         }
 
         private void StartWriteStream(InputQueue<string> redirectStandardIn, StreamWriter standardIn, bool keepStandardInOpen)
@@ -532,7 +583,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
                                 standardIn.Close();
                                 break;
                             }
-                    }
+                        }
                     }
                 }
 
