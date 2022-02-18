@@ -43,6 +43,7 @@ namespace Agent.Sdk.Knob
         public static readonly Knob DockerNetworkCreateDriver = new Knob(
             nameof(DockerNetworkCreateDriver),
             "Allow to specify which driver will be used when creating docker network",
+            new RuntimeKnobSource("agent.DockerNetworkCreateDriver"),
             new EnvironmentKnobSource("AZP_AGENT_DOCKER_NETWORK_CREATE_DRIVER"),
             new BuiltInDefaultKnobSource(string.Empty));
 

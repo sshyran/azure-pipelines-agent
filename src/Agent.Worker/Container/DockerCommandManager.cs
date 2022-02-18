@@ -227,7 +227,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Container
             var usingWindowsContainers = context.Containers.Where(x => x.ExecutionOS != PlatformUtil.OS.Windows).Count() == 0;
             var networkDrivers = await ExecuteDockerCommandAsync(context, "info", "-f \"{{range .Plugins.Network}}{{println .}}{{end}}\"");
             var valueMTU = AgentKnobs.MTUValueForContainerJobs.GetValue(_knobContext).AsString();
-            var driver = AgentKnobs.DockerNetworkCreateDriver.GetValue(_knobContext).AsString();
+            var driver = AgentKnobs.DockerNetworkCreateDriver.GetValue(context).AsString();
             string optionMTU = "";
 
             if (!String.IsNullOrEmpty(valueMTU))
