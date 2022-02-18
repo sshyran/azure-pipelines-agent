@@ -210,6 +210,16 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Handlers
                 var payloadJson = JsonUtility.ToString(payload);
                 redirectStandardIn.Enqueue(payloadJson);
                 HostContext.GetTrace(nameof(ContainerStepHost)).Info($"Payload: {payloadJson}");
+
+                if (environment.TryGetValue("VSTS_AGENT_TRACE_PROCESSINVOKER", out string addTracing))
+                {
+                    System.Environment.SetEnvironmentVariable("VSTS_AGENT_TRACE_PROCESSINVOKER", addTracing.ToLower());
+                }
+                else
+                {
+                    System.Environment.SetEnvironmentVariable("VSTS_AGENT_TRACE_PROCESSINVOKER", "false");
+                }
+                
                 return await processInvoker.ExecuteAsync(workingDirectory: HostContext.GetDirectory(WellKnownDirectory.Work),
                                                          fileName: containerEnginePath,
                                                          arguments: containerExecutionArgs,
