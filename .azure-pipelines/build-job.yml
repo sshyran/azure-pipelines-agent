@@ -114,9 +114,27 @@ jobs:
         sudo apt-get update
         apt-cache policy docker-ce
         sudo apt-get -y install docker-ce
+        sudo apt-get install -y docker-ce-rootless-extras
         sudo docker -v
         sudo usermod -aG docker $(whoami)
-        docker --info
+        # docker --help
+        # sudo /usr/bin/dockerd-rootless-setuptool.sh install
+        # sudo cat /lib/systemd/system/docker.service
+        # sed 's+ExecStart=/usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock+ExecStart=/usr/bin/setarch linux32 -B /usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock+g' /lib/systemd/system/docker.service
+        # systemctl daemon-reload
+        # systemctl start docker
+        # sleep 20
+        # sudo usermod -aG docker $(whoami)
+        # sudo docker version
+        # sudo systemctl stop docker
+        # sudo systemctl stop containerd
+        # curl https://download.docker.com/linux/static/stable/armhf/docker-18.06.1-ce.tgz --output docker-18.06.1-ce.tgz
+        # tar zxvf docker-18.06.1-ce.tgz
+        # sudo cp docker/* /usr/bin/
+        # sudo systemctl daemon-reload
+        # sudo systemctl start docker
+        # sudo docker version
+        # sudo systemctl status docker.service
 
   # Build agent layout
   - script: ${{ variables.devCommand }} layout Release ${{ parameters.os }}-${{ parameters.arch }}
@@ -126,13 +144,13 @@ jobs:
       env:
         ADO_ENABLE_LOGISSUE: true
 
-  # - ${{ if and(parameters.unitTests, eq(parameters.arch, 'arm')) }}:
-  #   - script: sudo apt update && sudo apt install -y qemu qemu-user-static qemu-user binfmt-support && docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-  #     displayName: Setup emulator
-  #   - script: docker buildx create --name testcontainer && docker buildx use testcontainer
-  #     displayName: Create Builder
-  #   - script: docker buildx build --file "$(Build.SourcesDirectory)/src/DockerFile-${{ parameters.arch }}" --platform linux/${{ parameters.os }}-${{ parameters.arch }} --load -t test-${{ parameters.arch }} .
-  #     displayName: Create contianer for testing
+  - ${{ if and(parameters.unitTests, eq(parameters.arch, 'arm')) }}:
+    - script: sudo apt update && sudo apt install -y qemu qemu-user-static qemu-user binfmt-support && docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+      displayName: Setup emulator
+    - script: docker buildx create --name testcontainer && docker buildx use testcontainer
+      displayName: Create Builder
+    - script: docker buildx build --file "$(Build.SourcesDirectory)/src/DockerFile-${{ parameters.arch }}" --platform linux/${{ parameters.os }}-${{ parameters.arch }} --load -t test-${{ parameters.arch }} .
+      displayName: Create contianer for testing
 
   # Run l0 tests
   - ${{ if and(parameters.unitTests, ne(parameters.arch, 'arm')) }}:
@@ -144,12 +162,12 @@ jobs:
     - script: docker run -v $(Build.SourcesDirectory)/src/Test/TestResults:/src/Test/TestResults -v $(Build.SourcesDirectory)/src/Test/TestLogs:/src/Test/TestLogs test-${{ parameters.arch }} testl0 Debug ${{ parameters.os }}-${{ parameters.arch }}
       displayName: Unit tests
 
-  # - ${{ if and(parameters.unitTests, eq(parameters.arch, 'arm')) }}:
-  #   - script: sudo docker buildx build --file "$(Build.SourcesDirectory)/src/DockerFile-${{ parameters.arch }}" --platform linux/${{ parameters.arch }} -t "test-${{ parameters.arch }}:latest" --output=type=docker .
-  #     displayName: Create contianer for testing
-  #   - script: sudo docker images
-  #   - script: sudo docker run --platform linux/${{ parameters.arch }} -v $(Build.SourcesDirectory)/src/Test/TestResults:/src/Test/TestResults -v $(Build.SourcesDirectory)/src/Test/TestLogs:/src/Test/TestLogs test-arm testl0 Debug ${{ parameters.os }}-${{ parameters.arch }}
-  #     displayName: Unit tests
+  - ${{ if and(parameters.unitTests, eq(parameters.arch, 'arm')) }}:
+    - script: sudo docker buildx build --file "$(Build.SourcesDirectory)/src/DockerFile-${{ parameters.arch }}" --platform linux/${{ parameters.arch }} -t "test-${{ parameters.arch }}:latest" --output=type=docker .
+      displayName: Create contianer for testing
+    - script: sudo docker images
+    - script: sudo docker run --platform linux/${{ parameters.arch }} -v $(Build.SourcesDirectory)/src/Test/:/src/Test/TestResults -v $(Build.SourcesDirectory)/src/Test/TestLogs:/src/Test/TestLogs test-arm testl0 Debug ${{ parameters.os }}-${{ parameters.arch }}
+      displayName: Unit tests
 
   # Install nuget
   - ${{ if eq(parameters.os, 'win') }}:

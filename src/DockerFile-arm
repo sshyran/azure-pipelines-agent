@@ -26,4 +26,5 @@ COPY /_downloads /_downloads
 COPY /_layout /_layout
 
 WORKDIR /src
+RUN ./dev.sh b
 ENTRYPOINT ["./dev.sh"]
