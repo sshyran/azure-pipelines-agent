@@ -171,6 +171,11 @@ jobs:
         codeCoverageTool: 'cobertura'
         summaryFileLocation: _reports/**/Cobertura.xml
         pathToSources: src
+    - task: PublishCodeCoverageResults@1
+      inputs:
+        codeCoverageTool: 'cobertura'
+        summaryFileLocation: _reports/**/Cobertura.html
+        pathToSources: src
 
   - ${{ if parameters.sign }}:
     # Signing steps
