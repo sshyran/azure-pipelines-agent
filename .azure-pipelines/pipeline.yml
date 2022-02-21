@@ -125,8 +125,8 @@ stages:
         jobName: build_linux_arm
         displayName: Linux (ARM)
         pool:
-          vmImage: ubuntu-18.04
-        # container: dotnetcore_arm
+          name: 1ES_ARM_Agent_Pool
+          vmImage: Ubuntu_2004_ARM64
         timeoutInMinutes: 75
         os: linux
         arch: arm

@@ -104,41 +104,19 @@ jobs:
   - ${{ if or(eq(parameters.arch, 'arm64'), eq(parameters.arch, 'arm')) }}:
     - script: sudo apt-get update && sudo apt-get -y install unzip
 
-  # - ${{ if eq(parameters.arch, 'arm') }}:
-  #   - script: |
-  #       sudo dpkg --print-architecture
-  #       sudo uname -a
-  #       sudo dpkg --add-architecture armhf
-  #       sudo apt-get update
-  #       sudo apt-get install -y libc6:armhf
-  #       sudo dpkg --print-architecture
-  #       sudo dpkg --print-foreign-architectures
-  #       curl -SL -o dotnet.tar.gz https://dotnetcli.blob.core.windows.net/dotnet/Sdk/master/dotnet-sdk-latest-linux-arm.tar.gz
-  #       sudo mkdir -p /usr/share/dotnet
-  #       sudo tar -zxf dotnet.tar.gz -C /usr/share/dotnet
-  #       sudo ln -s /usr/share/dotnet/dotnet /usr/bin/dotnet
-  #       dotnet --info
-    #   sudo apt-get update
-    #   sudo apt-get install -y qemu binfmt-support qemu-user-static
-    #   sudo update-binfmts --display
-    #   sudo sysctl -w vm.mmap_min_addr="0"
-    #   ls -l /proc/sys/fs/binfmt_misc
-      # displayName: Setup QEMU
-    # - script: |
-    #     sudo dpkg --add-architecture armhf
-    #     sudo apt-get -y install apt-transport-https ca-certificates curl software-properties-common
-    #     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-    #     sudo add-apt-repository "deb [arch=arm64] https://download.docker.com/linux/ubuntu bionic stable"
-    #     sudo apt-get update
-    #     apt-cache policy docker-ce
-    #     sudo apt-get -y install docker-ce
-    #     sleep 20
-    #     sudo systemctl status docker
-    #     sudo docker run --rm --privileged aptman/qus -s -- -p arm
-    #     sudo systemctl restart docker
-    #   displayName: Setup docker
-    # - script: docker buildx create --name testcontainer && docker buildx use testcontainer
-    #   displayName: Create Builder
+  - ${{ if eq(parameters.arch, 'arm') }}:
+    - script: |
+        sudo dpkg --add-architecture armhf
+        sudo apt-get -y install apt-transport-https ca-certificates curl software-properties-common
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+        sudo apt-key fingerprint 0EBFCD88
+        sudo add-apt-repository "deb [arch=arm64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+        sudo apt-get update
+        apt-cache policy docker-ce
+        sudo apt-get -y install docker-ce
+        sudo docker -v
+        sudo usermod -aG docker whoami
+        docker --info
 
   # Build agent layout
   - script: ${{ variables.devCommand }} layout Release ${{ parameters.os }}-${{ parameters.arch }}
@@ -148,13 +126,13 @@ jobs:
       env:
         ADO_ENABLE_LOGISSUE: true
 
-  - ${{ if and(parameters.unitTests, eq(parameters.arch, 'arm')) }}:
-    - script: sudo apt update && sudo apt install -y qemu qemu-user-static qemu-user binfmt-support && docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-      displayName: Setup emulator
-    - script: docker buildx create --name testcontainer && docker buildx use testcontainer
-      displayName: Create Builder
-    - script: docker buildx build --file "$(Build.SourcesDirectory)/src/DockerFile-${{ parameters.arch }}" --platform linux/${{ parameters.os }}-${{ parameters.arch }} --load -t test-${{ parameters.arch }} .
-      displayName: Create contianer for testing
+  # - ${{ if and(parameters.unitTests, eq(parameters.arch, 'arm')) }}:
+  #   - script: sudo apt update && sudo apt install -y qemu qemu-user-static qemu-user binfmt-support && docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+  #     displayName: Setup emulator
+  #   - script: docker buildx create --name testcontainer && docker buildx use testcontainer
+  #     displayName: Create Builder
+  #   - script: docker buildx build --file "$(Build.SourcesDirectory)/src/DockerFile-${{ parameters.arch }}" --platform linux/${{ parameters.os }}-${{ parameters.arch }} --load -t test-${{ parameters.arch }} .
+  #     displayName: Create contianer for testing
 
   # Run l0 tests
   - ${{ if and(parameters.unitTests, ne(parameters.arch, 'arm')) }}:
