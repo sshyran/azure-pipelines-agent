@@ -176,6 +176,12 @@ jobs:
         codeCoverageTool: 'cobertura'
         summaryFileLocation: _reports/**/Cobertura.html
         pathToSources: src
+    - task: BuildQualityChecks@8
+      inputs:
+        checkCoverage: true
+        coverageFailOption: 'fixed'
+        coverageType: 'branches'
+        coverageThreshold: '60'
 
   - ${{ if parameters.sign }}:
     # Signing steps
