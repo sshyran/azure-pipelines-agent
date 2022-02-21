@@ -115,7 +115,7 @@ jobs:
         apt-cache policy docker-ce
         sudo apt-get -y install docker-ce
         sudo docker -v
-        sudo usermod -aG docker whoami
+        sudo usermod -aG docker $(whoami)
         docker --info
 
   # Build agent layout
