@@ -2,18 +2,6 @@ FROM azpagentinfra/arm:latest AS test
 WORKDIR /app
 EXPOSE 80
 
-RUN apt update
-RUN apt install -y libglib2.0-dev
-RUN apt install -y libpixman-1-dev
-
-RUN apt install -y make
-RUN apt install -y wget
-RUN apt install -y gcc
-RUN wget https://download.qemu.org/qemu-4.1.0.tar.xz --no-check-certificate
-RUN cat *.xz | tar xvJf qemu-4.1.0.tar.xz -i
-WORKDIR /app/qemu-4.1.0
-RUN ./configure
-RUN make
 
 # COPY --from=qemu /usr/bin/qemu-arm-static /usr/bin/qemu-arm-static 
 
@@ -22,9 +10,6 @@ RUN apt install -y unzip
 
 WORKDIR /app
 COPY /src /src
-COPY /_downloads /_downloads
-COPY /_layout /_layout
 
 WORKDIR /src
-RUN ./dev.sh b
 ENTRYPOINT ["./dev.sh"]
