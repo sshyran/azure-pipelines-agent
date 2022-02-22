@@ -157,16 +157,6 @@ jobs:
         artifactType: container
       condition: always()
 
-  # Code coverage
-  - ${{ if and(parameters.codeCoverage, parameters.unitTests, parameters.functionalTests) }}:
-    - script: dotnet tool install --global dotnet-reportgenerator-globaltool
-      displayName: Install Report Generator
-
-    - script: ${{ variables.devCommand }} report
-      displayName: Generate Code Coverage report
-      workingDirectory: src
-
-    
     - task: BuildQualityChecks@8
       inputs:
         checkCoverage: true
