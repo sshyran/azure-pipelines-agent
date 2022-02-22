@@ -169,12 +169,12 @@ jobs:
     - task: PublishCodeCoverageResults@1
       inputs:
         codeCoverageTool: 'cobertura'
-        summaryFileLocation: _reports/**/Cobertura.xml
+        summaryFileLocation: _reports/**/index.html
         pathToSources: src
     - task: PublishCodeCoverageResults@1
       inputs:
         codeCoverageTool: 'cobertura'
-        summaryFileLocation: _reports/**/Cobertura.html
+        summaryFileLocation: _reports/**/Cobertura.xml
         pathToSources: src
     - task: BuildQualityChecks@8
       inputs:
