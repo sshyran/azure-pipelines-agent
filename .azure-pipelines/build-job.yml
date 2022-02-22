@@ -166,16 +166,7 @@ jobs:
       displayName: Generate Code Coverage report
       workingDirectory: src
 
-    - task: PublishCodeCoverageResults@1
-      inputs:
-        codeCoverageTool: 'cobertura'
-        summaryFileLocation: _reports/**/index.html
-        pathToSources: src
-    - task: PublishCodeCoverageResults@1
-      inputs:
-        codeCoverageTool: 'cobertura'
-        summaryFileLocation: _reports/**/Cobertura.xml
-        pathToSources: src
+    
     - task: BuildQualityChecks@8
       inputs:
         checkCoverage: true
