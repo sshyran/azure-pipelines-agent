@@ -278,9 +278,6 @@ function cmd_report ()
 
         echo "Generating HTML report"
         reportgenerator.exe "-reports:$COVERAGE_XML_FILE" "-reporttypes:Html;Cobertura" "-targetdir:$COVERAGE_REPORT_DIR/coveragereport"
-
-        echo "Removing of .coverage file"
-        rm $LATEST_COVERAGE_FILE
     fi
 }
 
