@@ -138,44 +138,6 @@ jobs:
       workingDirectory: src
       displayName: Functional tests
 
-  - ${{ if or(parameters.unitTests, parameters.functionalTests) }}:
-    # Publish test results
-    - task: PublishTestResults@2
-      displayName: Publish Test Results **/*.trx
-      inputs:
-        testRunner: VSTest
-        testResultsFiles: '**/*.trx'
-        testRunTitle: 'Agent Tests - ${{ parameters.os }}-${{ parameters.arch }}'
-      condition: always()
-
-    # Upload test log
-    - task: PublishBuildArtifacts@1
-      displayName: Publish Test logs
-      inputs:
-        pathToPublish: src/Test/TestLogs
-        artifactName: ${{ parameters.os }}-${{ parameters.arch }}-$(System.JobId)
-        artifactType: container
-      condition: always()
-
-  # Code coverage
-  - ${{ if and(parameters.codeCoverage, parameters.unitTests, parameters.functionalTests) }}:
-    - script: dotnet tool install --global dotnet-reportgenerator-globaltool
-      displayName: Install Report Generator
-
-    - script: ${{ variables.devCommand }} report
-      displayName: Generate Code Coverage report
-      workingDirectory: src
-
-    - task: PublishCodeCoverageResults@1
-      inputs:
-        codeCoverageTool: 'cobertura'
-        summaryFileLocation: _reports/**/index.html
-        pathToSources: src
-    - task: PublishCodeCoverageResults@1
-      inputs:
-        codeCoverageTool: 'cobertura'
-        summaryFileLocation: _reports/**/Cobertura.xml
-        pathToSources: src
     - task: DeleteFiles@1
       inputs:
         Contents: '**/*.coverage'
