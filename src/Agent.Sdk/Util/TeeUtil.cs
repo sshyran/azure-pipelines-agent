@@ -83,14 +83,15 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
             string extractedTeePath = Path.Combine(tempDirectory, $"{Guid.NewGuid().ToString()}");
             ZipFile.ExtractToDirectory(zipPath, extractedTeePath);
 
-            debug($"Extracted {zipPath} to ${extractedTeePath}");
+            debug($"Extracted {zipPath} to {extractedTeePath}");
 
             string extractedTeeDestinationPath = GetTeePath();
-            Directory.Move(Path.Combine(extractedTeePath, TeePluginName), extractedTeeDestinationPath);
+            IOUtil.CopyDirectory(Path.Combine(extractedTeePath, TeePluginName), extractedTeeDestinationPath, cancellationToken);
 
-            debug($"Moved to ${extractedTeeDestinationPath}");
+            debug($"Copied TEE to {extractedTeeDestinationPath}");
 
             IOUtil.DeleteDirectory(tempDirectory, CancellationToken.None);
+            IOUtil.DeleteDirectory(extractedTeePath, CancellationToken.None);
 
             // We have to set these files as executable because ZipFile.ExtractToDirectory does not set file permissions
             SetPermissions(Path.Combine(extractedTeeDestinationPath, "tf"), "a+x");
