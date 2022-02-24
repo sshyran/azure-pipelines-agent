@@ -1,11 +1,28 @@
 ## Features
+ - Update dumping waagent.conf file logic not to write waning on missed "waagent.conf" (#3706)
+ - Add simple support of Mariner OS distribution to installdependencies.sh (#3698)
+ - Allow specifying custom properties for PublishPipelineArtifact task (#3615)
+ - Dump Agent Azure VM extension logs (#3703)
+ - Added logging of origin of secrets (#3696)
+ - [Passive validations] Check debsums output on Debian (#3712)
+ - Separate email and user in publish script (#3557)
+ - Add correction of empty Matching pattern field to default value (#3730)
+ - Corrected condition for check value in itemPattern (#3732)
  - Update error message on PR changes #3738 (#3741)
 
 ## Bugs
+ - [TEE download and removal logic] Fix permissions setting on MacOS (#3704)
+ - Don't allow a cache failure to fail builds (#3699)
+ - Add null check for _jobServerQueue (#3711)
+ - Fix check for hosted agent (#3714)
+ - Change release x86 build image back to windows-2019 (#3726)
  - Add check the support of custom server certificate validation  (#3738)
+ - Update VssApiClient version to 0.5.173-private (#3763)
 
 ## Misc
-
+ - Added info about self-hosted case for manual testing (#3702)
+ - Update dotnet-install script (#3709)
+ - Update dotnet-install.sh script (#3716)
 
 
 ## Agent Downloads
