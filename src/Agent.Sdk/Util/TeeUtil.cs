@@ -91,7 +91,6 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
             debug($"Copied TEE to {extractedTeeDestinationPath}");
 
             IOUtil.DeleteDirectory(tempDirectory, CancellationToken.None);
-            IOUtil.DeleteDirectory(extractedTeePath, CancellationToken.None);
 
             // We have to set these files as executable because ZipFile.ExtractToDirectory does not set file permissions
             SetPermissions(Path.Combine(extractedTeeDestinationPath, "tf"), "a+x");
