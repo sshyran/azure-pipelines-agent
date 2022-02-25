@@ -1,232 +1,228 @@
 parameters:
+  - name: jobName
+    type: string
 
-- name: jobName
-  type: string
+  - name: displayName
+    type: string
 
-- name: displayName
-  type: string
+  - name: pool
+    type: object
 
-- name: pool
-  type: object
+  - name: container
+    type: string
 
-- name: container
-  type: string
+  - name: timeoutInMinutes
+    type: number
 
-- name: timeoutInMinutes
-  type: number
+  - name: branch
+    type: string
 
-- name: branch
-  type: string
+  - name: os
+    type: string
+    values:
+      - win
+      - linux
+      - osx
+      - rhel.6
 
-- name: os
-  type: string
-  values:
-  - win
-  - linux
-  - osx
-  - rhel.6
+  - name: arch
+    type: string
+    values:
+      - arm
+      - arm64
+      - x64
+      - x86
 
-- name: arch
-  type: string
-  values:
-  - arm
-  - arm64
-  - x64
-  - x86
+  - name: unitTests
+    type: boolean
 
-- name: unitTests
-  type: boolean
+  - name: functionalTests
+    type: boolean
 
-- name: functionalTests
-  type: boolean
+  - name: codeCoverage
+    type: boolean
 
-- name: codeCoverage
-  type: boolean
+  - name: componentDetection
+    type: boolean
 
-- name: componentDetection
-  type: boolean
+  - name: sign
+    type: boolean
 
-- name: sign
-  type: boolean
+  - name: verifySigning
+    type: boolean
 
-- name: verifySigning
-  type: boolean
+  - name: publishArtifact
+    type: boolean
 
-- name: publishArtifact
-  type: boolean
+  - name: enableADOLogIssue
+    type: boolean
+    default: false
 
-- name: enableADOLogIssue
-  type: boolean
-  default: false
-
-- name: packageType
-  type: string
-  default: agent
-  values:
-  - agent
-  - pipelines-agent
+  - name: packageType
+    type: string
+    default: agent
+    values:
+      - agent
+      - pipelines-agent
 
 jobs:
+  - job: ${{ parameters.jobName }}
+    displayName: ${{ parameters.displayName }}
+    pool: ${{ parameters.pool }}
+    timeoutInMinutes: ${{ parameters.timeoutInMinutes }}
 
-- job: ${{ parameters.jobName }}
-  displayName: ${{ parameters.displayName }}
-  pool: ${{ parameters.pool }}
-  timeoutInMinutes: ${{ parameters.timeoutInMinutes }}
+    # ${{ if ne(parameters.container, '') }}:
+    #   container: ${{ parameters.container }}
 
-  ${{ if ne(parameters.container, '') }}:
-    container: ${{ parameters.container }}
+    variables:
+      PACKAGE_TYPE: ${{ parameters.packageType }}
+      ${{ if eq(parameters.os, 'win') }}:
+        devCommand: dev.cmd
+      ${{ if ne(parameters.os, 'win') }}:
+        devCommand: ./dev.sh
+      layoutRoot: "_layout/${{ parameters.os }}-${{ parameters.arch }}"
 
-  variables:
-    PACKAGE_TYPE: ${{ parameters.packageType }}
-    ${{ if eq(parameters.os, 'win') }}:
-      devCommand: dev.cmd
-    ${{ if ne(parameters.os, 'win') }}:
-      devCommand: ./dev.sh
-    layoutRoot: '_layout/${{ parameters.os }}-${{ parameters.arch }}'
+    steps:
+      - script: uname -v
+      # Component detection
+      - ${{ if parameters.componentDetection }}:
+          - task: ms.vss-governance-buildtask.governance-build-task-component-detection.ComponentGovernanceComponentDetection@0
+            displayName: "Component Detection"
 
-  steps:
+      # Clean
+      - checkout: self
+        clean: true
 
-  # Component detection
-  - ${{ if parameters.componentDetection }}:
-    - task: ms.vss-governance-buildtask.governance-build-task-component-detection.ComponentGovernanceComponentDetection@0
-      displayName: 'Component Detection'
+      # # Switch to branch if set
+      # - ${{ if ne(parameters.branch, '') }}:
+      #     - template: switch-branch.yml
+      #       parameters:
+      #         branch: ${{ parameters.branch }}
 
-  # Clean
-  - checkout: self
-    clean: true
+      # # 1ES images used on the ARM pool doesn't contain unzip tool, so we need to install it before starting the build
+      # - ${{ if eq(parameters.arch, 'arm64') }}:
+      #     - script: sudo apt-get update && sudo apt-get -y install unzip
+      #       displayName: Install unzip
 
-  # Switch to branch if set
-  - ${{ if ne(parameters.branch, '') }}:
-    - template: switch-branch.yml
-      parameters:
-        branch: ${{ parameters.branch }}
+      # # Build agent layout
+      # - script: ${{ variables.devCommand }} layout Release ${{ parameters.os }}-${{ parameters.arch }}
+      #   workingDirectory: src
+      #   displayName: Build & Layout Release
+      #   ${{ if parameters.enableADOLogIssue }}:
+      #     env:
+      #       ADO_ENABLE_LOGISSUE: true
 
-  # 1ES images used on the ARM pool doesn't contain unzip tool, so we need to install it before starting the build
-  - ${{ if eq(parameters.arch, 'arm64') }}:
-    - script: sudo apt-get update && sudo apt-get -y install unzip
-      displayName: Install unzip
+      # # Run l0 tests
+      # - ${{ if parameters.unitTests }}:
+      #     - script: ${{ variables.devCommand }} testl0 Debug ${{ parameters.os }}-${{ parameters.arch }}
+      #       workingDirectory: src
+      #       displayName: Unit tests
 
-  # Build agent layout
-  - script: ${{ variables.devCommand }} layout Release ${{ parameters.os }}-${{ parameters.arch }}
-    workingDirectory: src
-    displayName: Build & Layout Release
-    ${{ if parameters.enableADOLogIssue }}:
-      env:
-        ADO_ENABLE_LOGISSUE: true
+      # # Install nuget
+      # - ${{ if eq(parameters.os, 'win') }}:
+      #     - task: NuGetToolInstaller@1
+      #       displayName: Install NuGet for signing tests
 
-  # Run l0 tests
-  - ${{ if parameters.unitTests }}:
-    - script: ${{ variables.devCommand }} testl0 Debug ${{ parameters.os }}-${{ parameters.arch }}
-      workingDirectory: src
-      displayName: Unit tests
+      # # Run l1 tests
+      # - ${{ if parameters.functionalTests }}:
+      #     - ${{ if and(eq(parameters.os, 'win'), eq(parameters.arch, 'x86')) }}:
+      #         - task: UseDotNet@2
+      #           displayName: Install .NET Core 3.1 SDK
+      #           inputs:
+      #             version: "3.1.22"
+      #             packageType: runtime
+      #             performMultiLevelLookup: true
+      #     - script: ${{ variables.devCommand }} testl1 Debug ${{ parameters.os }}-${{ parameters.arch }}
+      #       workingDirectory: src
+      #       displayName: Functional tests
 
-  # Install nuget
-  - ${{ if eq(parameters.os, 'win') }}:
-    - task: NuGetToolInstaller@1
-      displayName: Install NuGet for signing tests
+      # - ${{ if or(parameters.unitTests, parameters.functionalTests) }}:
+      #     # Publish test results
+      #     - task: PublishTestResults@2
+      #       displayName: Publish Test Results **/*.trx
+      #       inputs:
+      #         testRunner: VSTest
+      #         testResultsFiles: "**/*.trx"
+      #         testRunTitle: "Agent Tests - ${{ parameters.os }}-${{ parameters.arch }}"
+      #       condition: always()
 
-  # Run l1 tests
-  - ${{ if parameters.functionalTests }}:
-    - ${{ if and(eq(parameters.os, 'win'), eq(parameters.arch, 'x86')) }}:
-      - task: UseDotNet@2
-        displayName: Install .NET Core 3.1 SDK
-        inputs:
-          version: '3.1.22'
-          packageType: runtime
-          performMultiLevelLookup: true
-    - script: ${{ variables.devCommand }} testl1 Debug ${{ parameters.os }}-${{ parameters.arch }}
-      workingDirectory: src
-      displayName: Functional tests
+      #     # Upload test log
+      #     - task: PublishBuildArtifacts@1
+      #       displayName: Publish Test logs
+      #       inputs:
+      #         pathToPublish: src/Test/TestLogs
+      #         artifactName: ${{ parameters.os }}-${{ parameters.arch }}-$(System.JobId)
+      #         artifactType: container
+      #       condition: always()
 
-  - ${{ if or(parameters.unitTests, parameters.functionalTests) }}:
-    # Publish test results
-    - task: PublishTestResults@2
-      displayName: Publish Test Results **/*.trx
-      inputs:
-        testRunner: VSTest
-        testResultsFiles: '**/*.trx'
-        testRunTitle: 'Agent Tests - ${{ parameters.os }}-${{ parameters.arch }}'
-      condition: always()
+      # # Code coverage
+      # - ${{ if and(parameters.codeCoverage, parameters.unitTests, parameters.functionalTests) }}:
+      #     - script: dotnet tool install --global dotnet-reportgenerator-globaltool
+      #       displayName: Install Report Generator
 
-    # Upload test log
-    - task: PublishBuildArtifacts@1
-      displayName: Publish Test logs
-      inputs:
-        pathToPublish: src/Test/TestLogs
-        artifactName: ${{ parameters.os }}-${{ parameters.arch }}-$(System.JobId)
-        artifactType: container
-      condition: always()
+      #     - script: ${{ variables.devCommand }} report
+      #       displayName: Generate Code Coverage report
+      #       workingDirectory: src
 
-  # Code coverage
-  - ${{ if and(parameters.codeCoverage, parameters.unitTests, parameters.functionalTests) }}:
-    - script: dotnet tool install --global dotnet-reportgenerator-globaltool
-      displayName: Install Report Generator
+      #     - task: PublishCodeCoverageResults@1
+      #       inputs:
+      #         codeCoverageTool: "cobertura"
+      #         summaryFileLocation: _reports/**/Cobertura.xml
+      #         pathToSources: src
 
-    - script: ${{ variables.devCommand }} report
-      displayName: Generate Code Coverage report
-      workingDirectory: src
+      # - ${{ if parameters.sign }}:
+      #     # Signing steps
+      #     - template: signing.yml
+      #       parameters:
+      #         layoutRoot: ${{ variables.layoutRoot }}
+      #         isWindows: ${{ eq(parameters.os, 'win') }}
 
-    - task: PublishCodeCoverageResults@1
-      inputs:
-        codeCoverageTool: 'cobertura'
-        summaryFileLocation: _reports/**/Cobertura.xml
-        pathToSources: src
+      # # Publish artifacts
+      # - ${{ if parameters.publishArtifact }}:
+      #     # Package .NET Core Windows dependency (VC++ Redistributable)
+      #     - ${{ if eq(parameters.os, 'win') }}:
+      #         - template: package-vcredist.yml
+      #           parameters:
+      #             layoutRoot: ${{ variables.layoutRoot }}
+      #             flavor: ${{ parameters.arch }}
 
-  - ${{ if parameters.sign }}:
-    # Signing steps
-    - template: signing.yml
-      parameters:
-        layoutRoot: ${{ variables.layoutRoot }}
-        isWindows: ${{ eq(parameters.os, 'win') }}
+      #     # Create agent package zip
+      #     - script: "${{ variables.devCommand }} package Release ${{ parameters.os }}-${{ parameters.arch }}"
+      #       workingDirectory: src
+      #       displayName: Package Release
 
-  # Publish artifacts
-  - ${{ if parameters.publishArtifact }}:
+      #     - script: "${{ variables.devCommand }} hash Release ${{ parameters.os }}-${{ parameters.arch }}"
+      #       workingDirectory: src
+      #       displayName: Hash Package
 
-    # Package .NET Core Windows dependency (VC++ Redistributable)
-    - ${{ if eq(parameters.os, 'win') }}:
-      - template: package-vcredist.yml
-        parameters:
-          layoutRoot: ${{ variables.layoutRoot }}
-          flavor: ${{ parameters.arch }}
+      #     # Upload agent package zip as build artifact
+      #     - task: PublishBuildArtifacts@1
+      #       displayName: Publish Artifact
+      #       inputs:
+      #         pathToPublish: _package
+      #         artifactName: agent
+      #         artifactType: container
 
-    # Create agent package zip
-    - script: "${{ variables.devCommand }} package Release ${{ parameters.os }}-${{ parameters.arch }}"
-      workingDirectory: src
-      displayName: Package Release
+      #     # Publish agent package hash too
+      #     - task: PublishBuildArtifacts@1
+      #       displayName: Publish Artifact
+      #       inputs:
+      #         pathToPublish: _package_hash
+      #         artifactName: hash
+      #         artifactType: container
 
-    - script: "${{ variables.devCommand }} hash Release ${{ parameters.os }}-${{ parameters.arch }}"
-      workingDirectory: src
-      displayName: Hash Package
+      # # Signing verification
+      # - ${{ if parameters.verifySigning }}:
+      #     # Verify all binaries are signed (generate report)
+      #     - task: securedevelopmentteam.vss-secure-development-tools.build-task-codesignvalidation.CodesignValidation@0
+      #       displayName: "Generate Codesign Report"
+      #       inputs:
+      #         path: ${{ variables.layoutRoot }}
 
-    # Upload agent package zip as build artifact
-    - task: PublishBuildArtifacts@1
-      displayName: Publish Artifact
-      inputs:
-        pathToPublish: _package
-        artifactName: agent
-        artifactType: container
-
-    # Publish agent package hash too
-    - task: PublishBuildArtifacts@1
-      displayName: Publish Artifact
-      inputs:
-        pathToPublish: _package_hash
-        artifactName: hash
-        artifactType: container
-
-  # Signing verification
-  - ${{ if parameters.verifySigning }}:
-
-    # Verify all binaries are signed (generate report)
-    - task: securedevelopmentteam.vss-secure-development-tools.build-task-codesignvalidation.CodesignValidation@0
-      displayName: 'Generate Codesign Report'
-      inputs:
-        path: ${{ variables.layoutRoot }}
-
-    # Verify all binaries are signed (check report)
-    - task: securedevelopmentteam.vss-secure-development-tools.build-task-postanalysis.PostAnalysis@1
-      displayName: 'Verify Codesign Report'
-      inputs:
-        CodesignValidation: true
-        CodesignValidationBreakOn: WarningAbove
-        ToolLogsNotFoundAction: Error
+      #     # Verify all binaries are signed (check report)
+      #     - task: securedevelopmentteam.vss-secure-development-tools.build-task-postanalysis.PostAnalysis@1
+      #       displayName: "Verify Codesign Report"
+      #       inputs:
+      #         CodesignValidation: true
+      #         CodesignValidationBreakOn: WarningAbove
+      #         ToolLogsNotFoundAction: Error
