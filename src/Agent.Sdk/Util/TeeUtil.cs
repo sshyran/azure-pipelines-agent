@@ -72,7 +72,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
         // Sets required permissions for extracted files.
         private async Task DownloadAndExtractTee() {
             string tempDirectory = Path.Combine(agentTempDirectory, TeeTempDir);
-            IOUtil.DeleteDirectory(tempDirectory, CancellationToken.None);
+            IOUtil.DeleteDirectory(tempDirectory, cancellationToken);
             Directory.CreateDirectory(tempDirectory);
 
             string zipPath = Path.Combine(tempDirectory, $"{Guid.NewGuid().ToString()}.zip");
@@ -90,7 +90,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
 
             debug($"Copied TEE to {extractedTeeDestinationPath}");
 
-            IOUtil.DeleteDirectory(tempDirectory, CancellationToken.None);
+            IOUtil.DeleteDirectory(tempDirectory, cancellationToken);
 
             // We have to set these files as executable because ZipFile.ExtractToDirectory does not set file permissions
             SetPermissions(Path.Combine(extractedTeeDestinationPath, "tf"), "a+x");
@@ -136,10 +136,10 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
         public void DeleteTee()
         {
             string teeDirectory = GetTeePath();
-            IOUtil.DeleteDirectory(teeDirectory, CancellationToken.None);
+            IOUtil.DeleteDirectory(teeDirectory, cancellationToken);
 
             string tempDirectory = Path.Combine(agentTempDirectory, TeeTempDir);
-            IOUtil.DeleteDirectory(tempDirectory, CancellationToken.None);
+            IOUtil.DeleteDirectory(tempDirectory, cancellationToken);
 
             debug($"Cleaned up {teeDirectory} and {tempDirectory}");
         }
