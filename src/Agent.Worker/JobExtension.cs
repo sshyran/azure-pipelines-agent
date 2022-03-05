@@ -151,8 +151,12 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
                             if (knob.IsDeprecated)
                             {
                                 context.Warning(outputLine);
-                                context.Warning((knob as DeprecatedKnob).DeprecationInfo);
 
+                                string deprecationInfo = (knob as DeprecatedKnob).DeprecationInfo;
+                                if (!string.IsNullOrEmpty(deprecationInfo))
+                                {
+                                    context.Warning(deprecationInfo);
+                                }
                             }
                             else
                             {
