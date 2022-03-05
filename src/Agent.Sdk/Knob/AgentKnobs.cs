@@ -145,7 +145,7 @@ namespace Agent.Sdk.Knob
         public static readonly Knob UseLegacyHttpHandler = new DeprecatedKnob(
             nameof(UseLegacyHttpHandler),
             "Use the libcurl-based HTTP handler rather than .NET's native HTTP handler, as we did on .NET Core 2.1",
-            "The legacy http handler will go away when the agent migrates to .NET 6.0 (expected date: Apr - May), and we recommend you don't use it.",
+            "Legacy http handler will be removed in one of the next agent releases with migration to .Net Core 6. We are highly recommend to not use it.",
             new EnvironmentKnobSource(LegacyHttpVariableName),
             new BuiltInDefaultKnobSource("false"));
 
