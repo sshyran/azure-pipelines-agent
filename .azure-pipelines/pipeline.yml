@@ -51,8 +51,8 @@ resources:
   containers:
   - container: dotnetcore_arm
     image: azpagentinfra/arm:latest
-  - container: dotnetcore_centos6
-    image: azpagentinfra/centos6:latest
+  - container: centos7
+    image: agentdocker.azurecr.io/centos7:latest
 
 stages:
 
@@ -163,12 +163,12 @@ stages:
   - ${{ if parameters.rhel7_x64 }}:
     - template: build-jobs.yml
       parameters:
-        jobName: build_rhel6_x64
+        jobName: build_rhel7_x64
         displayName: RHEL7 (x64)
         pool:
           vmImage: ubuntu-18.04
-        container: dotnetcore_centos6
-        os: rhel.6
+        container: centos7
+        os: rhel.7
         arch: x64
         branch: ${{ parameters.branch }}
         componentDetection: false
