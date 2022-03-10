@@ -40,7 +40,7 @@ parameters:
 - name: linux_arm64
   type: boolean
   default: true
-- name: rhel6_x64
+- name: rhel7_x64
   type: boolean
   default: true
 - name: macOS_x64
@@ -160,7 +160,7 @@ stages:
         buildAlternatePackage: ${{ parameters.buildAlternatePackage }}
 
   # RHEL7 (x64)
-  - ${{ if parameters.rhel6_x64 }}:
+  - ${{ if parameters.rhel7_x64 }}:
     - template: build-jobs.yml
       parameters:
         jobName: build_rhel7_x64
