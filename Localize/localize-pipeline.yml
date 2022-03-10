@@ -100,14 +100,12 @@ stages:
     # Body of message is compiled as Office 365 connector card
     # More details about cards - https://docs.microsoft.com/en-us/microsoftteams/platform/task-modules-and-cards/cards/cards-reference#office-365-connector-card
     - powershell: .\send-notifications.ps1 -IsPRCreated $true -RepoName "Agent"
-      displayName: 'Send MS Teams notification about PR opened'
       env:
         TEAMS_WEBHOOK: $(MSTeamsUri)
       displayName: 'Send MS Teams notification about PR opened'
       condition: and(succeeded(), eq(variables['SHOULDCREATEPR'], 'True'), eq(variables['build.reason'], 'Schedule'))
 
     - powershell: .\send-notifications.ps1 -IsPRCreated $false -RepoName "Agent"
-      displayName: 'Send MS Teams notification about error'
       env:
         TEAMS_WEBHOOK: $(MSTeamsUri)
       displayName: 'Send MS Teams notification about error'
