@@ -40,6 +40,13 @@ namespace Agent.Sdk.Knob
             new EnvironmentKnobSource("AGENT_DOCKER_MTU_VALUE"),
             new BuiltInDefaultKnobSource(string.Empty));
 
+        public static readonly Knob DockerNetworkCreateDriver = new Knob(
+            nameof(DockerNetworkCreateDriver),
+            "Allow to specify which driver will be used when creating docker network",
+            new RuntimeKnobSource("agent.DockerNetworkCreateDriver"),
+            new EnvironmentKnobSource("AZP_AGENT_DOCKER_NETWORK_CREATE_DRIVER"),
+            new BuiltInDefaultKnobSource(string.Empty));
+
         // Directory structure
         public static readonly Knob AgentToolsDirectory = new Knob(
             nameof(AgentToolsDirectory),
@@ -138,6 +145,7 @@ namespace Agent.Sdk.Knob
         public static readonly Knob UseLegacyHttpHandler = new DeprecatedKnob(
             nameof(UseLegacyHttpHandler),
             "Use the libcurl-based HTTP handler rather than .NET's native HTTP handler, as we did on .NET Core 2.1",
+            "Legacy http handler will be removed in one of the next agent releases with migration to .Net Core 6. We are highly recommend to not use it.",
             new EnvironmentKnobSource(LegacyHttpVariableName),
             new BuiltInDefaultKnobSource("false"));
 
