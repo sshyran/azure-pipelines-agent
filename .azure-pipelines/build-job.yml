@@ -130,7 +130,7 @@ jobs:
     - ${{ if and(eq(parameters.os, 'win'), eq(parameters.arch, 'x86')) }}:
       - powershell: |
         .\Misc\dotnet-install.ps1 -Architecture x86 -Version 6.0.200
-    - script: ${{ variables.devCommand }} testl1 Debug ${{ parameters.os }}-${{ parameters.arch }}
+    - script: ${{ variables.devCommand }} testl1 Debug
       workingDirectory: src
       displayName: Functional tests
 
