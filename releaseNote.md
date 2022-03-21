@@ -1,3 +1,15 @@
+## Features
+ - Move notifications about Agent Localization PR from Slack to MS Teams - Part 2 (#3745)
+ - Update info about legacy http handler (#3775)
+
+## Bugs
+ - Fix null ref exception for in IsInjectedTaskForTarget method for TFS 2017 and earlier (#3762)
+ - Fix TEE download error when agent and work directory are located on different mounts (#3764)
+
+## Misc
+ - Migrate to Ubuntu X64 for ARM build (#3772)
+ - Update the `src/Misc/dotnet-install.sh` file (#3786)
+
 
 ## Agent Downloads
 
