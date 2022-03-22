@@ -115,8 +115,13 @@ namespace Microsoft.VisualStudio.Services.Agent
                     logRetentionDays = _defaultLogRetentionDays;
                 }
 
-                // this should give us _diag folder under agent root directory
+                // this should give us _diag folder under agent root directory as default value for diagLogDirctory
                 string diagLogDirectory = Path.Combine(new DirectoryInfo(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location)).Parent.FullName, Constants.Path.DiagDirectory);
+                string diagLogDirectoryEnv = Environment.GetEnvironmentVariable($"{hostType.ToUpperInvariant()}_DIAGLOGPATH");
+                if (!string.IsNullOrEmpty(diagLogDirectoryEnv))
+                {
+                    diagLogDirectory = Path.Combine(diagLogDirectoryEnv, Constants.Path.DiagDirectory);
+                }
                 _traceManager = new TraceManager(new HostTraceListener(diagLogDirectory, hostType, logPageSize, logRetentionDays), this.SecretMasker);
             }
             else
