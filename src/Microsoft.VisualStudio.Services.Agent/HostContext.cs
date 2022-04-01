@@ -73,6 +73,7 @@ namespace Microsoft.VisualStudio.Services.Agent
         private IDisposable _diagListenerSubscription;
         private StartupType _startupType;
         private string _perfFile;
+        private string _diagLogPath;
         public event EventHandler Unloading;
         public CancellationToken AgentShutdownToken => _agentShutdownTokenSource.Token;
         public ShutdownReason AgentShutdownReason { get; private set; }
@@ -116,13 +117,13 @@ namespace Microsoft.VisualStudio.Services.Agent
                 }
 
                 // this should give us _diag folder under agent root directory as default value for diagLogDirctory
-                string diagLogDirectory = Path.Combine(new DirectoryInfo(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location)).Parent.FullName, Constants.Path.DiagDirectory);
+                _diagLogPath = Path.Combine(new DirectoryInfo(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location)).Parent.FullName, Constants.Path.DiagDirectory);
                 string diagLogDirectoryEnv = Environment.GetEnvironmentVariable($"{hostType.ToUpperInvariant()}_DIAGLOGPATH");
                 if (!string.IsNullOrEmpty(diagLogDirectoryEnv))
                 {
-                    diagLogDirectory = Path.Combine(diagLogDirectoryEnv, Constants.Path.DiagDirectory);
+                    _diagLogPath = Path.Combine(diagLogDirectoryEnv, Constants.Path.DiagDirectory);
                 }
-                _traceManager = new TraceManager(new HostTraceListener(diagLogDirectory, hostType, logPageSize, logRetentionDays), this.SecretMasker);
+                _traceManager = new TraceManager(new HostTraceListener(_diagLogPath, hostType, logPageSize, logRetentionDays), this.SecretMasker);
             }
             else
             {
@@ -174,9 +175,7 @@ namespace Microsoft.VisualStudio.Services.Agent
                     break;
 
                 case WellKnownDirectory.Diag:
-                    path = Path.Combine(
-                        GetDirectory(WellKnownDirectory.Root),
-                        Constants.Path.DiagDirectory);
+                    path = _diagLogPath;
                     break;
 
                 case WellKnownDirectory.Externals:

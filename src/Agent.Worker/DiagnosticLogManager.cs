@@ -84,7 +84,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
 
             // Copy worker diag log files
             List<string> workerDiagLogFiles = GetWorkerDiagLogFiles(HostContext.GetDirectory(WellKnownDirectory.Diag), jobStartTimeUtc);
-            executionContext.Debug($"Copying {workerDiagLogFiles.Count()} worker diag logs.");
+            executionContext.Debug($"Copying {workerDiagLogFiles.Count()} from {HostContext.GetDirectory(WellKnownDirectory.Diag)} worker diag logs.");
 
             foreach (string workerLogFile in workerDiagLogFiles)
             {
@@ -95,7 +95,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             }
 
             // Copy agent diag log files
-            List<string> agentDiagLogFiles = GetAgentDiagLogFiles(HostContext.GetDirectory(WellKnownDirectory.Diag), jobStartTimeUtc);
+            List<string> agentDiagLogFiles = GetAgentDiagLogFiles(jobStartTimeUtc);
             executionContext.Debug($"Copying {agentDiagLogFiles.Count()} agent diag logs.");
 
             foreach (string agentLogFile in agentDiagLogFiles)
@@ -431,8 +431,18 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             return workerLogFiles;
         }
 
-        private List<string> GetAgentDiagLogFiles(string diagFolder, DateTime jobStartTimeUtc)
+        private List<string> GetAgentDiagLogFiles(DateTime jobStartTimeUtc)
         {
+            // Since this is the Worker context, we still want to fetch the Agent _diag folder.
+            // This might have been overriden by the envrionment variable.
+            // TODO: this is a hacky way to do it, maybe it should be a config value
+            var diagFolder = Environment.GetEnvironmentVariable($"AGENT_DIAGLOGPATH");
+            if (string.IsNullOrEmpty(diagFolder))
+            {
+                diagFolder = HostContext.GetDirectory(WellKnownDirectory.Root);
+            }
+            diagFolder = Path.Join(diagFolder, Constants.Path.DiagDirectory);
+
             // Get the newest agent log file that created just before the start of the job
             var agentLogFiles = new List<string>();
             var directoryInfo = new DirectoryInfo(diagFolder);
