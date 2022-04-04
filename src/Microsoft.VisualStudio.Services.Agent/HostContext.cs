@@ -127,6 +127,7 @@ namespace Microsoft.VisualStudio.Services.Agent
             }
             else
             {
+                _diagLogPath = Path.GetDirectoryName(logFile);
                 _traceManager = new TraceManager(new HostTraceListener(logFile), this.SecretMasker);
             }
 
