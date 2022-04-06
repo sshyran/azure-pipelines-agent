@@ -1,15 +1,7 @@
-## Features
- - Move notifications about Agent Localization PR from Slack to MS Teams - Part 2 (#3745)
- - Update info about legacy http handler (#3775)
+## Hotfix
 
-## Bugs
- - Fix null ref exception for in IsInjectedTaskForTarget method for TFS 2017 and earlier (#3762)
- - Fix TEE download error when agent and work directory are located on different mounts (#3764)
-
-## Misc
- - Migrate to Ubuntu X64 for ARM build (#3772)
- - Update the `src/Misc/dotnet-install.sh` file (#3786)
-
+- Fixed `debsums` package installing for Debian-based Linux systems([#3804](https://github.com/microsoft/azure-pipelines-agent/pull/3804))
+- Added `DumpJobEventLogs` agent knob to disable dumping event logs by default([#3803](https://github.com/microsoft/azure-pipelines-agent/pull/3803))
 
 ## Agent Downloads
 
@@ -76,7 +68,7 @@ C:\myagent> Add-Type -AssemblyName System.IO.Compression.FileSystem ; [System.IO
 
 ## Alternate Agent Downloads
 
-This following alternate packages do not include Node 6 and are only suitable for users who do not use Node 6 dependent tasks. 
+This following alternate packages do not include Node 6 and are only suitable for users who do not use Node 6 dependent tasks.
 See [notes](docs/node6.md) on Node version support for more details.
 
 |             | Package | SHA-256 |
