@@ -84,7 +84,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
 
             // Copy worker diag log files
             List<string> workerDiagLogFiles = GetWorkerDiagLogFiles(HostContext.GetDirectory(WellKnownDirectory.Diag), jobStartTimeUtc);
-            executionContext.Debug($"Copying {workerDiagLogFiles.Count()} from {HostContext.GetDirectory(WellKnownDirectory.Diag)} worker diag logs.");
+            executionContext.Debug($"Copying {workerDiagLogFiles.Count()} worker diag logs from {HostContext.GetDirectory(WellKnownDirectory.Diag)}.");
 
             foreach (string workerLogFile in workerDiagLogFiles)
             {
