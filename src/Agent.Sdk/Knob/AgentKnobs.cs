@@ -315,5 +315,12 @@ namespace Agent.Sdk.Knob
             new RuntimeKnobSource("TEE_PLUGIN_DOWNLOAD_RETRY_COUNT"),
             new EnvironmentKnobSource("TEE_PLUGIN_DOWNLOAD_RETRY_COUNT"),
             new BuiltInDefaultKnobSource("3"));
+
+        public static readonly Knob DumpPackagesVerificationResult = new Knob(
+            nameof(DumpPackagesVerificationResult),
+            "If true, dump packages verification results",
+            new RuntimeKnobSource("VSTSAGENT_DUMP_PACKAGES_VERIFICATION_RESULTS"),
+            new EnvironmentKnobSource("VSTSAGENT_DUMP_PACKAGES_VERIFICATION_RESULTS"),
+            new BuiltInDefaultKnobSource("false"));
     }
 }
