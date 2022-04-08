@@ -238,10 +238,24 @@ namespace Microsoft.VisualStudio.Services.Agent
             }
         }
 
+        private bool _proceedProcessWebConsoleLinesQueueAsync = false;
+
         private async Task ProcessWebConsoleLinesQueueAsync(bool runOnce = false)
         {
-            while (!_jobCompletionSource.Task.IsCompleted || runOnce)
+            _proceedProcessWebConsoleLinesQueueAsync = true;
+            int timeout = 1000;
+            var task = ProcessWebConsoleLinesQueueAsyncIteration(runOnce);
+            while ((!_jobCompletionSource.Task.IsCompleted || runOnce) && _proceedProcessWebConsoleLinesQueueAsync)
             {
+                if (await Task.WhenAny(task, Task.Delay(timeout)) != task)
+                {
+                    // timeout logic
+                }
+            }
+        }
+
+        private async Task ProcessWebConsoleLinesQueueAsyncIteration(bool runOnce)
+        {
                 if (_webConsoleLineAggressiveDequeue && ++_webConsoleLineAggressiveDequeueCount > _webConsoleLineAggressiveDequeueLimit)
                 {
                     Trace.Info("Stop aggressive process web console line queue.");
@@ -341,7 +355,7 @@ namespace Microsoft.VisualStudio.Services.Agent
 
                 if (runOnce)
                 {
-                    break;
+                    _proceedProcessWebConsoleLinesQueueAsync = false;
                 }
                 else
                 {
@@ -350,7 +364,6 @@ namespace Microsoft.VisualStudio.Services.Agent
                         Task.Delay(_webConsoleLineAggressiveDequeue ? _aggressiveDelayForWebConsoleLineDequeue : TimeSpan.FromMilliseconds(_webConsoleLineUpdateRate)),
                         _webConsoleLinesDequeueNow.Task);
                 }
-            }
         }
 
         public void UpdateWebConsoleLineRate(Int32 rateInMillis)
@@ -360,10 +373,24 @@ namespace Microsoft.VisualStudio.Services.Agent
             _webConsoleLinesDequeueNow?.SetResult(true);
         }
 
+        private bool _proceedProcessFilesUploadQueueAsync = false;
+
         private async Task ProcessFilesUploadQueueAsync(bool runOnce = false)
         {
-            while (!_jobCompletionSource.Task.IsCompleted || runOnce)
+            _proceedProcessFilesUploadQueueAsync = true;
+            int timeout = 1000;
+            var task = ProcessFilesUploadQueueAsyncIteration(runOnce);
+            while ((!_jobCompletionSource.Task.IsCompleted || runOnce) && _proceedProcessFilesUploadQueueAsync)
             {
+                if (await Task.WhenAny(task, Task.Delay(timeout)) != task)
+                {
+                    // timeout logic
+                }
+            }
+        }
+
+        private async Task ProcessFilesUploadQueueAsyncIteration(bool runOnce)
+        {
                 List<UploadFileInfo> filesToUpload = new List<UploadFileInfo>();
                 UploadFileInfo dequeueFile;
                 while (_fileUploadQueue.TryDequeue(out dequeueFile))
@@ -411,19 +438,32 @@ namespace Microsoft.VisualStudio.Services.Agent
 
                 if (runOnce)
                 {
-                    break;
+                    _proceedProcessFilesUploadQueueAsync = false;
                 }
                 else
                 {
                     await Task.Delay(_delayForFileUploadDequeue);
                 }
-            }
         }
+
+        private bool _proceedProcessTimelinesUpdateQueueAsync = false;
 
         private async Task ProcessTimelinesUpdateQueueAsync(bool runOnce = false)
         {
-            while (!_jobCompletionSource.Task.IsCompleted || runOnce)
+            _proceedProcessTimelinesUpdateQueueAsync = true;
+            int timeout = 1000;
+            var task = ProcessTimelinesUpdateQueueAsyncIteration(runOnce);
+            while ((!_jobCompletionSource.Task.IsCompleted || runOnce) && _proceedProcessTimelinesUpdateQueueAsync)
             {
+                if (await Task.WhenAny(task, Task.Delay(timeout)) != task)
+                {
+                    // timeout logic
+                }
+            }
+        }
+
+        private async Task ProcessTimelinesUpdateQueueAsyncIteration(bool runOnce)
+        {
                 List<PendingTimelineRecord> pendingUpdates = new List<PendingTimelineRecord>();
                 foreach (var timeline in _allTimelines)
                 {
@@ -513,11 +553,7 @@ namespace Microsoft.VisualStudio.Services.Agent
                     // continue process timeline records update,
                     // we might have more records need update,
                     // since we just create a new sub-timeline
-                    if (pendingSubtimelineUpdate)
-                    {
-                        continue;
-                    }
-                    else
+                    if (!pendingSubtimelineUpdate)
                     {
                         if (mainTimelineRecordsUpdateErrors.Count > 0 &&
                             _bufferedRetryRecords.ContainsKey(_jobTimelineId) &&
@@ -529,7 +565,7 @@ namespace Microsoft.VisualStudio.Services.Agent
                         }
                         else
                         {
-                            break;
+                            _proceedProcessTimelinesUpdateQueueAsync = false;
                         }
                     }
                 }
@@ -537,7 +573,6 @@ namespace Microsoft.VisualStudio.Services.Agent
                 {
                     await Task.Delay(_delayForTimelineUpdateDequeue);
                 }
-            }
         }
 
         private List<TimelineRecord> MergeTimelineRecords(List<TimelineRecord> timelineRecords)
