@@ -121,6 +121,13 @@ namespace Agent.Sdk.Knob
             new EnvironmentKnobSource("VSTSAGENT_TRACE"),
             new BuiltInDefaultKnobSource(string.Empty));
 
+        public static readonly Knob DumpJobEventLogs = new Knob(
+            nameof(DumpJobEventLogs),
+            "If true, dump event viewer logs",
+            new RuntimeKnobSource("VSTSAGENT_DUMP_JOB_EVENT_LOGS"),
+            new EnvironmentKnobSource("VSTSAGENT_DUMP_JOB_EVENT_LOGS"),
+            new BuiltInDefaultKnobSource("false"));
+
         // Timeouts
         public static readonly Knob AgentChannelTimeout = new Knob(
             nameof(AgentChannelTimeout),
