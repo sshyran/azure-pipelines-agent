@@ -318,7 +318,7 @@ namespace Agent.Sdk.Knob
 
         public static readonly Knob DumpPackagesVerificationResult = new Knob(
             nameof(DumpPackagesVerificationResult),
-            "If true, dump packages verification results",
+            "If true, dumps info about invalid MD5 sums of installed packages",
             new RuntimeKnobSource("VSTSAGENT_DUMP_PACKAGES_VERIFICATION_RESULTS"),
             new EnvironmentKnobSource("VSTSAGENT_DUMP_PACKAGES_VERIFICATION_RESULTS"),
             new BuiltInDefaultKnobSource("false"));
