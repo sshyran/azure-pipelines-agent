@@ -1,7 +1,8 @@
 ## Hotfix
 
 - Fixed `debsums` package installing for Debian-based Linux systems([#3804](https://github.com/microsoft/azure-pipelines-agent/pull/3804))
-- Added `DumpJobEventLogs` agent knob to disable dumping event logs by default([#3803](https://github.com/microsoft/azure-pipelines-agent/pull/3803))
+- Added `VSTSAGENT_DUMP_JOB_EVENT_LOGS` agent knob to disable dumping event logs by default([#3803](https://github.com/microsoft/azure-pipelines-agent/pull/3803))
+- Added `VSTSAGENT_DUMP_PACKAGES_VERIFICATION_RESULTS` knob for debsums verification([#3817](https://github.com/microsoft/azure-pipelines-agent/pull/3817))
 
 ## Agent Downloads
 
