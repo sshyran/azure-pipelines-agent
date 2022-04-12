@@ -1,5 +1,11 @@
 const { spawn } = require('child_process');
 var stdinString = "";
+
+const getActiveHandlersAndRequests = () => {
+    console.log("##vso[task.debug]Active Handlers: " + JSON.stringify(process._getActiveHandles()));
+    console.log("##vso[task.debug]Active Requests: " + JSON.stringify(process._getActiveRequests()));
+}
+
 process.stdin.on('data', function (chunk) {
     stdinString += chunk;
 });
@@ -55,23 +61,32 @@ process.stdin.on('end', function () {
     process.env['TF_BUILD'] = 'True';
     console.log("##vso[task.debug]Handler Setup Complete");
     var launch = spawn(handler, [handlerArg], options);
+    const intervalID = setInterval(getActiveHandlersAndRequests, 10000);
     launch.on('exit', function (code) {
+        getActiveHandlersAndRequests();
+        clearInterval(intervalID);
         console.log("##vso[task.debug]Handler exit code: " + code);
         if (code != 0) {
             process.exit(code);
         }
     });
     launch.on('close', function (code) {
+        getActiveHandlersAndRequests();
+        clearInterval(intervalID);
         console.log("##vso[task.debug]Handler has closed all stdio with code: " + code);
         if (code != 0) {
             process.exit(code);
         }
     });
     launch.on('disconnect', function () {
+        getActiveHandlersAndRequests();
+        clearInterval(intervalID);
         console.log("##vso[task.warning]Handler has been disconnected");
         process.exit(0);
     });
     launch.on('error', function (err) {
+        getActiveHandlersAndRequests();
+        clearInterval(intervalID);
         console.log("##vso[task.warning]Error from handler: " + err);
         process.exit(1);
     });
