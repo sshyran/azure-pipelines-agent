@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using Agent.Sdk;
+using Agent.Sdk.Knob;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -163,7 +164,12 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Handlers
             string tempDir = Path.Combine(HostContext.GetDirectory(WellKnownDirectory.Work), Constants.Path.TempDirectory);
             string targetEntryScript = Path.Combine(tempDir, "containerHandlerInvoker.js");
             HostContext.GetTrace(nameof(ContainerStepHost)).Info($"Copying containerHandlerInvoker.js to {tempDir}");
-            File.Copy(Path.Combine(HostContext.GetDirectory(WellKnownDirectory.Bin), "containerHandlerInvoker.js.template"), targetEntryScript, true);
+            string containerHandlerInvokerTemplate = "containerHandlerInvoker.js.template";
+            if (AgentKnobs.EnableEventHandlers.GetValue(HostContext).AsBoolean())
+            {
+                containerHandlerInvokerTemplate = Path.Combine("eventHandlersTemplate", containerHandlerInvokerTemplate);
+            }
+            File.Copy(Path.Combine(HostContext.GetDirectory(WellKnownDirectory.Bin), containerHandlerInvokerTemplate), targetEntryScript, true);
 
             string node;
             if (!string.IsNullOrEmpty(Container.CustomNodePath))

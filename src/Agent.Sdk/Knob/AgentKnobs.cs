@@ -47,6 +47,13 @@ namespace Agent.Sdk.Knob
             new EnvironmentKnobSource("AZP_AGENT_DOCKER_NETWORK_CREATE_DRIVER"),
             new BuiltInDefaultKnobSource(string.Empty));
 
+        public static readonly Knob EnableEventHandlers = new Knob(
+            nameof(EnableEventHandlers),
+            "If true, event handlers are enabled in the 'containerHandlerInvoker.js' script",
+            new RuntimeKnobSource("agent.enableEventHandlers"),
+            new EnvironmentKnobSource("AZP_AGENT_ENABLE_EVENT_HANDLERS"),
+            new BuiltInDefaultKnobSource("false"));
+
         // Directory structure
         public static readonly Knob AgentToolsDirectory = new Knob(
             nameof(AgentToolsDirectory),
