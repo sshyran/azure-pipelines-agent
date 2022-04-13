@@ -1,9 +1,25 @@
 const { spawn } = require('child_process');
 var stdinString = "";
 
-const getActiveHandlersAndRequests = () => {
-    console.log("##vso[task.debug]Active Handlers: " + JSON.stringify(process._getActiveHandles()));
-    console.log("##vso[task.debug]Active Requests: " + JSON.stringify(process._getActiveRequests()));
+function getReplacer (censor) {
+    let i = 0;
+    return function (key, value) {
+        if (i !== 0 && typeof(censor) === 'object' && typeof(value) == 'object' && censor == value) {
+            return '[Circular]';
+        }
+        if (i > 30) {
+            return '[Unknown]';
+        }
+        i++;
+        return value;
+    }
+}
+
+function getActiveHandlesAndRequests () {
+    const activeHandles = process._getActiveHandles();
+    const activeRequests = process._getActiveRequests();
+    console.log("##vso[task.debug] >>> >>> >>> Active Handles: " + JSON.stringify(activeHandles, getReplacer(activeHandles)));
+    console.log("##vso[task.debug] >>> >>> >>> Active Requests: " + JSON.stringify(activeRequests, getReplacer(activeRequests)));
 }
 
 process.stdin.on('data', function (chunk) {
@@ -61,39 +77,41 @@ process.stdin.on('end', function () {
     process.env['TF_BUILD'] = 'True';
     console.log("##vso[task.debug]Handler Setup Complete");
     var launch = spawn(handler, [handlerArg], options);
-    const intervalID = setInterval(getActiveHandlersAndRequests, 10000);
+    const intervalID = setInterval(getActiveHandlesAndRequests, 10000);
     launch.on('exit', function (code) {
-        getActiveHandlersAndRequests();
+        getActiveHandlesAndRequests();
         clearInterval(intervalID);
-        console.log("##vso[task.debug]Handler exit code: " + code);
+        console.log("##vso[task.debug] >>> >>> >>> Handler exit code: " + code);
         if (code != 0) {
             process.exit(code);
         }
     });
     launch.on('close', function (code) {
-        getActiveHandlersAndRequests();
+        getActiveHandlesAndRequests();
         clearInterval(intervalID);
-        console.log("##vso[task.debug]Handler has closed all stdio with code: " + code);
+        console.log("##vso[task.debug] >>> >>> >>> Handler has closed all stdio with code: " + code);
         if (code != 0) {
             process.exit(code);
         }
     });
     launch.on('disconnect', function () {
-        getActiveHandlersAndRequests();
+        getActiveHandlesAndRequests();
         clearInterval(intervalID);
-        console.log("##vso[task.warning]Handler has been disconnected");
+        console.log("##vso[task.warning] >>> >>> >>> Handler has been disconnected");
         process.exit(0);
     });
     launch.on('error', function (err) {
-        getActiveHandlersAndRequests();
+        getActiveHandlesAndRequests();
         clearInterval(intervalID);
-        console.log("##vso[task.warning]Error from handler: " + err);
+        console.log("##vso[task.warning] >>> >>> >>> Error from handler: " + err);
         process.exit(1);
     });
     launch.on('message', function (message) {
-        console.log("##vso[task.debug]Message from handler: " + JSON.stringify(message));
+        getActiveHandlesAndRequests();
+        console.log("##vso[task.debug] >>> >>> >>> Message from handler: " + JSON.stringify(message, getReplacer(message)));
     });
     launch.on('spawn', function () {
-        console.log("##vso[task.debug]Handler has spawned successfully");
+        getActiveHandlesAndRequests();
+        console.log("##vso[task.debug] >>> >>> >>> Handler has spawned successfully");
     });
 });
