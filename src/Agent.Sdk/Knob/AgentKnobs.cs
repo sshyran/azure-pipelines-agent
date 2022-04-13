@@ -50,7 +50,6 @@ namespace Agent.Sdk.Knob
         public static readonly Knob EnableEventHandlers = new Knob(
             nameof(EnableEventHandlers),
             "If true, event handlers are enabled in the 'containerHandlerInvoker.js' script",
-            new RuntimeKnobSource("agent.enableEventHandlers"),
             new EnvironmentKnobSource("AZP_AGENT_ENABLE_EVENT_HANDLERS"),
             new BuiltInDefaultKnobSource("false"));
 
