@@ -162,14 +162,22 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Handlers
             //    We use this intermediate script to read everything from STDIN, then launch the task execution engine (node/powershell) and redirect STDOUT/STDERR
 
             string tempDir = Path.Combine(HostContext.GetDirectory(WellKnownDirectory.Work), Constants.Path.TempDirectory);
-            string targetEntryScript = Path.Combine(tempDir, "containerHandlerInvoker.js");
-            HostContext.GetTrace(nameof(ContainerStepHost)).Info($"Copying containerHandlerInvoker.js to {tempDir}");
-            string containerHandlerInvokerTemplate = "containerHandlerInvoker.js.template";
+            string dotTemplate = ".template";
+            string debugNode = "debug-node";
+            string whyIsNodeRunninng = "why-is-node-running.js";
+            string whyIsNodeRunninngTarget = Path.Combine(tempDir, whyIsNodeRunninng);
+            string whyIsNodeRunninngTemplate = Path.Combine(debugNode, whyIsNodeRunninng) + dotTemplate;
+            string containerHandlerInvoker = "containerHandlerInvoker.js";
+            string containerHandlerInvokerTarget = Path.Combine(tempDir, containerHandlerInvoker);
+            string containerHandlerInvokerTemplate = containerHandlerInvoker + dotTemplate;
             if (AgentKnobs.EnableEventHandlers.GetValue(HostContext).AsBoolean())
             {
-                containerHandlerInvokerTemplate = Path.Combine("eventHandlersTemplate", containerHandlerInvokerTemplate);
+                containerHandlerInvokerTemplate = Path.Combine(debugNode, containerHandlerInvokerTemplate);
+                HostContext.GetTrace(nameof(ContainerStepHost)).Info($"Copying {whyIsNodeRunninngTemplate} to {tempDir}");
+                File.Copy(Path.Combine(HostContext.GetDirectory(WellKnownDirectory.Bin), whyIsNodeRunninngTemplate), whyIsNodeRunninngTarget, true);
             }
-            File.Copy(Path.Combine(HostContext.GetDirectory(WellKnownDirectory.Bin), containerHandlerInvokerTemplate), targetEntryScript, true);
+            HostContext.GetTrace(nameof(ContainerStepHost)).Info($"Copying {containerHandlerInvokerTemplate} to {tempDir}");
+            File.Copy(Path.Combine(HostContext.GetDirectory(WellKnownDirectory.Bin), containerHandlerInvokerTemplate), containerHandlerInvokerTarget, true);
 
             string node;
             if (!string.IsNullOrEmpty(Container.CustomNodePath))

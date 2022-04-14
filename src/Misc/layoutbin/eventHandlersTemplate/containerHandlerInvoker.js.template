@@ -1,26 +1,7 @@
 const { spawn } = require('child_process');
+const wtfnode = require('./why-node-is-running');
+
 var stdinString = "";
-
-function getReplacer (censor) {
-    let i = 0;
-    return function (key, value) {
-        if (i !== 0 && typeof(censor) === 'object' && typeof(value) == 'object' && censor == value) {
-            return '[Circular]';
-        }
-        if (i > 30) {
-            return '[Unknown]';
-        }
-        i++;
-        return value;
-    }
-}
-
-function getActiveHandlesAndRequests () {
-    const activeHandles = process._getActiveHandles();
-    const activeRequests = process._getActiveRequests();
-    console.log("##vso[task.debug] >>> >>> >>> Active Handles: " + JSON.stringify(activeHandles, getReplacer(activeHandles)));
-    console.log("##vso[task.debug] >>> >>> >>> Active Requests: " + JSON.stringify(activeRequests, getReplacer(activeRequests)));
-}
 
 process.stdin.on('data', function (chunk) {
     stdinString += chunk;
@@ -77,9 +58,9 @@ process.stdin.on('end', function () {
     process.env['TF_BUILD'] = 'True';
     console.log("##vso[task.debug]Handler Setup Complete");
     var launch = spawn(handler, [handlerArg], options);
-    const intervalID = setInterval(getActiveHandlesAndRequests, 10000);
+    const intervalID = setInterval(wtfnode.dump, 10000);
     launch.on('exit', function (code) {
-        getActiveHandlesAndRequests();
+        wtfnode.dump();
         clearInterval(intervalID);
         console.log("##vso[task.debug] >>> >>> >>> Handler exit code: " + code);
         if (code != 0) {
@@ -87,7 +68,7 @@ process.stdin.on('end', function () {
         }
     });
     launch.on('close', function (code) {
-        getActiveHandlesAndRequests();
+        wtfnode.dump();
         clearInterval(intervalID);
         console.log("##vso[task.debug] >>> >>> >>> Handler has closed all stdio with code: " + code);
         if (code != 0) {
@@ -95,23 +76,23 @@ process.stdin.on('end', function () {
         }
     });
     launch.on('disconnect', function () {
-        getActiveHandlesAndRequests();
+        wtfnode.dump();
         clearInterval(intervalID);
         console.log("##vso[task.warning] >>> >>> >>> Handler has been disconnected");
         process.exit(0);
     });
     launch.on('error', function (err) {
-        getActiveHandlesAndRequests();
+        wtfnode.dump();
         clearInterval(intervalID);
         console.log("##vso[task.warning] >>> >>> >>> Error from handler: " + err);
         process.exit(1);
     });
     launch.on('message', function (message) {
-        getActiveHandlesAndRequests();
+        wtfnode.dump();
         console.log("##vso[task.debug] >>> >>> >>> Message from handler: " + JSON.stringify(message, getReplacer(message)));
     });
     launch.on('spawn', function () {
-        getActiveHandlesAndRequests();
+        wtfnode.dump();
         console.log("##vso[task.debug] >>> >>> >>> Handler has spawned successfully");
     });
 });
