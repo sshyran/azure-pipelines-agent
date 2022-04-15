@@ -1,5 +1,5 @@
 const { spawn } = require('child_process');
-const wtfnode = require('./why-node-is-running');
+const wtfnode = require('./why-is-node-running');
 
 var stdinString = "";
 
