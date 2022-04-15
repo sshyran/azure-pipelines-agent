@@ -173,7 +173,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Handlers
             string containerHandlerInvokerSource = containerHandlerInvoker + dotTemplate;
             string containerHandlerInvokerTarget = Path.Combine(tempDir, containerHandlerInvoker);
 
-            if (AgentKnobs.EnableEventHandlers.GetValue(HostContext).AsBoolean())
+            if (environment["debugNode"] == "true")
             {
                 containerHandlerInvokerSource = Path.Combine(debugNode, containerHandlerInvokerSource);
                 HostContext.GetTrace(nameof(ContainerStepHost)).Info($"Copying {whyIsNodeRunninng} to {tempDir}");
