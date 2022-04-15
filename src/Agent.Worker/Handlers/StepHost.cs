@@ -189,7 +189,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Handlers
                 node = Container.TranslateToContainerPath(Path.Combine(HostContext.GetDirectory(WellKnownDirectory.Externals), "node", "bin", $"node{IOUtil.ExeExtension}"));
             }
 
-            string entryScript = Container.TranslateContainerPathForImageOS(PlatformUtil.HostOS, Container.TranslateToContainerPath(targetEntryScript));
+            string entryScript = Container.TranslateContainerPathForImageOS(PlatformUtil.HostOS, Container.TranslateToContainerPath(containerHandlerInvokerTarget));
 
             string userArgs = "";
             string workingDirectoryParam = "";
