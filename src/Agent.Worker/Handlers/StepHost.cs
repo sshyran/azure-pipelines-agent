@@ -165,7 +165,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Handlers
             string debugNode = "debug-node";
 
             string whyIsNodeRunninng = "why-is-node-running.js";
-            string whyIsNodeRunninngSource = Path.Combine(debugNode, whyIsNodeRunninng);
+            string whyIsNodeRunninngSource = Path.Combine(debugNode, whyIsNodeRunninng) + dotTemplate;
             string whyIsNodeRunninngTarget = Path.Combine(tempDir, whyIsNodeRunninng);
 
             string containerHandlerInvoker = "containerHandlerInvoker.js";
