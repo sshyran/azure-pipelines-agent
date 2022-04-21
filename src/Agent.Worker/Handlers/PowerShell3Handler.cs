@@ -64,6 +64,9 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Handlers
             StepHost.OutputDataReceived += OnDataReceived;
             StepHost.ErrorDataReceived += OnDataReceived;
 
+            // It is used only for NodeHandler.
+            Environment["debugNode"] = "false";
+
             // Execute the process. Exit code 0 should always be returned.
             // A non-zero exit code indicates infrastructural failure.
             // Task failure should be communicated over STDOUT using ## commands.
