@@ -100,6 +100,10 @@ jobs:
     - template: switch-branch.yml
       parameters:
         branch: ${{ parameters.branch }}
+        
+  - task: npmAuthenticate@0
+    inputs:
+      workingFile: .npmrc
 
   # 1ES images used on the ARM pool doesn't contain unzip tool, so we need to install it before starting the build
   - ${{ if eq(parameters.arch, 'arm64') }}:
