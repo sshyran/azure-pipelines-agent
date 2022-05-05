@@ -1,3 +1,13 @@
+## Features
+
+
+## Bugs
+ - Updated azure-devops-node-api npm package to fix prototype pollution vulnerability (#3823)
+ - Fix package-lock (#3826)
+
+## Misc
+
+
 
 ## Agent Downloads
 
