@@ -281,11 +281,14 @@ namespace Microsoft.VisualStudio.Services.Agent
 
         private string GetDiagOrDefault(string diagFolder)
         {
-            if (string.IsNullOrEmpty(diagFolder))
+            if (!string.IsNullOrEmpty(diagFolder))
             {
-                diagFolder = new DirectoryInfo(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location)).Parent.FullName;
-            } 
-            return Path.Combine(diagFolder, Constants.Path.DiagDirectory);
+                return diagFolder;
+            }
+           
+            return Path.Combine(
+                new DirectoryInfo(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location)).Parent.FullName,
+                Constants.Path.DiagDirectory);          
         }
 
         public string GetConfigFile(WellKnownConfigFile configFile)
