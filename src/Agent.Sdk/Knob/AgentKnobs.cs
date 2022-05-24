@@ -144,7 +144,7 @@ namespace Agent.Sdk.Knob
 
         public static readonly Knob WorkerDiagLogPath = new Knob(
             nameof(WorkerDiagLogPath),
-            "If set to anything, the _diag folder containing the agent diag log will be created here.",
+            "If set to anything, the folder containing the agent worker diag log will be created here.",
             new EnvironmentKnobSource("WORKER_DIAGLOGPATH"),
             new BuiltInDefaultKnobSource(string.Empty));
 
