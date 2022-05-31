@@ -173,6 +173,7 @@ $sqlPackageInfo += (Get-MaxInfoFromSqlServerDtaf)
 $sqlPackageInfo += (Get-MaxInfoFromVisualStudio)
 $sqlPackageInfo += (Get-MaxInfoFromVisualStudioByVersion -VersionNumber 15)
 $sqlPackageInfo += (Get-MaxInfoFromVisualStudioByVersion -VersionNumber 16)
+$sqlPackageInfo += (Get-MaxInfoFromVisualStudioByVersion -VersionNumber 17)
 $sqlPackageInfo |
     Sort-Object -Property Version -Descending |
     Select -First 1 |
