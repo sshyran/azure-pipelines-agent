@@ -197,8 +197,9 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
                 // Base on Kusto, the longest we have on the service today is over 850 seconds.
                 // Timeout limit can be overwrite by environment variable
                 var timeoutSeconds = AgentKnobs.TaskDownloadTimeout.GetValue(UtilKnobValueContext.Instance()).AsInt();
+                int retryLimit = 3;
 
-                while (retryCount < 3)
+                while (true)
                 {
                     using (var taskDownloadTimeout = new CancellationTokenSource(TimeSpan.FromSeconds(timeoutSeconds)))
                     using (var taskDownloadCancellation = CancellationTokenSource.CreateLinkedTokenSource(taskDownloadTimeout.Token, executionContext.CancellationToken))
@@ -223,7 +224,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
                             Trace.Info($"Task download has been cancelled.");
                             throw;
                         }
-                        catch (Exception ex) when (retryCount < 2)
+                        catch (Exception ex)
                         {
                             retryCount++;
                             Trace.Error($"Fail to download task '{task.Id} ({task.Name}/{task.Version})' -- Attempt: {retryCount}");
@@ -236,9 +237,15 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
                             else
                             {
                                 executionContext.Warning(StringUtil.Loc("TaskDownloadFailed", task.Name, ex.Message));
-                                if (ex.InnerException != null) {
-                                    executionContext.Warning("Inner Exception: {ex.InnerException.Message}");
+                                if (ex.InnerException != null)
+                                {
+                                    executionContext.Warning($"Inner Exception: {ex.InnerException.Message}");
                                 }
+                            }
+
+                            if (retryCount == retryLimit)
+                            {
+                                throw ex;
                             }
                         }
                     }
