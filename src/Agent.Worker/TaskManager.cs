@@ -245,7 +245,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
 
                             if (retryCount == retryLimit)
                             {
-                                throw ex;
+                                throw;
                             }
                         }
                     }
